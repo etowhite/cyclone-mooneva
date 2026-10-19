@@ -2,9 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppSettings, DailyLog, FirstDayOfWeek, INITIAL_SYMPTOMS } from '../types';
 import { toLocalISOString } from '../utils/dateUtils';
+import { formatNumber, useDisplayFormat } from '../services/displayFormat';
 import { requestNotificationPermission } from '../services/notifications';
 import { FIRST_DAY_OPTIONS, resolveFirstDayOfWeek } from '../utils/weekStart';
 import CycleSetupStep, { CycleSetupValues } from './onboarding/CycleSetupStep';
+import { settingBounds } from '../services/logic/cycle';
 import { applySettingsInterlocks } from '../services/logic/settingsInterlocks';
 
 interface OnboardingWizardProps {
@@ -13,6 +15,7 @@ interface OnboardingWizardProps {
 
 const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
   const { t, i18n } = useTranslation();
+  const fmt = useDisplayFormat();
   const [step, setStep] = useState(0);
 
   // --- Form State ---
@@ -326,14 +329,15 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
                 {dates.map((date) => {
                   const dateStr = toLocalISOString(date);
                   const isSelected = lastPeriodDate === dateStr;
+                  const parts = fmt.calendarParts(date);
                   return (
                     <button
                       key={dateStr}
                       onClick={() => setLastPeriodDate(dateStr)}
                       className={`flex flex-col items-center justify-center min-w-[60px] h-[70px] rounded-xl transition-all flex-shrink-0 ${isSelected ? 'bg-[#7598a0] text-white shadow-md' : 'text-slate-500 hover:bg-white/50'}`}
                     >
-                      <span className="text-[10px] font-bold uppercase">{date.toLocaleDateString(i18n.language, { month: 'short' })}</span>
-                      <span className="text-xl font-black">{date.getDate()}</span>
+                      <span className="text-[10px] font-bold uppercase">{fmt.monthName(parts.year, parts.month)}</span>
+                      <span className="text-xl font-black">{formatNumber(parts.day)}</span>
                     </button>
                   );
                 })}
@@ -388,7 +392,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
               >-</button>
               <span className="text-2xl font-black text-slate-700">{cycleSetup.periodLength} <span className="text-sm font-bold text-slate-400">{t('common.days')}</span></span>
               <button
-                onClick={() => setCycleSetup(s => ({ ...s, periodLength: Math.min(10, s.periodLength + 1) }))}
+                onClick={() => setCycleSetup(s => ({ ...s, periodLength: Math.min(settingBounds(s).period.max, s.periodLength + 1) }))}
                 className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-500 text-xl font-bold bg-[#F0F2F5] active:scale-95 transition-all"
                 style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
               >+</button>

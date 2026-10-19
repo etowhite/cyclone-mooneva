@@ -50,6 +50,8 @@ All primitives come from the WebCrypto API (`crypto.subtle`) provided by the pla
 
 The device secret is not derived from anything the user knows; it exists only in the platform keystore. Cycle records and daily logs are stored encrypted; nothing is transmitted anywhere.
 
+The optional Lab tab keeps its entries in one more encrypted key, `mooneva_lab_enc`, written with the same AES-256-GCM and the same device key as the data above, and it is part of a backup only when that key exists.
+
 ### The automatic-backup password
 
 Separate from the device secret above, and stored separately.

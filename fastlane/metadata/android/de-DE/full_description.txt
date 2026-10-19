@@ -17,7 +17,7 @@ Die meisten Perioden-Apps laden deine Zyklusdaten auf Firmenserver hoch, wo sie 
 <li>Diskret-Modus – tarnt die App als Aufgabenliste, inklusive Icon und Name</li>
 <li>PIN-Sperre mit einstellbarem Timeout</li>
 <li>Verschlüsseltes Backup und Wiederherstellung</li>
-<li>Import deines Verlaufs aus drip, Flo und Clue</li>
+<li>Import deines Verlaufs aus drip, Flo, Clue und SimpleInnovation</li>
 <li>Persischer (Jalaali-)Kalender und vollständige Rechts-nach-links-Unterstützung</li>
 <li>Einstellbarer erster Wochentag</li>
 <li>Dunkles Design</li>

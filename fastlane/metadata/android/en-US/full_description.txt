@@ -17,7 +17,7 @@ Most period tracking apps upload your cycle data to company servers, where it ca
 <li>Discrete mode — disguises the app as a task list, icon and name included</li>
 <li>PIN lock with configurable timeout</li>
 <li>Encrypted backup and restore</li>
-<li>Import your history from drip, Flo and Clue</li>
+<li>Import your history from drip, Flo, Clue and SimpleInnovation</li>
 <li>Persian (Jalaali) calendar and full right-to-left support</li>
 <li>Configurable first day of week</li>
 <li>Dark theme</li>

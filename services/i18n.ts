@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import type { BackendModule, ReadCallback } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { formatNumber } from './displayFormat';
 
 // --- Translation Resources ---
 // English is bundled so there is always a working fallback on first paint.
@@ -47,14 +48,10 @@ export const i18nReady = i18n
         fallbackLng: 'en',
         interpolation: {
             escapeValue: false, // react already safes from xss
-            format: (value, format, lng) => {
-                if (typeof value === 'number' || (!isNaN(value) && !isNaN(parseFloat(value)))) {
-                    // Eastern Arabic numerals for Arabic and Persian
-                    const locales = lng === 'ar' ? 'ar-u-nu-arab' : lng === 'fa' ? 'fa-u-nu-arab' : lng;
-                    return new Intl.NumberFormat(locales).format(value);
-                }
-                return value;
-            }
+            // alwaysFormat sends every {{value}} here, not only ones with a format name.
+            // Numbers get the app's digits; strings (already formatted) pass through.
+            alwaysFormat: true,
+            format: (value, _format, lng) => (typeof value === 'number' ? formatNumber(value, lng) : value),
         },
         detection: {
             order: ['querystring', 'cookie', 'localStorage', 'navigator', 'htmlTag'],
@@ -81,13 +78,5 @@ if (i18n.isInitialized) {
         applyLocaleSettings(i18n.language);
     });
 }
-
-// Utility to format numbers outside of translations
-export const formatNumber = (val: number | string) => {
-    const lng = i18n.language;
-    const locales = lng === 'ar' ? 'ar-u-nu-arab' : lng === 'fa' ? 'fa-u-nu-arab' : lng;
-    return new Intl.NumberFormat(locales).format(Number(val));
-};
-
 
 export default i18n;

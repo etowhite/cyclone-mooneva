@@ -1,11 +1,12 @@
 import React from 'react';
 
 // 1. Neumorphic Toggle
-export const Toggle = ({ active, onClick, disabled, small = false }: { active: boolean; onClick: () => void; disabled?: boolean; small?: boolean }) => (
+export const Toggle = ({ active, onClick, disabled, small = false, label }: { active: boolean; onClick: () => void; disabled?: boolean; small?: boolean; label?: string }) => (
     <button
         type="button"
         role="switch"
         aria-checked={active}
+        aria-label={label}
         onClick={disabled ? undefined : onClick}
         disabled={disabled}
         className={`${small ? 'w-10 h-6' : 'w-14 h-8'} rounded-full relative transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7598a0] focus-visible:ring-offset-2 ${active ? 'bg-[#7598a0]' : 'bg-[#E8EAED]'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -25,9 +26,9 @@ export const Toggle = ({ active, onClick, disabled, small = false }: { active: b
     </button>
 );
 
-// 2. Neumorphic Card (title omitted from UI per design)
+// 2. Neumorphic Card. The title is not shown; it names the group for screen readers.
 export const SettingCard = ({ children, title }: { children: React.ReactNode, title?: string }) => (
-    <div className="space-y-3">
+    <div className="space-y-3" role="group" aria-label={title}>
         <div
             className="bg-[#F0F2F5] rounded-[24px] overflow-hidden"
             style={{ boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)' }}
@@ -38,11 +39,13 @@ export const SettingCard = ({ children, title }: { children: React.ReactNode, ti
 );
 
 // 3. Neumorphic Row
-export const SettingRow = ({ label, desc, icon, children, last, mergeWithNext, onClick, tooltip, rightElement }: { label: string, desc?: React.ReactNode, icon?: React.ReactNode, children?: React.ReactNode, last?: boolean, mergeWithNext?: boolean, onClick?: () => void, tooltip?: string, rightElement?: React.ReactNode }) => (
-    <div
-        onClick={onClick}
+export const SettingRow = ({ label, desc, icon, children, last, mergeWithNext, onClick, tooltip, rightElement }: { label: string, desc?: React.ReactNode, icon?: React.ReactNode, children?: React.ReactNode, last?: boolean, mergeWithNext?: boolean, onClick?: () => void, tooltip?: string, rightElement?: React.ReactNode }) => {
+    const Root = onClick ? 'button' : 'div';
+    return (
+    <Root
+        {...(onClick ? { type: 'button' as const, onClick } : {})}
         title={tooltip}
-        className={`py-3 px-4 ${!last ? 'border-b border-slate-200/50' : ''} ${mergeWithNext ? 'setting-row-merge-next' : ''} ${onClick ? 'cursor-pointer active:bg-slate-100/50 transition-colors' : ''}`}
+        className={`py-3 px-4 ${!last ? 'border-b border-slate-200/50' : ''} ${mergeWithNext ? 'setting-row-merge-next' : ''} ${onClick ? 'block w-full text-start cursor-pointer active:bg-slate-100/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#7598a0]' : ''}`}
     >
         <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -64,5 +67,6 @@ export const SettingRow = ({ label, desc, icon, children, last, mergeWithNext, o
                 {rightElement}
             </div>
         </div>
-    </div>
-);
+    </Root>
+    );
+};

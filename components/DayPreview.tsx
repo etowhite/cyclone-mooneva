@@ -5,6 +5,7 @@ import { MOOD_OPTIONS } from '../types';
 import { diffInDays } from '../utils/dateUtils';
 import { hasDailyLogContent } from '../utils/dailyLogContent';
 import { findActivePeriod } from '../services/logic/cycle';
+import { CUSTOM_MOOD_COLORS, isCustomMood, moodLabel, symptomLabel } from '../services/logic/logNames';
 
 interface DayPreviewProps {
     date: string;
@@ -61,6 +62,17 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                                 {t('dashboard.pregnancy')} · {t('dashboard.pregnancy_week', { week: meta.pregnancyWeek ?? 1 })}
                             </span>
                         )}
+                        {log?.pregnancyEnd === true && meta.isPregnancy && (
+                            <span
+                                className="day-preview-chip day-preview-pregnancy-end-chip text-[10px] font-bold text-violet-500 uppercase tracking-wider px-2 h-[20px] rounded-lg flex items-center flex-shrink-0"
+                                style={{
+                                    backgroundColor: '#F0F2F5',
+                                    boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.3), -2px -2px 4px rgba(255, 255, 255, 0.8)'
+                                }}
+                            >
+                                {t('log.pregnancy_ended')}
+                            </span>
+                        )}
                         {log?.flow && (
                             <div
                                 className="day-preview-chip day-preview-flow-chip flex items-center gap-1 px-2 h-[20px] rounded-lg flex-shrink-0"
@@ -82,7 +94,24 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                         <div className="flex flex-wrap gap-2">
                             {log.mood.map(m => {
                                 const config = MOOD_OPTIONS.find(opt => opt.id === m);
-                                if (!config) return null;
+                                if (!config) {
+                                    // Not a built-in: a plain grey chip with the name as typed, no emoji.
+                                    if (!isCustomMood(m)) return null;
+                                    return (
+                                        <div
+                                            key={m}
+                                            className="day-preview-chip day-preview-mood-chip day-preview-mood-chip-custom px-2 h-[20px] rounded-lg flex items-center justify-center flex-shrink-0"
+                                            style={{
+                                                backgroundColor: '#F0F2F5',
+                                                boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.3), -2px -2px 4px rgba(255, 255, 255, 0.8)',
+                                                border: `1.5px solid ${CUSTOM_MOOD_COLORS.color}`,
+                                                color: CUSTOM_MOOD_COLORS.dark,
+                                            }}
+                                        >
+                                            <span className="text-[10px] font-black tracking-wider leading-none">{moodLabel(m, t)}</span>
+                                        </div>
+                                    );
+                                }
                                 return (
                                     <div
                                         key={m}
@@ -104,7 +133,8 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                 </div>
                 <button
                     onClick={onClose}
-                    className="p-1 -mr-1 text-slate-400 hover:text-slate-600 transition-colors flex-shrink-0"
+                    aria-label={t('common.close', 'Close')}
+                    className="p-1 -me-1 text-slate-400 hover:text-slate-600 transition-colors flex-shrink-0"
                 >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -119,7 +149,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                     <div className="flex flex-wrap items-center gap-1.5">
                         {log?.symptoms?.map((s) => (
                             <span key={s} className="day-preview-tag day-preview-tag-neutral text-[10px] font-bold text-slate-500 bg-white/50 px-2 py-0.5 rounded-full">
-                                {t(`symptom.${s.toLowerCase()}`, s)}
+                                {symptomLabel(s, t)}
                             </span>
                         ))}
                         {log?.discharge && (

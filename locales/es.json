@@ -17,6 +17,7 @@
         "days": "días",
         "date": "Fecha",
         "days_overdue": "{{count}} días de retraso",
+        "days_overdue_one": "{{count}} día de retraso",
         "in_days": "en {{count}} días",
         "more_count": "{{count}} más",
         "items_pending": "{{count}} tareas pendientes",
@@ -42,7 +43,9 @@
         "copy": "Copiar",
         "copied": "¡Copiado!",
         "shop": "Tienda",
-        "navigation": "Navegación"
+        "navigation": "Navegación",
+        "increase": "Aumentar",
+        "decrease": "Disminuir"
     },
     "whats_new": {
         "tip": "Mooneva parece minimalista, pero <b>Ajustes</b> está lleno de herramientas potentes. ¿Te falta alguna función? Échale un vistazo: actualizamos a menudo y añadimos lo que nos piden."
@@ -127,7 +130,9 @@
         "section_cycle_updates": "Actualizaciones del ciclo",
         "permission_denied_message": "Las notificaciones están desactivadas. Actívalas en los ajustes de tu dispositivo para recibir recordatorios.",
         "exact_alarm_message": "Los recordatorios pueden llegar tarde o no llegar. Permite alarmas y recordatorios en los ajustes del dispositivo para recibirlos a tiempo.",
-        "pill_reminder_discrete": "Recordatorio"
+        "pill_reminder_discrete": "Recordatorio",
+        "discreet_toggle": "Notificaciones discretas",
+        "discreet_toggle_desc": "Textos de recordatorio neutros, ocultos en la pantalla de bloqueo. La app no cambia."
     },
     "nav": {
         "history": "Historial"
@@ -153,7 +158,6 @@
         "cycle_day": "Día {{day}}",
         "cycle_day_progress": "Día {{day}}/<hl>{{total}}</hl>",
         "period_day": "Día de regla {{day}}",
-        "period_late": "Regla retrasada",
         "period_soon": "Regla pronto",
         "period_due": "Periodo esperado",
         "period_in": "Regla en {{count}} días",
@@ -193,7 +197,8 @@
         "no_recent_data": "Sin datos recientes",
         "log_to_resume": "Registra un periodo para reanudar las predicciones",
         "pregnancy": "Embarazo",
-        "pregnancy_week": "Semana {{week}}"
+        "pregnancy_week": "Semana {{week}}",
+        "no_cycle_data": "No hay datos del ciclo para este día"
     },
     "discrete": {
         "title": "Mis Tareas",
@@ -240,6 +245,7 @@
             "logged_period": "Regla anotada",
             "flow_logged": "Flujo registrado",
             "mid_flow_pause": "Pausa en periodo",
+            "pregnancy_end": "Fin del embarazo",
             "predicted_period": "Regla prevista",
             "fertile_window": "Ventana fértil",
             "ovulation_day": "Día de ovulación",
@@ -272,7 +278,10 @@
         "category_logs": "Detalles del registro",
         "category_other": "Otro",
         "jump_to_month": "Ir a un mes",
-        "jump_close": "Cerrar"
+        "jump_close": "Cerrar",
+        "period_in_pregnancy_confirm": "Este día está dentro de un embarazo. Un periodo que empiece aquí termina el embarazo el día anterior. ¿Continuar?",
+        "cell_cycle_day": "día del ciclo",
+        "cell_meds_logged": "Medicación registrada"
     },
     "cycle_insight": {
         "title": "Información del ciclo",
@@ -366,6 +375,9 @@
         "pill_taken_at": "Píldora tomada a las {{time}}",
         "pill_report_label": "Píldora",
         "meds_add": "Añadir medicamento o suplemento",
+        "custom_own": "Tuyos",
+        "custom_symptom_add": "Añadir síntoma",
+        "custom_mood_add": "Añadir estado de ánimo",
         "meds_hint": "Analgésicos, otros medicamentos o suplementos",
         "meds_report_label": "Medicinas",
         "intensity_spotting": "Manchado",
@@ -429,9 +441,14 @@
         "pregnancy": "Embarazo",
         "experimental": "Experimental, necesita comentarios",
         "pregnancy_start_question": "¿El embarazo empezó este día?",
-        "pregnancy_start_desc": "Termina solo cuando empiece tu próximo periodo",
+        "pregnancy_start_desc": "Termina cuando empiece tu próximo periodo o el día que marques como final",
         "pregnancy_tagged": "Este intervalo se mostrará como embarazo, no como un vacío de registro.",
-        "pregnancy_paused_note": "Las predicciones están en pausa, junto con la predicción adaptativa, la ventana fértil y el SPM. Puedes volver a activarlas en Ajustes."
+        "pregnancy_end_question": "¿El embarazo terminó este día?",
+        "pregnancy_end_desc": "El último día del embarazo",
+        "pregnancy_end_already": "Ya termina el {{date}}",
+        "pregnancy_end_future": "Un embarazo no puede terminar en el futuro",
+        "pregnancy_end_needs_span": "Solo para un día dentro de un embarazo",
+        "pregnancy_ended": "Terminado"
     },
     "settings": {
         "language": "Idioma",
@@ -512,7 +529,9 @@
         "feedback_title": "Ayúdanos a mejorar",
         "feedback_desc": "¿Encontraste un error, tienes una idea para una función o viste una traducción incorrecta? Cuéntanos en 30 segundos.",
         "feedback_button": "Enviar comentarios",
-        "show_fertile_window_desc": "Mostrar ventana fértil",
+        "show_fertile_window_desc": "Muestra la ventana fértil y el día de ovulación, con información de fertilidad",
+        "show_ovulation": "Mostrar día de ovulación",
+        "show_ovulation_desc": "Marca el día estimado de ovulación sin información de fertilidad.",
         "fertility_disclaimer_title": "Aviso legal:",
         "fertility_disclaimer_body": "Esta aplicación proporciona estimaciones de la ventana fértil basadas en la duración del ciclo solo con fines informativos. Estas predicciones no están destinadas a lograr o prevenir el embarazo y no deben utilizarse para la planificación del embarazo ni como método anticonceptivo. Para mayor precisión, considera registrar la temperatura basal, observar el moco cervical o utilizar un método sintotérmico con pruebas de LH opcionales.",
         "show_pms_window": "Mostrar ventana SPM",
@@ -533,9 +552,9 @@
         "restore_backup": "Restaurar Copia",
         "import_from_file": "Importar desde archivo",
         "import_from_app": "Importar desde otra aplicación (experimental)",
-        "import_app_desc": "Admite archivos de exportación de drip (CSV), Flo y Clue (JSON)",
+        "import_app_desc": "Admite archivos de exportación de drip (CSV), Flo, Clue y SimpleInnovation Period Tracker (JSON)",
         "import_app_confirm": "Se encontraron {{days}} días y {{periods}} periodos en esta exportación de {{app}}. ¿Importarlos? Tus registros existentes se conservan.",
-        "import_unrecognized": "No se reconoció este archivo. Compatibles: CSV de drip, exportación JSON de Flo, measurements.json de Clue.",
+        "import_unrecognized": "No se reconoció este archivo. Compatibles: CSV de drip, exportación JSON de Flo, measurements.json de Clue, JSON de SimpleInnovation Period Tracker.",
         "backup_is_encrypted": "La copia está cifrada",
         "enter_backup_password": "Introduce contraseña de copia...",
         "archive_desc_long": "Archiva datos antiguos para mantener tendencias actuales.",
@@ -609,6 +628,7 @@
         "birth_control_sub_desc": "Oculta la fertilidad, marca los sangrados como sangrado por deprivación",
         "birth_control_pill_hint": "Ideal para usuarias de píldora combinada, anillo o parche.",
         "pause_predictions_full_desc": "Oculta las estimaciones de periodo, ovulación y SPM hasta que vuelvas a activarlas.",
+        "pregnancy_predictions_paused": "Las predicciones están en pausa durante tu embarazo. Se reanudan después de tu próximo periodo.",
         "adaptive_prediction_label": "Predicción Adaptativa",
         "adaptive_prediction_desc_long": "Promedia los últimos 3 ciclos para predecir la duración del ciclo",
         "cycle_length_label": "Duración del Ciclo",
@@ -649,7 +669,9 @@
         "auto_backup_run_now": "Hacer copia ahora",
         "wipe_auto_backup_note": "Las copias automáticas ya guardadas en «{{folder}}» no se eliminan. Ya no se podrán abrir, porque la contraseña también se borra. Elimínalas tú misma si quieres deshacerte de ellas.",
         "pregnancy": "Embarazo",
-        "auto_backup_saved_to": "Copia guardada en {{folder}}"
+        "auto_backup_saved_to": "Copia guardada en {{folder}}",
+        "import_lab_kept": "Copia restaurada. Los datos de Lab del archivo no se pudieron usar, así que se conservaron tus datos de Lab actuales.",
+        "import_app_choose": "Elegir archivo de exportación"
     },
     "trends": {
         "header": "Análisis",
@@ -710,7 +732,15 @@
         "pill_low": "Omitida",
         "pill_high": "Tomada",
         "pregnancy_note": "Los gráficos de ciclo se pausan durante el embarazo y vuelven tras tu primer periodo.",
-        "pregnancy_charts_paused": "Todavía no hay nada que mostrar. Estos gráficos cuentan días del ciclo, y un embarazo no tiene."
+        "pregnancy_charts_paused": "Todavía no hay nada que mostrar. Estos gráficos cuentan días del ciclo, y un embarazo no tiene.",
+        "heatmap_row_top": "{{name}}: más frecuente el {{days}}",
+        "heatmap_row_none": "{{name}}: ningún día con datos suficientes",
+        "heatmap_day_share": "día {{day}}, {{share}}",
+        "heatmap_cell_thin": "Día {{day}}: no hay suficientes ciclos",
+        "heatmap_cell": "Día {{day}}: {{hits}} de {{total}} ciclos",
+        "heatmap_cell_one": "Día {{day}}: {{hits}} de {{total}} ciclo",
+        "flow_peak_day": "Más abundante el día {{day}}",
+        "cycle_lengths_list": "Duración de los ciclos: {{lengths}}"
     },
     "timeline": {
         "header": "Línea de tiempo",
@@ -722,7 +752,8 @@
         "gap_hint": "Brecha en el registro – no usado para predicciones",
         "short_cycle_hint": "Ciclo demasiado corto (<18 días) – no usado para predicciones",
         "show_more_count": "Mostrar más historial ({{count}})",
-        "pregnancy_hint": "Embarazo, no se usa para predicciones"
+        "pregnancy_hint": "Embarazo, no se usa para predicciones",
+        "includes_pregnancy": "Incluye embarazo"
     },
     "onboarding": {
         "trust": {
@@ -839,5 +870,208 @@
         "loss of appetite": "Pérdida de apetito",
         "crying": "Ganas de llorar",
         "anger": "Enojo"
+    },
+    "lab": {
+        "title": "Lab",
+        "nav": "Lab",
+        "error": "Lab could not be shown. The rest of the app still works.",
+        "load_failed": "Lab data could not be read, so Lab is paused to protect it. Your calendar data is not affected.",
+        "reminder_title": "Time to check your device",
+        "reminder_body": "Your device should be close to full.",
+        "reminder_overdue_title": "Your device is overdue",
+        "reminder_overdue_body": "It was due {{hours}} h ago. Empty or change it now.",
+        "settings_section": "Lab",
+        "toggle_label": "Lab",
+        "toggle_desc": "Super experimental, English only for now. Adds a Mooneva Lab tab with a device timer and a blood estimate for cups, discs, pads and tampons.",
+        "home": {
+            "log": "Log",
+            "history": "History",
+            "settings": "Lab settings",
+            "active": "Timer running",
+            "next_check": "Next check",
+            "remaining": "{{time}} left",
+            "check_now": "Check now",
+            "overdue": "Overdue",
+            "minutes_left": "{{minutes}} min left",
+            "duration_hm": "{{hours}}h {{minutes}}m",
+            "duration_m": "{{minutes}}m",
+            "change_device_in_use": "Change device in use",
+            "overdue_by": "Overdue by {{time}}",
+            "duration_dh": "{{days}}d {{hours}}h",
+            "overdue_action": "Empty or change it now",
+            "stale_title": "Last entry was {{time}} ago",
+            "stale_body": "Are you still using it? Nothing is hidden: the timer stays until you log or say you are not using one.",
+            "stale_log": "Log now",
+            "stale_stop": "I'm not using one"
+        },
+        "idle": {
+            "title": "No period right now",
+            "subtitle": "Nothing to time yet",
+            "body": "Start a period to follow your device here. You can still log an entry at any time.",
+            "in_period_title": "Nothing logged yet",
+            "in_period_subtitle": "This period has no entries",
+            "in_period_body": "Tap Log when you empty or change your device. The timer and estimate appear here.",
+            "stopped_title": "Timer stopped",
+            "stopped_subtitle": "The timer is stopped",
+            "stopped_body": "Log when you put one in."
+        },
+        "prompt": {
+            "start": "Start period today?",
+            "extend": "Extend this period to today?",
+            "note": "You can also log an entry without changing your calendar.",
+            "not_now": "Not now",
+            "yes": "Yes",
+            "confirm": "Confirm",
+            "start_confirm": "This marks today as a period day on your calendar.",
+            "extend_confirm": "This adds today to your current period on your calendar."
+        },
+        "gauge": {
+            "title": "Estimated blood this period",
+            "ml_estimate": "mL estimate",
+            "aria": "Estimated blood this period: {{ml}} mL",
+            "line_note": "Dashed line: {{ml}} mL",
+            "cup_disc": "Cup/disc: about {{ml}} mL",
+            "pbac": "Soak score {{score}} (about {{ml}} mL, rough)",
+            "info_label": "About this estimate",
+            "info_estimate": "This is an estimate from what you log. It is not a medical measurement. If you are worried about your bleeding, talk to a doctor or nurse.",
+            "info_line": "The dashed line marks 80 mL, the older research definition of heavy bleeding in one period (Cochrane review, Bofill Rodriguez et al. 2020). Today heavy bleeding is defined by how it affects you. It is only a marker.",
+            "info_fraction": "Cup and disc fluid is counted as blood using your blood share, 36% by default, the average in Fraser et al. 1985. It differs a lot between people (about 2 to 82% in that study), is lower on the pill and higher with an IUD, and rises with heavier flow (Magnay et al. 2013). You can change it in Lab settings.",
+            "info_pbac": "Pads and tampons use a soak score (the PBAC chart, Higham et al. 1990). The mL beside a score is a rough guess of 0.8 mL per point, not a validated conversion.",
+            "last_title": "Last period",
+            "last_legend": "Last period: {{ml}} mL",
+            "aria_last": "Estimated blood last period: {{ml}} mL"
+        },
+        "log": {
+            "title": "Log emptying",
+            "edit_title": "Edit entry",
+            "change_device": "Change device",
+            "time": "Time",
+            "no_device": "Add a device in Lab settings first.",
+            "adjust_fullness": "Move the slider to show how full it was.",
+            "select_saturation": "Tap the picture that looks most like your pad or tampon.",
+            "bad_time": "Enter a valid date and time.",
+            "save_failed": "Could not save. Please try again.",
+            "future_time": "This time is in the future.",
+            "final": "Not putting a new one in",
+            "final_hint": "The timer stops after this entry.",
+            "discard_title": "Discard this entry?",
+            "discard_body": "Your changes will be lost.",
+            "discard": "Discard",
+            "keep_editing": "Keep editing",
+            "title_pad": "Log pad change",
+            "title_tampon": "Log tampon change"
+        },
+        "fullness": {
+            "label": "How full",
+            "empty": "Empty",
+            "half": "Half",
+            "full": "Full",
+            "overfull": "Overfull",
+            "ml": "About {{ml}} mL of fluid",
+            "prompt": "Slide to set how full it was"
+        },
+        "pbac": {
+            "question": "How soaked was it?",
+            "alt": "{{product}}, {{saturation}}",
+            "light": "Light",
+            "moderate": "Medium",
+            "saturated": "Soaked",
+            "clots": "Clots",
+            "small_clots": "Small clots",
+            "large_clots": "Large clots",
+            "fewer": "Fewer: {{what}}",
+            "more": "More: {{what}}",
+            "flooding": "Flooding (leaked through)",
+            "points_rough": "Soak score, about {{ml}} mL (rough)",
+            "tap_image_pad": "Tap the picture that looks most like your pad.",
+            "tap_image_tampon": "Tap the picture that looks most like your tampon."
+        },
+        "time": {
+            "date": "Date",
+            "time": "Time",
+            "previous_day": "Previous day",
+            "next_day": "Next day"
+        },
+        "switch": {
+            "title": "Change device",
+            "select": "Select",
+            "add_new": "Add a new device"
+        },
+        "history": {
+            "title": "Lab history",
+            "empty_title": "No entries yet",
+            "empty_body": "Entries you log appear here, grouped by period.",
+            "period_from": "Period from {{date}}",
+            "not_in_period": "Not in a period",
+            "delete_title": "Delete this entry?",
+            "delete_message": "This only removes the Lab entry. Your calendar is not changed.",
+            "outside_hint": "These days are not part of a period in the calendar.",
+            "fullness_fluid": "{{pct}}% full, about {{ml}} mL fluid",
+            "blood_estimate": "about {{ml}} mL blood, estimate",
+            "clots_small_one": "{{count}} small clot",
+            "clots_small_other": "{{count}} small clots",
+            "clots_large_one": "{{count}} large clot",
+            "clots_large_other": "{{count}} large clots",
+            "edit_at": "Edit entry, {{time}}, {{date}}",
+            "delete_at": "Delete entry, {{time}}, {{date}}"
+        },
+        "settings": {
+            "title": "Lab settings",
+            "devices": "Devices",
+            "no_devices": "No devices yet. Add one to start logging.",
+            "add_device": "Add a device",
+            "active": "In use",
+            "set_active": "Use this one",
+            "remove_device": "Remove {{name}}",
+            "remove_title": "Remove {{name}}?",
+            "remove_message": "Past entries keep their own device details.",
+            "fraction_title": "Blood share",
+            "fraction_label": "Share of cup and disc fluid counted as blood",
+            "fraction_note": "Default {{default}}%, the average in Fraser et al. 1985. You can set it from 20 to 60%.",
+            "reminder": "Reminder",
+            "reminder_desc": "A notification shortly before your device should be full.",
+            "lead_title": "Notify me before it is full",
+            "lead_0": "At that time",
+            "lead_30": "30 min before",
+            "lead_60": "1 hour before",
+            "remove_confirm": "Remove"
+        },
+        "devices": {
+            "type_cup": "Cup",
+            "type_disc": "Disc",
+            "type_pad": "Pad",
+            "type_tampon": "Tampon",
+            "absorbency_light": "Light",
+            "absorbency_regular": "Regular",
+            "absorbency_super": "Super",
+            "absorbency_maxi": "Maxi",
+            "add_title": "Add a device",
+            "add_own": "Or add your own",
+            "name_label": "Brand or name",
+            "name_placeholder": "e.g. my cup",
+            "capacity_label": "Capacity (mL)",
+            "capacity_value": "{{capacity}} mL",
+            "absorbency_label": "Absorbency",
+            "removed": "Removed device",
+            "iconCup": "Menstrual cup",
+            "iconDisc": "Menstrual disc",
+            "iconPad": "Pad",
+            "iconTampon": "Tampon",
+            "capacity_range": "Capacity must be 10 to 100 mL."
+        },
+        "trends": {
+            "blood_title": "Estimated blood per period",
+            "blood_info": "An estimate from what you log, not a measurement. Cups and discs count your blood share of the fluid. Pads and tampons count a rough conversion from their soak score, about 0.8 mL per point. The dashed line marks 80 mL, the older research definition of heavy bleeding (Cochrane review, Bofill Rodriguez et al. 2020). It is only a marker.",
+            "reference_label": "{{ml}} mL",
+            "blood_aria": "{{label}}: about {{value}} mL",
+            "days_title": "Days per period",
+            "days_info": "Days with bleeding logged in each period.",
+            "days_aria": "{{label}}: {{value}} days"
+        },
+        "load_retry": "Try again",
+        "reset": "Reset Lab data",
+        "reset_title": "Reset Lab data?",
+        "reset_body": "This deletes all Lab entries, devices and Lab settings on this phone. Your calendar and other data stay.",
+        "paused_pregnancy": "Lab está en pausa durante un embarazo. Tus datos de Lab se conservan."
     }
 }

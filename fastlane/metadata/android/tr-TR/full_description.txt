@@ -17,7 +17,7 @@ Mooneva Cycle, tamamen çevrimdışı çalışan gizli bir regl takipçisi ve ad
 <li>Gizli mod — uygulamayı simgesi ve adıyla birlikte görev listesi gibi gösterir</li>
 <li>Ayarlanabilir zaman aşımıyla PIN kilidi</li>
 <li>Şifreli yedekleme ve geri yükleme</li>
-<li>Geçmişini drip, Flo ve Clue'dan içe aktarma</li>
+<li>Geçmişini drip, Flo, Clue ve SimpleInnovation'dan içe aktarma</li>
 <li>Farsça (Celali) takvim ve tam sağdan sola desteği</li>
 <li>Haftanın ilk gününü seçebilme</li>
 <li>Koyu tema</li>

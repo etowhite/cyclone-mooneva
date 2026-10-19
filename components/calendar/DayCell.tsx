@@ -1,7 +1,8 @@
 import React from 'react';
 import { DayMeta, AppSettings, DailyLog } from '../../types';
 import { diffInDays, getTodayStr } from '../../utils/dateUtils';
-import { formatNumber } from '../../services/i18n';
+import { useTranslation } from 'react-i18next';
+import { formatNumber, useDisplayFormat } from '../../services/displayFormat';
 import { SexMarkerIcon } from './SexMarkerIcon';
 
 interface DayCellProps {
@@ -34,6 +35,8 @@ export const DayCell: React.FC<DayCellProps> = ({
     onToggleBleedingDay,
     label
 }) => {
+    const { t } = useTranslation();
+    const fmt = useDisplayFormat();
     const hasFlow = meta.isPeriodSpan;
     const isInsideSpan = meta.isPeriod;
     const isStart = meta.isCycleStart;
@@ -55,6 +58,9 @@ export const DayCell: React.FC<DayCellProps> = ({
     // The day the span was marked. The rest of the span carries the wash only, so without
     // this the start is indistinguishable from any other day inside it.
     const isPregnancyStart = !!log?.pregnancyStart;
+    // Last day of the pregnancy; same slot as the start sprout, which wins on a one-day span.
+    // A marker only counts inside a pregnancy span (meta.isPregnancy comes from getPregnancySpans): after a period cut the span short it is a leftover.
+    const isPregnancyEnd = log?.pregnancyEnd === true && !!meta.isPregnancy;
 
     const todayStr = getTodayStr();
     const isFutureLocked = diffInDays(dateStr, todayStr) > 7;
@@ -108,9 +114,29 @@ export const DayCell: React.FC<DayCellProps> = ({
         containerClass = "bg-transparent text-slate-600 hover:bg-white/70 border border-transparent";
     }
 
+    // What a tap toggles in edit mode.
+    const isPeriodDay = !!(meta.isPeriod || meta.isPeriodSpan);
+    const showCycleDay = !!meta.dayOfCycle && meta.dayOfCycle > 0 && !isEditMode;
+    const hasMeds = (log?.meds?.length ?? 0) > 0;
+    const ariaLabel = [
+        `${fmt.weekday(date)}, ${fmt.dayMonthYear(date)}`,
+        showCycleDay && `${t('calendar.cell_cycle_day', 'cycle day')} ${formatNumber(meta.dayOfCycle!)}`,
+        sexType && (sexType === 'protected' ? t('calendar.legend.protected_sex', 'Protected sex') : t('calendar.legend.unprotected_sex', 'Unprotected sex')),
+        log?.pillTakenAt ? t('trends.pill_taken', 'Pill taken') : hasMeds && t('calendar.cell_meds_logged', 'Medication logged'),
+        isPeriodDay && t('calendar.legend.logged_period', 'Period'),
+        meta.isFertile && t('calendar.legend.fertile_window', 'Fertile Window'),
+        meta.isOvulation && t('calendar.legend.ovulation_day', 'Ovulation Day'),
+        meta.isPMS && t('calendar.legend.pms_phase', 'PMS Phase'),
+    ].filter(Boolean).join(', ');
+
     return (
         <button
             key={dateStr}
+            aria-label={ariaLabel}
+            aria-current={isToday ? 'date' : undefined}
+            aria-pressed={isEditMode ? isPeriodDay : isSelected}
+            aria-hidden={!isCurrentMonth || undefined}
+            disabled={!isCurrentMonth}
             className={`
         calendar-day-cell aspect-square relative transition-all active:scale-90 flex items-center justify-center
         ${containerClass}
@@ -134,15 +160,14 @@ export const DayCell: React.FC<DayCellProps> = ({
         >
             <div className="relative w-full h-full flex items-center justify-center">
                 {/* Cycle Day Badge - top of the cell */}
-                {meta.dayOfCycle && meta.dayOfCycle > 0 && !isEditMode && (
-                    <span className="calendar-cycle-badge absolute top-[3px] left-1/2 -translate-x-1/2 text-[8px] font-extrabold text-slate-500/95 tracking-tight">
-                        {formatNumber(meta.dayOfCycle)}
+                {showCycleDay && (
+                    <span className="calendar-cycle-badge absolute top-[3px] left-1/2 -translate-x-1/2 text-[8px] font-extrabold text-slate-600 tracking-tight">
+                        {formatNumber(meta.dayOfCycle ?? 0)}
                     </span>
                 )}
                 {sexType && (
                     <SexMarkerIcon
                         type={sexType}
-                        label={sexType === 'protected' ? 'Protected sex' : 'Unprotected sex'}
                         className={`calendar-sex-marker-edge calendar-sex-marker-${sexType} absolute top-1/2 -translate-y-1/2 text-purple-500 z-10 pointer-events-none`}
                     />
                 )}
@@ -171,8 +196,8 @@ export const DayCell: React.FC<DayCellProps> = ({
                         </svg>
                     )}
                     {/* Contraceptive pill taken - cyan capsule; other meds/supplements - violet capsule */}
-                    {(log?.pillTakenAt || (log?.meds?.length ?? 0) > 0) && (
-                        <svg aria-label={log?.pillTakenAt ? "Pill taken" : "Medication logged"} role="img" className={`w-[10px] h-[10px] ${log?.pillTakenAt ? 'text-cyan-500' : 'text-violet-400'}`} viewBox="0 0 24 24" fill="currentColor">
+                    {(log?.pillTakenAt || hasMeds) && (
+                        <svg aria-hidden="true" className={`w-[10px] h-[10px] ${log?.pillTakenAt ? 'text-cyan-500' : 'text-violet-400'}`} viewBox="0 0 24 24" fill="currentColor">
                             <path fillRule="evenodd" d="M19.5 6.5a3.5 3.5 0 0 0-7 0v11a3.5 3.5 0 1 0 7 0v-11ZM16 2a5.5 5.5 0 0 0-5.5 5.5v11a5.5 5.5 0 1 0 11 0v-11A5.5 5.5 0 0 0 16 2Zm-3.5 5.5v4.25h7V7.5a3.5 3.5 0 1 0-7 0Z" clipRule="evenodd" />
                         </svg>
                     )}
@@ -218,9 +243,21 @@ export const DayCell: React.FC<DayCellProps> = ({
                 )
             }
 
+            {/* Pregnancy End – same slot, only when neither a period nor the pregnancy starts here */}
+            {
+                isPregnancyEnd && !isStart && !isPregnancyStart && (
+                    <div data-testid="pregnancy-end-marker" className="absolute top-[13%] right-[13%] translate-x-1/2 -translate-y-1/2 bg-white rounded-full p-0.5 z-10 shadow-sm border border-violet-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-violet-500">
+                            <path d="M6 22a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1Z" />
+                            <path d="M8 4h11l-3 4.5 3 4.5H8V4Z" />
+                        </svg>
+                    </div>
+                )
+            }
+
             {/* Fertility Dot Indicators – center on circle border (top-right) */}
             {
-                (isOvulation || isPredFertile) && !isStart && !isPregnancyStart && (
+                (isOvulation || isPredFertile) && !isStart && !isPregnancyStart && !isPregnancyEnd && (
                     <div className={`absolute top-[13%] right-[13%] translate-x-1/2 -translate-y-1/2 z-10 flex items-center justify-center ${isOvulation ? 'bg-white rounded-full p-0.5 shadow-sm border border-[#b0f4eb]' : ''}`}>
                         {isOvulation ? (
                             // Ovulation: Large pulsing dot

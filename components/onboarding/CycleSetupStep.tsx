@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SettingCard, SettingRow, Toggle } from '../settings/SettingsUI';
 import NumberSettingRow from '../settings/NumberSettingRow';
+import { settingBounds } from '../../services/logic/cycle';
 import { applySettingsInterlocks } from '../../services/logic/settingsInterlocks';
 
 // Icons mirrored from Settings.tsx so this step matches the Cycle Management panel.
@@ -71,7 +72,7 @@ const CycleSetupStep: React.FC<CycleSetupStepProps> = ({ values, onChange }) => 
                             icon={<Icons.Brain />}
                             last
                         >
-                            <Toggle
+                            <Toggle label={t('settings.adaptive_prediction_label')}
                                 active={values.adaptivePrediction && !values.isOnBirthControl}
                                 onClick={() => {
                                     if (!values.isOnBirthControl) {
@@ -91,7 +92,7 @@ const CycleSetupStep: React.FC<CycleSetupStepProps> = ({ values, onChange }) => 
                             desc={values.isOnBirthControl ? t('settings.on_bc_disabled') : t('settings.show_fertile_window_desc')}
                             icon={<Icons.Egg />}
                         >
-                            <Toggle
+                            <Toggle label={t('settings.show_fertile_window')}
                                 active={values.showFertileWindow && !values.isOnBirthControl}
                                 onClick={() => !values.isOnBirthControl && set({ showFertileWindow: !values.showFertileWindow })}
                                 disabled={values.isOnBirthControl}
@@ -147,7 +148,7 @@ const CycleSetupStep: React.FC<CycleSetupStepProps> = ({ values, onChange }) => 
                             desc={t('settings.show_pms_window_desc')}
                             icon={<Icons.Alert />}
                         >
-                            <Toggle
+                            <Toggle label={t('settings.show_pms_window')}
                                 active={values.showPMS}
                                 onClick={() => set({ showPMS: !values.showPMS })}
                             />
@@ -160,8 +161,8 @@ const CycleSetupStep: React.FC<CycleSetupStepProps> = ({ values, onChange }) => 
                                 icon={<Icons.Alert />}
                                 value={values.pmsLength}
                                 onChange={(val) => set({ pmsLength: val })}
-                                min={1}
-                                max={7}
+                                min={settingBounds(values).pms.min}
+                                max={settingBounds(values).pms.max}
                                 defaultValue={3}
                             />
                         )}
@@ -173,7 +174,7 @@ const CycleSetupStep: React.FC<CycleSetupStepProps> = ({ values, onChange }) => 
                             desc={t('settings.birth_control_sub_desc')}
                             icon={<Icons.Pill />}
                         >
-                            <Toggle
+                            <Toggle label={t('settings.birth_control')}
                                 active={values.isOnBirthControl}
                                 onClick={() => {
                                     if (!values.isOnBirthControl) {
@@ -200,7 +201,7 @@ const CycleSetupStep: React.FC<CycleSetupStepProps> = ({ values, onChange }) => 
                             icon={<Icons.Pause />}
                             last
                         >
-                            <Toggle
+                            <Toggle label={t('settings.pause_predictions')}
                                 active={values.predictionsPaused}
                                 onClick={() => {
                                     const nextVal = !values.predictionsPaused;

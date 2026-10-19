@@ -1,0 +1,5 @@
+New Lab tab (experimental, English only, off by default): a timer and blood estimate for cups, discs, pads and tampons.
+
+Add your own symptoms and moods. Import from SimpleInnovation. Set a pregnancy end date. Discreet notifications without changing the app icon. Show the ovulation day without fertility wording. Periods up to 15 days.
+
+Better screen reader support, Persian digits, and many fixes.

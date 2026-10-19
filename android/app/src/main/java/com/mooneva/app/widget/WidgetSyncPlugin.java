@@ -33,8 +33,8 @@ public class WidgetSyncPlugin extends Plugin {
     public void updateWidgetData(PluginCall call) {
         int cycleDay = call.getInt("cycleDay", 1);
         int cycleLength = call.getInt("cycleLength", 28);
-        int daysUntilPeriod = call.getInt("daysUntilPeriod", 14);
-        int daysUntilOvulation = call.getInt("daysUntilOvulation", 14);
+        int daysUntilPeriod = call.getInt("daysUntilPeriod", -1);
+        int daysUntilOvulation = call.getInt("daysUntilOvulation", -1);
         String currentPhase = call.getString("currentPhase", "follicular");
         boolean discreteMode = call.getBoolean("discreteMode", false);
 

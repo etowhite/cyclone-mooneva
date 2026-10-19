@@ -45,8 +45,10 @@ export interface DailyLog {
   meds?: string[]; // Free-form names of other medications/supplements taken this day
   // --- Medical Flags ---
   ignoreForAverages?: boolean;   // Manual override for outliers (miscarriage, stress, etc)
-  /** This day starts a pregnancy. The span ends at the next period; no end is stored. */
+  /** This day starts a pregnancy. The span ends at `pregnancyEnd` or the day before the next period, whichever is first. */
   pregnancyStart?: boolean;
+  /** Last day of a pregnancy, inclusive. Read as `=== true`. A period starting earlier ends the span first. */
+  pregnancyEnd?: boolean;
 
 }
 
@@ -101,8 +103,11 @@ export type ContraceptionReminder =
     };
 
 export interface AppSettings {
+  labEnabled?: boolean; // Shows the Lab tab; off by default
   // Security Feature: Disguises app as Task Manager
   discreteMode: boolean;
+  // Neutral reminder texts and the private channel, without hiding the app. Absent = off.
+  discreetNotifications?: boolean;
   darkNeumorphism?: boolean;
 
   userName: string;
@@ -128,6 +133,7 @@ export interface AppSettings {
   pmsLength: number;              // Days before period for PMS warning (default: 3)
   showFertileWindow: boolean;     // Whether to display fertile window
   hideFertilityLevel?: boolean;   // Whether to hide the fertility level on the status card
+  showOvulation?: boolean;        // Show the estimated ovulation day without the fertile window (absent = off; see getCycleVisibility)
 
   // Notification / Reminder toggles
   reminderPeriodStart?: boolean;
@@ -200,50 +206,12 @@ export const INITIAL_SYMPTOMS: SymptomConfig[] = ALL_DEFAULT_SYMPTOMS.map(s => (
 }));
 
 
-export interface PredictionResults {
-  lastPeriodStart: string | null;
-  periodLength: number;
-  cycleLengthUsed: number;
-  effective: {
-    cycleLength: number;
-    periodLength: number;
-    source: 'settings' | 'adaptive';
-  };
-  userSettings: {
-    cycleLength: number;
-    periodLength: number;
-  };
-  nextPeriodStart: string | null;
-  nextPeriodEnd: string | null;
-  /** Last logged period is older than the outlier threshold, so the forecast is a guess
-   *  off stale data - show "no recent data" rather than an overdue day count. */
-  isStale?: boolean;
-  fertileWindow: {
-    start: string;
-    end: string;
-  } | null;
-  ovulationDate: string | null;
-  pmsWindow: {
-    start: string;
-    end: string;
-  } | null;
-  currentEventDays?: number;
-  futurePredictions?: {
-    startDate: string;
-    endDate: string;
-    ovulationDate: string | null;
-    fertileStart: string | null;
-    fertileEnd: string | null;
-    pmsStart: string;
-    pmsEnd: string;
-  }[];
-}
-
 export interface BackupData {
   data: Record<string, DailyLog>;
   settings: AppSettings;
   timestamp: string;
   periods?: PeriodRecord[];
+  lab?: unknown; // Lab data, present only when the Lab key exists on disk
 }
 
 export interface DayMeta {

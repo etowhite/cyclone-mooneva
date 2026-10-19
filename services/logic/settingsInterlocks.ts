@@ -12,8 +12,36 @@ export type SettingsInterlockState = Pick<
   | 'isOnBirthControl'
   | 'predictionsPaused'
   | 'showFertileWindow'
+  | 'showOvulation'
   | 'showPMS'
 >;
+
+/**
+ * What the cycle UI shows. The only place these display rules live: predictions
+ * and the cycle model always hold the facts, every surface asks this.
+ * Fertile wording and ovulation can be shown separately; the fertile window
+ * implies ovulation, and birth control hides both.
+ * Birth control also decides the withdrawal question and the pill log (records already
+ * saved are shown by the caller regardless).
+ */
+export function getCycleVisibility(
+  s: Pick<AppSettings, 'isOnBirthControl' | 'showFertileWindow' | 'showOvulation' | 'showPMS'> &
+    Partial<Pick<AppSettings, 'contraceptionReminder' | 'reminderPillDaily'>>
+) {
+  // Same source the scheduler uses: the contraception reminder wins, the legacy daily pill flag applies only without it.
+  const pillReminder = s.contraceptionReminder
+    ? s.contraceptionReminder.enabled && s.contraceptionReminder.method === 'pill'
+    : !!s.reminderPillDaily;
+  const fertile = s.showFertileWindow && !s.isOnBirthControl;
+  return {
+    fertile,
+    ovulation: !s.isOnBirthControl && (s.showFertileWindow || s.showOvulation === true),
+    pms: !!s.showPMS,
+    // Daily log: the withdrawal-bleed question follows birth control; "Took pill" also follows a pill reminder.
+    withdrawalQuestion: !!s.isOnBirthControl,
+    pillLog: !!s.isOnBirthControl || pillReminder,
+  };
+}
 
 /**
  * Apply the cycle-management rules after a settings change.
@@ -30,6 +58,7 @@ export function applySettingsInterlocks<T extends SettingsInterlockState>(
 
   if (next.isOnBirthControl) {
     next.showFertileWindow = false;
+    next.showOvulation = false;
     next.adaptivePrediction = false;
     next.cycleLength = 28;
   }
@@ -37,6 +66,7 @@ export function applySettingsInterlocks<T extends SettingsInterlockState>(
   if (next.predictionsPaused) {
     next.adaptivePrediction = false;
     next.showFertileWindow = false;
+    next.showOvulation = false;
     next.showPMS = false;
   }
 

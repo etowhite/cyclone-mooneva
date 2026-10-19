@@ -1,6 +1,7 @@
 import { Cycle } from '../../types';
 import { useTranslation } from 'react-i18next';
-import { formatNumber } from '../../services/i18n';
+import { formatNumber, useDisplayFormat } from '../../services/displayFormat';
+import { parseLocalDate } from '../../utils/dateUtils';
 import { isCycleEligibleForAverage } from '../../services/logic/cycle';
 
 interface CycleHistoryChartProps {
@@ -8,7 +9,8 @@ interface CycleHistoryChartProps {
 }
 
 const CycleHistoryChart: React.FC<CycleHistoryChartProps> = ({ cycles }) => {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
+    const fmt = useDisplayFormat();
 
     // Every cycle the caller passed, oldest to newest. The caller applies the date
     // range; capping at 6 here made the range buttons look broken on 6 months and 1 year.
@@ -56,9 +58,8 @@ const CycleHistoryChart: React.FC<CycleHistoryChartProps> = ({ cycles }) => {
 
     // Format month label
     const getMonthLabel = (dateStr: string) => {
-        const [y, m] = dateStr.split('-').map(Number);
-        const date = new Date(y, m - 1, 1);
-        return date.toLocaleDateString(i18n.language, { month: 'short' });
+        const p = fmt.calendarParts(parseLocalDate(dateStr));
+        return fmt.monthName(p.year, p.month);
     };
 
     // Calculate average line position
@@ -81,6 +82,8 @@ const CycleHistoryChart: React.FC<CycleHistoryChartProps> = ({ cycles }) => {
 
             <div className="relative overflow-x-auto pb-2">
                 <svg
+                    role="img"
+                    aria-label={`${t('trends.cycle_regularity')}. ${t('trends.cycle_range', { min: formatNumber(shortest), max: formatNumber(longest), spread: formatNumber(longest - shortest) })}. ${t('trends.cycle_lengths_list', 'Cycle lengths: {{lengths}}', { lengths: lengths.map(l => formatNumber(l)).join(', ') })}`}
                     width={chartWidth + 40}
                     height={chartHeight + 40}
                     className="mx-auto"

@@ -4,6 +4,7 @@
  */
 
 import { INITIAL_SYMPTOMS } from '../../types';
+import { repairLogNames } from './logNames';
 import type {
     AppSettings,
     BackupData,
@@ -13,6 +14,7 @@ import type {
 } from '../../types';
 import Logger from '../logger';
 
+import { Capacitor } from '@capacitor/core';
 import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
@@ -31,6 +33,7 @@ const PBKDF2_ITERATIONS_BACKUP_V1 = 100000;
 const PBKDF2_ITERATIONS_BACKUP_V2 = 600000;
 const BACKUP_VERSION = 2;
 const DEVICE_SECRET_KEY = 'mooneva_device_secret';
+export const LAB_STORAGE_KEY = 'mooneva_lab_enc';
 
 const BACKUP_SECURITY_SETTING_KEYS = ['pin', 'pinHash', 'pinSalt', 'lockTimeout'] as const;
 
@@ -125,6 +128,17 @@ const migrateMoodToArray = (logs: Record<string, DailyLog>): Record<string, Dail
     return logs;
 };
 
+/**
+ * Imports used to store lowercase symptom ids ("cramps") while the log UI stores labels
+ * ("Cramps"). Rewrites built-in names to the stored form; unknown (custom) names stay.
+ * Returns whether anything changed so the caller can persist only then.
+ */
+const repairBuiltInNames = (logs: Record<string, DailyLog>): boolean => {
+    let changed = false;
+    for (const log of Object.values(logs)) if (log && repairLogNames(log)) changed = true;
+    return changed;
+};
+
 export const loadData = async (): Promise<Record<string, DailyLog>> => {
     const encryptedBase64 = localStorage.getItem(STORAGE_KEY_ENCRYPTED);
 
@@ -132,14 +146,19 @@ export const loadData = async (): Promise<Record<string, DailyLog>> => {
         // Check for legacy unencrypted data
         const legacyData = localStorage.getItem(STORAGE_KEY_LEGACY);
         if (legacyData) {
+            let parsed: Record<string, DailyLog>;
             try {
-                const parsed = migrateMoodToArray(JSON.parse(legacyData));
-                await saveData(parsed); // Migrate to encrypted
-                localStorage.removeItem(STORAGE_KEY_LEGACY);
-                return parsed;
+                parsed = migrateMoodToArray(JSON.parse(legacyData));
+                repairBuiltInNames(parsed);
             } catch (e) {
                 Logger.error("Failed to migrate legacy data:", e);
+                return {};
             }
+            // Outside the catch on purpose: a failed encrypted write keeps the legacy key and fails
+            // the load, so the caller's load-failure guard blocks writes instead of saving {} over it.
+            await saveData(parsed);
+            localStorage.removeItem(STORAGE_KEY_LEGACY);
+            return parsed;
         }
         return {};
     }
@@ -158,6 +177,7 @@ export const loadData = async (): Promise<Record<string, DailyLog>> => {
 
         const decoder = new TextDecoder();
         const parsed = migrateMoodToArray(JSON.parse(decoder.decode(decrypted)));
+        if (repairBuiltInNames(parsed)) await saveData(parsed).catch(() => undefined); // saveData already logs; a failed write must not block loading
 
         // In a future update, we can handle DATA_SCHEMA_VERSION migrations here
         return parsed;
@@ -167,7 +187,16 @@ export const loadData = async (): Promise<Record<string, DailyLog>> => {
     }
 };
 
+// Once a wipe starts, a debounced save that fires during its awaits must not write the old data
+// back under the key the wipe just removed. The wipe ends in a page reload, which clears this.
+let wiping = false;
+/** True once wipeAllData has started. The Lab store checks it before its own write. */
+export const isWiping = (): boolean => wiping;
+/** Test-only: the real flag resets with the page reload that ends a wipe. */
+export const __resetWipingForTests = (): void => { wiping = false; };
+
 export const saveData = async (data: Record<string, DailyLog>) => {
+    if (wiping) return;
     try {
         const masterKey = await getDeviceMasterKey();
         const encoder = new TextEncoder();
@@ -189,6 +218,7 @@ export const saveData = async (data: Record<string, DailyLog>) => {
         combined.set(new Uint8Array(encrypted), iv.length);
 
         const base64 = bytesToBase64(combined);
+        if (wiping) return;
         localStorage.setItem(STORAGE_KEY_ENCRYPTED, base64);
     } catch (e) {
         Logger.error("Failed to save encrypted data:", e);
@@ -238,6 +268,7 @@ export const loadSettings = async (): Promise<AppSettings> => {
     }
 
     if (settings) {
+        let migrated: AppSettings | null;
         try {
             const parsed: unknown = JSON.parse(settings);
             if (!isPlainRecord(parsed)) {
@@ -293,22 +324,25 @@ export const loadSettings = async (): Promise<AppSettings> => {
                 };
             }
 
-            if (!encryptedBase64) {
-                // First read of a legacy plaintext blob: persist encrypted, drop the plaintext copy.
-                await saveSettings(normalizedSettings);
-                localStorage.removeItem(SETTINGS_KEY);
-            }
-
-            return normalizedSettings;
+            migrated = encryptedBase64 ? null : normalizedSettings;
+            if (!migrated) return normalizedSettings;
         } catch (e) {
             Logger.error("Failed to load settings:", e);
+            return defaults;
         }
+        // First read of a legacy plaintext blob: persist encrypted, drop the plaintext copy.
+        // Outside the catch on purpose: a failed write must not fall back to defaults (a legacy PIN
+        // would be lost), so it throws and the caller's load-failure guard blocks writes.
+        await saveSettings(migrated);
+        localStorage.removeItem(SETTINGS_KEY);
+        return migrated;
     }
 
     return defaults;
 };
 
 export const saveSettings = async (settings: AppSettings): Promise<void> => {
+    if (wiping) return;
     try {
         const masterKey = await getDeviceMasterKey();
         const encoder = new TextEncoder();
@@ -325,6 +359,7 @@ export const saveSettings = async (settings: AppSettings): Promise<void> => {
         combined.set(iv);
         combined.set(new Uint8Array(encrypted), iv.length);
 
+        if (wiping) return;
         localStorage.setItem(SETTINGS_KEY_ENCRYPTED, bytesToBase64(combined));
     } catch (e) {
         Logger.error("Failed to save encrypted settings:", e);
@@ -332,11 +367,33 @@ export const saveSettings = async (settings: AppSettings): Promise<void> => {
     }
 };
 
+/** Encrypt a string with the device key. Same iv + ciphertext base64 format as saveData. Used by Lab. */
+export const encryptString = async (plain: string): Promise<string> => {
+    const masterKey = await getDeviceMasterKey();
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, masterKey, new TextEncoder().encode(plain));
+    const combined = new Uint8Array(iv.length + encrypted.byteLength);
+    combined.set(iv);
+    combined.set(new Uint8Array(encrypted), iv.length);
+    return bytesToBase64(combined);
+};
+
+/** Inverse of encryptString. Throws when the key or the data is wrong. */
+export const decryptString = async (b64: string): Promise<string> => {
+    const masterKey = await getDeviceMasterKey();
+    const combined = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv: combined.slice(0, 12) }, masterKey, combined.slice(12));
+    return new TextDecoder().decode(decrypted);
+};
+
 export const wipeAllData = async () => {
+    wiping = true;
     localStorage.removeItem(STORAGE_KEY_ENCRYPTED);
+    localStorage.removeItem(STORAGE_KEY_LEGACY);
     localStorage.removeItem(SETTINGS_KEY);
     localStorage.removeItem(SETTINGS_KEY_ENCRYPTED);
     localStorage.removeItem(STORAGE_KEY_PERIODS);
+    localStorage.removeItem(LAB_STORAGE_KEY);
     // Clear device secret keys for a full wipe
     localStorage.removeItem(DEVICE_SECRET_KEY);
     localStorage.removeItem(`${DEVICE_SECRET_KEY}_salt`);
@@ -345,6 +402,18 @@ export const wipeAllData = async () => {
         await SecureStoragePlugin.remove({ key: `${DEVICE_SECRET_KEY}_salt` });
     } catch (e) {
         // SecureStorage may not be available on web
+    }
+    // Best effort: pending Lab reminders (ids 140-143) must not outlive the data they were built from.
+    try {
+        if (Capacitor.isNativePlatform()) {
+            const [{ LocalNotifications }, { LAB_REMINDER_ID, LAB_OVERDUE_REMINDERS }] = await Promise.all([
+                import('@capacitor/local-notifications'),
+                import('../notifications'),
+            ]);
+            await LocalNotifications.cancel({ notifications: [LAB_REMINDER_ID, ...LAB_OVERDUE_REMINDERS.map(o => o.id)].map(id => ({ id })) });
+        }
+    } catch (e) {
+        // Notifications may not be available on web
     }
     // Settings are gone after this, so the Settings toggle that would otherwise
     // clear the auto-backup password becomes unreachable. This is the last chance
@@ -380,6 +449,7 @@ export const loadPeriods = async (): Promise<PeriodRecord[]> => {
 };
 
 export const savePeriods = async (periods: PeriodRecord[]) => {
+    if (wiping) return;
     try {
         const masterKey = await getDeviceMasterKey();
         const encoder = new TextEncoder();
@@ -398,6 +468,7 @@ export const savePeriods = async (periods: PeriodRecord[]) => {
         combined.set(new Uint8Array(encrypted), iv.length);
 
         const base64 = bytesToBase64(combined);
+        if (wiping) return;
         localStorage.setItem(STORAGE_KEY_PERIODS, base64);
     } catch (e) {
         Logger.error("Failed to save encrypted periods:", e);
@@ -568,6 +639,11 @@ export const mergeRestoredSettings = (
         if (Object.hasOwn(currentSettings, key)) {
             Object.assign(safeSettings, { [key]: currentSettings[key] });
         }
+    }
+
+    // A backup from before Lab has no labEnabled: keep this device's choice.
+    if (!Object.hasOwn(restoredSettings, 'labEnabled') && Object.hasOwn(currentSettings, 'labEnabled')) {
+        safeSettings.labEnabled = currentSettings.labEnabled;
     }
 
     return safeSettings;

@@ -17,7 +17,7 @@ La plupart des applications de suivi des règles envoient vos données de cycle 
 <li>Mode discret — déguise l'application en liste de tâches, icône et nom inclus</li>
 <li>Verrouillage par PIN avec délai configurable</li>
 <li>Sauvegarde et restauration chiffrées</li>
-<li>Importez votre historique depuis drip, Flo et Clue</li>
+<li>Importez votre historique depuis drip, Flo, Clue et SimpleInnovation</li>
 <li>Calendrier persan (Jalaali) et prise en charge complète de droite à gauche</li>
 <li>Premier jour de la semaine configurable</li>
 <li>Thème sombre</li>

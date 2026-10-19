@@ -1,55 +1,37 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatNumber } from '../services/i18n';
+import { formatNumber, useDisplayFormat } from '../services/displayFormat';
 import { Cycle } from '../types';
-import { cycleCoversDate, type PregnancySpan } from '../services/logic/cycle';
-import { useCalendarSystem } from '../hooks/useCalendarSystem';
+import type { PregnancySpan } from '../services/logic/cycle';
 import { addDays, diffInDays, getTodayStr, parseLocalDate } from '../utils/dateUtils';
 
 interface TimelineViewProps {
   cycles: Cycle[];
-  predictions: { nextPeriodStart: string | null; fertileWindow: { start: string; end: string } | null };
+  /** getCycleVisibility(settings).fertile: false on birth control or with the fertile window off. */
+  showFertile: boolean;
   /** Optional: absent in tests that only care about cycles. */
   pregnancySpans?: PregnancySpan[];
+  /** `settings.historyArchivedDate`: pregnancy rows that started before it are hidden, like cycle rows. */
+  archivedBefore?: string;
   // No unused props
 }
 
-const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions, pregnancySpans = [] }) => {
-  const { t, i18n } = useTranslation();
+const TimelineView: React.FC<TimelineViewProps> = ({ cycles, showFertile: fertileOn, pregnancySpans = [], archivedBefore }) => {
+  const { t } = useTranslation();
   const [showAll, setShowAll] = React.useState(false);
-  const calendarSystem = useCalendarSystem();
+  const fmt = useDisplayFormat();
 
-  // Format dates: "Jan 30 - Feb 2" or "Bahman 10 - 15"
-  const formatPeriodRange = (startDateStr: string, length: number) => {
-    const start = parseLocalDate(startDateStr);
-    const end = parseLocalDate(addDays(startDateStr, length - 1));
-
-    // Convert both to Target Calendar System
-    const startParts = calendarSystem.toCalendarDate(start);
-    const endParts = calendarSystem.toCalendarDate(end);
-
-    const startMonth = calendarSystem.formatMonth(startParts.year, startParts.month);
-    const endMonth = calendarSystem.formatMonth(endParts.year, endParts.month);
-
-    if (startParts.month === endParts.month) {
-      return `${startMonth} ${formatNumber(startParts.day)} – ${formatNumber(endParts.day)}`;
-    }
-    return `${startMonth} ${formatNumber(startParts.day)} – ${endMonth} ${formatNumber(endParts.day)}`;
-  };
+  const todayStr = getTodayStr();
+  // Rows outside the current year, or crossing a year, show it (see dateRange).
+  const formatPeriodRange = (startDateStr: string, length: number) =>
+    fmt.dateRange(parseLocalDate(startDateStr), parseLocalDate(addDays(startDateStr, length - 1)), parseLocalDate(todayStr));
 
   // Filter cycles to only show completed/started in the past
-  const todayStr = getTodayStr();
   const historyCycles = cycles.filter(c => c.startDate <= todayStr);
 
-  /**
-   * A pregnancy that ended at the user's *first* recorded period has no cycle in front of
-   * it to carry the badge, because a cycle only exists between two periods. Those spans get
-   * their own row; the ones a cycle already covers keep the badge on that cycle instead of
-   * being listed twice.
-   */
-  const orphanSpans = pregnancySpans.filter(
-    sp => sp.start <= todayStr && !historyCycles.some(c => cycleCoversDate(c, sp.start))
-  );
+  // Every pregnancy gets its own row with its own dates and length. The cycle around it
+  // stays a normal cycle row and only carries an "Includes pregnancy" tag.
+  const pregnancyRows = pregnancySpans.filter(sp => sp.start <= todayStr && (!archivedBefore || sp.start >= archivedBefore));
 
   type HistoryEntry =
     | { kind: 'cycle'; startDate: string; cycle: Cycle }
@@ -57,7 +39,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions, pregna
 
   const historyEntries: HistoryEntry[] = [
     ...historyCycles.map(c => ({ kind: 'cycle' as const, startDate: c.startDate, cycle: c })),
-    ...orphanSpans.map(sp => ({ kind: 'pregnancy' as const, startDate: sp.start, span: sp })),
+    ...pregnancyRows.map(sp => ({ kind: 'pregnancy' as const, startDate: sp.start, span: sp })),
   ].sort((a, b) => b.startDate.localeCompare(a.startDate));
 
   const displayedHistory = showAll ? historyEntries : historyEntries.slice(0, 6);
@@ -142,8 +124,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions, pregna
                   const fertileDuration = Math.max(0, fertileEndDay - fertileStartDay);
                   const fertileLeft = (fertileStartDay / cycleLenForCalc) * 100;
                   const fertileWidth = (fertileDuration / cycleLenForCalc) * 100;
-                  // fertileWindow is null on birth control / fertility hidden, matching the calendar.
-                  const showFertile = !isInvalid && fertileWidth > 0 && predictions.fertileWindow !== null;
+                  const showFertile = !isInvalid && fertileWidth > 0 && fertileOn;
 
                   return (
                     <div key={`${cycle.startDate}-${idx}`} className="flex flex-col">
@@ -152,7 +133,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions, pregna
                           {formatPeriodRange(cycle.startDate, spanLen)}
                           {isPregnancy && (
                             <span className="ms-1.5 rounded-full bg-violet-100 px-1.5 py-0.5 text-[9px] font-bold normal-case text-violet-700">
-                              {t('settings.pregnancy')}
+                              {t('timeline.includes_pregnancy', 'Includes pregnancy')}
                             </span>
                           )}
                         </span>
@@ -182,7 +163,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions, pregna
 
                         {/* Period Segment */}
                         <div
-                          className="absolute top-0 left-0 h-full bg-cycle-period rounded-full flex items-center justify-center z-20 border-r border-white/20"
+                          className="timeline-period-segment absolute top-0 left-0 h-full rounded-full flex items-center justify-center z-20 border-r border-white/20 bg-[#e11d48]"
                           style={{
                             width: `${periodWidth}%`,
                             boxShadow: '2px 0 4px rgba(251, 113, 133, 0.3)'

@@ -4,6 +4,7 @@
  */
 
 export * from './cycle';
+export * from './cycleModel';
 export * from './storage';
 export * from './status';
 export * from './importers';

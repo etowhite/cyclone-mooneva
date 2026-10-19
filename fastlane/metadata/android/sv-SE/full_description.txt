@@ -17,7 +17,7 @@ De flesta mensappar laddar upp din cykeldata till företagsservrar, där den kan
 <li>Diskret läge – förkläder appen till en att göra-lista, ikon och namn inkluderat</li>
 <li>PIN-kod med inställbar timeout</li>
 <li>Krypterad säkerhetskopiering och återställning</li>
-<li>Importera din historik från drip, Flo och Clue</li>
+<li>Importera din historik från drip, Flo, Clue och SimpleInnovation</li>
 <li>Persisk (Jalaali) kalender och fullt stöd för höger till vänster</li>
 <li>Inställbar första veckodag</li>
 <li>Mörkt tema</li>

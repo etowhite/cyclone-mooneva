@@ -1,5 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { symptomLabel } from '../../services/logic/logNames';
+import { formatNumber } from '../../services/displayFormat';
 
 interface HeatmapConfig {
     blob?: string;
@@ -40,6 +42,8 @@ interface HeatmapSectionProps {
         label: string;
         data: Record<number, number>;
         config?: HeatmapConfig;
+        /** The label is a name typed by the user: shown as is, never translated or re-cased. */
+        literal?: boolean;
     }[];
     /** How many counted cycles reached each cycle day. Cells are a share of this, not a
      *  raw count, so a 1 year range reads like a 3 month one and the late columns stop
@@ -59,6 +63,8 @@ const stepForShare = (share: number, steps: string[]): string => {
     return steps[Math.min(steps.length - 1, Math.max(1, Math.ceil(share * (steps.length - 1))))];
 };
 
+const TOP_DAYS = 3;
+
 const HeatmapSection: React.FC<HeatmapSectionProps> = ({
     title,
     lowLabel = 'Low',
@@ -76,6 +82,22 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
     const days = Array.from({ length: dayCount }, (_, i) => i + 1);
     const CELL_WIDTH = 18;
     const isRtl = i18n.dir?.() === 'rtl';
+    const rowSummary = (row: HeatmapSectionProps['rows'][number]): string => {
+        const name = row.literal ? row.label : symptomLabel(row.label, t);
+        const top = days
+            .map(day => ({ day, reached: opportunities[day] || 0, count: row.data[day] || 0 }))
+            .filter(d => d.count > 0 && d.reached >= minOpportunities && d.reached > 0)
+            .map(d => ({ day: d.day, share: d.count / d.reached }))
+            .sort((a, b) => b.share - a.share || a.day - b.day)
+            .slice(0, TOP_DAYS)
+            .map(d => t('trends.heatmap_day_share', 'day {{day}}, {{share}}', {
+                day: formatNumber(d.day),
+                share: `${formatNumber(Math.round(d.share * 100))}%`,
+            }));
+        return top.length === 0
+            ? t('trends.heatmap_row_none', '{{name}}: no days with enough data', { name })
+            : t('trends.heatmap_row_top', '{{name}}: most often on {{days}}', { name, days: top.join('; ') });
+    };
     const labelAlignClass = isRtl ? 'pl-2 text-left' : 'pr-2 text-right';
 
     return (
@@ -117,9 +139,9 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
                     {rows.map((row) => (
                         <div
                             key={row.id}
-                            className={`heatmap-row-label h-[22px] leading-[22px] ${labelAlignClass} text-[9.5px] font-bold text-slate-700 truncate capitalize`}
+                            className={`heatmap-row-label h-[22px] leading-[22px] ${labelAlignClass} text-[9.5px] font-bold text-slate-700 truncate${row.literal ? '' : ' capitalize'}`}
                         >
-                            {t(`symptom.${row.label.toLowerCase()}`, row.label)}
+                            {row.literal ? row.label : symptomLabel(row.label, t)}
                         </div>
                     ))}
                 </div>
@@ -141,7 +163,7 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
 
                         {/* Grid Rows - Smooth heat gradient */}
                         {rows.map((row) => (
-                            <div key={row.id} className="flex h-[22px]">
+                            <div key={row.id} className="flex h-[22px]" role="img" aria-label={rowSummary(row)}>
                                 {days.map((day) => {
                                     const count = row.data[day] || 0;
                                     const reached = opportunities[day] || 0;
@@ -157,6 +179,7 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
                                     return (
                                         <div
                                             key={day}
+                                            aria-hidden="true"
                                             className="flex-1 flex items-center justify-center px-px"
                                             style={{ minWidth: `${CELL_WIDTH}px` }}
                                         >
@@ -164,8 +187,8 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
                                                 className="w-4 h-4 rounded-sm transition-colors duration-200"
                                                 style={{ backgroundColor: bgColor }}
                                                 title={thin
-                                                    ? `Day ${day}: not enough cycles`
-                                                    : `Day ${day}: ${count} of ${reached} cycles`}
+                                                    ? t('trends.heatmap_cell_thin', 'Day {{day}}: not enough cycles', { day: formatNumber(day) })
+                                                    : t('trends.heatmap_cell', 'Day {{day}}: {{hits}} of {{total}} cycles', { day: formatNumber(day), hits: formatNumber(count), total: formatNumber(reached), count: reached })}
                                             />
                                         </div>
                                     );

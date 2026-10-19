@@ -4,9 +4,11 @@
  */
 
 import { Capacitor } from '@capacitor/core';
-import type { LocalNotificationSchema } from '@capacitor/local-notifications';
-import type { AppSettings, ContraceptionReminder, PredictionResults } from '../types';
+import type { LocalNotificationSchema, LocalNotificationsPlugin } from '@capacitor/local-notifications';
+import type { AppSettings, ContraceptionReminder } from '../types';
 import Logger from './logger';
+import { getCycleVisibility } from './logic/settingsInterlocks';
+import type { CycleModel } from './logic/cycleModel';
 import { parseStrictLocalDate } from '../utils/dateUtils';
 
 import i18n from './i18n';
@@ -69,7 +71,28 @@ const CHANNEL_ID = 'mooneva_reminders';
  */
 const CHANNEL_ID_PRIVATE = 'mooneva_reminders_private';
 
-const channelFor = (discrete: boolean): string => (discrete ? CHANNEL_ID_PRIVATE : CHANNEL_ID);
+/**
+ * The one rule for discreet reminders: discrete mode, or the Notifications page switch
+ * (settings.discreetNotifications, absent = off). Texts and channel both follow it.
+ */
+export const isDiscreetNotifications = (
+  settings: Pick<AppSettings, 'discreteMode' | 'discreetNotifications'>,
+): boolean => !!settings.discreteMode || settings.discreetNotifications === true;
+
+export const channelFor = (discrete: boolean): string => (discrete ? CHANNEL_ID_PRIVATE : CHANNEL_ID);
+
+/**
+ * Notification id of the Lab device reminder (services/lab/reminder.ts). It sits outside
+ * the cancel list used by syncReminderNotificationsNow (1-9, 80-89, 100-139) on purpose,
+ * so Cycle's sync never cancels it and Lab never touches Cycle's ids.
+ */
+export const LAB_REMINDER_ID = 140;
+/** Lab "still overdue" reminders, 1, 3 and 6 hours after the device was due (ids 141-143). */
+export const LAB_OVERDUE_REMINDERS = [
+  { id: 141, hours: 1 },
+  { id: 142, hours: 3 },
+  { id: 143, hours: 6 },
+] as const;
 const DEFAULT_TIME = '09:00';
 
 export const REMINDER_DEFAULT_TIMES = {
@@ -319,40 +342,52 @@ export async function openExactAlarmSettings(): Promise<void> {
   }
 }
 
+/**
+ * Android: create the reminder channel (required for Android 8+). Only the one in use, so the
+ * system notification list does not grow a second entry the user never asked for.
+ *
+ * The description is what shows in system Settings > Apps > Notifications, so it must
+ * not name the subject either. It said "Period and daily log reminders" while this feature was being built;
+ * name and description are the two fields Android does let an app update in place,
+ * so that fix reaches existing installs on the next launch.
+ *
+ * Shared with Lab, whose reminder needs the channel to exist before it schedules.
+ */
+export async function createReminderChannel(
+  LocalNotifications: Pick<LocalNotificationsPlugin, 'createChannel'>,
+  discrete: boolean,
+): Promise<void> {
+  if (Capacitor.getPlatform() === 'android') {
+    await LocalNotifications.createChannel({
+      id: channelFor(discrete),
+      name: 'Reminders',
+      description: 'Scheduled reminders',
+      importance: 5, // MAX importance for heads-up
+      visibility: discrete ? -1 : 1, // -1 secret: nothing on the lock screen
+      vibration: true,
+      lights: true
+    });
+  }
+}
+
 let reminderSyncQueue = Promise.resolve();
 
-export function syncReminderNotifications(settings: AppSettings, predictions?: PredictionResults | null): Promise<void> {
+export function syncReminderNotifications(settings: AppSettings, cycleModel: CycleModel): Promise<void> {
   if (!Capacitor.isNativePlatform()) return Promise.resolve();
 
-  const nextSync = reminderSyncQueue.then(() => syncReminderNotificationsNow(settings, predictions));
+  const nextSync = reminderSyncQueue.then(() => syncReminderNotificationsNow(settings, cycleModel));
   reminderSyncQueue = nextSync.catch(() => { });
   return nextSync;
 }
 
-async function syncReminderNotificationsNow(settings: AppSettings, predictions?: PredictionResults | null): Promise<void> {
+async function syncReminderNotificationsNow(settings: AppSettings, cycleModel: CycleModel): Promise<void> {
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
 
-    const discrete = !!settings.discreteMode;
+    const discrete = isDiscreetNotifications(settings);
+    const vis = getCycleVisibility(settings);
 
-    // Android: create channel (required for Android 8+). Only the one in use, so the
-    // system notification list does not grow a second entry the user never asked for.
-    //
-    // The description is what shows in system Settings > Apps > Notifications, so it must
-    // not name the subject either. It said "Period and daily log reminders" while this feature was being built;
-    // name and description are the two fields Android does let an app update in place,
-    // so that fix reaches existing installs on the next launch.
-    if (Capacitor.getPlatform() === 'android') {
-      await LocalNotifications.createChannel({
-        id: channelFor(discrete),
-        name: 'Reminders',
-        description: 'Scheduled reminders',
-        importance: 5, // MAX importance for heads-up
-        visibility: discrete ? -1 : 1, // -1 secret: nothing on the lock screen
-        vibration: true,
-        lights: true
-      });
-    }
+    await createReminderChannel(LocalNotifications, discrete);
 
     // Cancel all existing reminders to prevent duplicates
     const allIds = [...new Set([
@@ -403,11 +438,13 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
     }
 
     // --- 2. Date-Specific One-Shot Reminders ---
-    if (predictions) {
+    // Every forecast reminder needs a forecast: the model has none when paused, stale or empty.
+    const { nextPeriod } = cycleModel;
+    if (nextPeriod) {
       // A. Expected Period Start
-      if (settings.reminderPeriodStart && predictions.nextPeriodStart) {
+      if (settings.reminderPeriodStart) {
         const { hour, minute } = parseTimeHHmm(settings.reminderPeriodStartTime, REMINDER_DEFAULT_TIMES.reminderPeriodStartTime);
-        const target = parseLocalDate(predictions.nextPeriodStart);
+        const target = parseLocalDate(nextPeriod.start);
         target.setHours(hour, minute, 0, 0);
 
         if (target.getTime() > now.getTime()) {
@@ -426,9 +463,9 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
       }
 
       // B. Period Input Nudge (Same day as start, usually later)
-      if (settings.reminderPeriodInput && predictions.nextPeriodStart) {
+      if (settings.reminderPeriodInput) {
         const { hour, minute } = parseTimeHHmm(settings.reminderPeriodInputTime, REMINDER_DEFAULT_TIMES.reminderPeriodInputTime);
-        const target = parseLocalDate(predictions.nextPeriodStart);
+        const target = parseLocalDate(nextPeriod.start);
         target.setHours(hour, minute, 0, 0);
 
         if (target.getTime() > now.getTime()) {
@@ -447,9 +484,9 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
       }
 
       // C. Expected Period End
-      if (settings.reminderPeriodEnd && predictions.nextPeriodEnd) {
+      if (settings.reminderPeriodEnd) {
         const { hour, minute } = parseTimeHHmm(settings.reminderPeriodEndTime, REMINDER_DEFAULT_TIMES.reminderPeriodEndTime);
-        const target = parseLocalDate(predictions.nextPeriodEnd);
+        const target = parseLocalDate(nextPeriod.end);
         target.setHours(hour, minute, 0, 0);
 
         if (target.getTime() > now.getTime()) {
@@ -468,9 +505,9 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
       }
 
       // D. Fertility reminder
-      if (settings.reminderFertility && predictions.fertileWindow?.start) {
+      if (vis.fertile && settings.reminderFertility && cycleModel.fertileNext) {
         const { hour, minute } = parseTimeHHmm(settings.reminderFertilityTime, REMINDER_DEFAULT_TIMES.reminderFertilityTime);
-        const target = parseLocalDate(predictions.fertileWindow.start);
+        const target = parseLocalDate(cycleModel.fertileNext.start);
         target.setHours(hour, minute, 0, 0);
 
         if (target.getTime() > now.getTime()) {
@@ -489,11 +526,11 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
       }
 
       // E. Ovulation Specific
-      if (settings.reminderOvulation && predictions.ovulationDate) {
+      if (vis.ovulation && settings.reminderOvulation && cycleModel.ovulationNext) {
         const { hour, minute } = parseTimeHHmm(settings.reminderOvulationTime, REMINDER_DEFAULT_TIMES.reminderOvulationTime);
         // Alert usually ON the day OR day before? Bodies says 'Estimated ovulation is tomorrow.'
         // So we schedule it for OvulationDate - 1 day
-        const target = parseLocalDate(predictions.ovulationDate);
+        const target = parseLocalDate(cycleModel.ovulationNext);
         target.setDate(target.getDate() - 1);
         target.setHours(hour, minute, 0, 0);
 
@@ -513,11 +550,10 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
       }
 
       // --- 3. Smart Reminders (PMS & Late) ---
-      // A. PMS Reminder: match the PMS window configured for the calendar.
-      if (settings.reminderPMS && predictions.nextPeriodStart) {
+      // A. PMS Reminder: the start of the model's PMS window, the same one the calendar paints.
+      if (vis.pms && settings.reminderPMS && cycleModel.pmsNext && cycleModel.rules.pms > 0) {
         const { hour, minute } = parseTimeHHmm(settings.reminderPMSTime, REMINDER_DEFAULT_TIMES.reminderPMSTime);
-        const targetDate = parseLocalDate(predictions.nextPeriodStart);
-        targetDate.setDate(targetDate.getDate() - (settings.pmsLength ?? 3));
+        const targetDate = parseLocalDate(cycleModel.pmsNext.start);
         targetDate.setHours(hour, minute, 0, 0);
 
         if (targetDate.getTime() > now.getTime()) {
@@ -537,8 +573,7 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
           // Anchoring to a fixed time (rather than now + 10min) means the repeated syncs
           // triggered by every settings change converge on the same instant instead of
           // pushing the notification further out each time.
-          const oneDayBefore = parseLocalDate(predictions.nextPeriodStart);
-          oneDayBefore.setDate(oneDayBefore.getDate() - 1);
+          const oneDayBefore = parseLocalDate(cycleModel.pmsNext.end);
           if (now.getTime() < oneDayBefore.getTime()) {
             const catchUpTime = new Date(now);
             catchUpTime.setDate(catchUpTime.getDate() + 1);
@@ -555,9 +590,9 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
       }
 
       // B. Late Period Reminder (Checks for 7 days)
-      if (settings.reminderPeriodLate && predictions.nextPeriodStart) {
+      if (settings.reminderPeriodLate) {
         const { hour, minute } = parseTimeHHmm(settings.reminderPeriodLateTime, REMINDER_DEFAULT_TIMES.reminderPeriodLateTime);
-        const startDate = parseLocalDate(predictions.nextPeriodStart);
+        const startDate = parseLocalDate(nextPeriod.start);
         startDate.setDate(startDate.getDate() + 1);
         startDate.setHours(hour, minute, 0, 0);
 

@@ -18,11 +18,14 @@ public class AppIconPlugin extends Plugin {
         }
 
         PackageManager pm = getContext().getPackageManager();
+        // The installed package name can carry a suffix (the debug build); the alias classes
+        // are named after the code namespace, which does not change.
         String pkg = getContext().getPackageName();
+        String ns = MainActivity.class.getPackage().getName();
 
         // Define components
-        ComponentName defaultAlias = new ComponentName(pkg, pkg + ".LauncherDefault");
-        ComponentName todoAlias = new ComponentName(pkg, pkg + ".LauncherTodo");
+        ComponentName defaultAlias = new ComponentName(pkg, ns + ".LauncherDefault");
+        ComponentName todoAlias = new ComponentName(pkg, ns + ".LauncherTodo");
 
         // Logic: Enable requested, disable others
         if ("Todo".equals(name)) {

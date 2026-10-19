@@ -17,7 +17,7 @@ A legtöbb menstruációkövető alkalmazás feltölti a ciklusadataidat cégek 
 <li>Diszkrét alkalmazás mód — teendőlistának álcázza az appot, ikonnal és névvel együtt</li>
 <li>PIN-kód zár beállítható időtúllépéssel</li>
 <li>Titkosított biztonsági mentés és visszaállítás</li>
-<li>Előzmények importálása a drip, Flo és Clue alkalmazásokból</li>
+<li>Előzmények importálása a drip, Flo, Clue és SimpleInnovation alkalmazásokból</li>
 <li>Perzsa (Jalaali) naptár és teljes jobbról balra írás támogatás</li>
 <li>Beállítható hét első napja</li>
 <li>Sötét téma</li>

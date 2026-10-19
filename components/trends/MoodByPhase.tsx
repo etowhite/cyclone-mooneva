@@ -1,16 +1,15 @@
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { DailyLog, Cycle, MOOD_OPTIONS } from '../../types';
 import { useTranslation } from 'react-i18next';
-import { formatNumber } from '../../services/i18n';
-import { toLocalISOString } from '../../utils/dateUtils';
-import { phaseForCycleDay } from '../../services/logic/status';
-import type { AppSettings } from '../../types';
+import { addDays } from '../../utils/dateUtils';
+import type { CycleModel } from '../../services/logic/cycleModel';
+import { CUSTOM_MOOD_COLORS, isCustomMood } from '../../services/logic/logNames';
 
 
 interface MoodByPhaseProps {
     logs: Record<string, DailyLog>;
     cycles: Cycle[];
-    settings: Pick<AppSettings, 'periodLength' | 'lutealPhaseLength' | 'pmsLength' | 'showPMS'>;
+    cycleModel: CycleModel;
 }
 
 interface PhaseMood {
@@ -65,13 +64,13 @@ const DynamicMoodText: React.FC<{ text: string; color: string }> = ({ text, colo
     );
 };
 
-const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles, settings }) => {
+const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles, cycleModel }) => {
     const { t } = useTranslation();
 
     // Calculate mood distribution by cycle phase
     const phaseMoods = useMemo(() => {
-        // The UI keeps PMS grouped with luteal because it has four cards;
-        // the day assignment itself still follows the dashboard phase rules.
+        // The UI keeps PMS grouped with luteal because it has four cards. A past day's
+        // phase is the model's, from its own real cycle (the model paints no PMS there).
         const phases = {
             menstrual: { name: t('trends.phase_menstrual'), icon: '🩸', iconColor: 'text-rose-500' },
             follicular: { name: t('trends.phase_follicular'), icon: '🌱', iconColor: 'text-lime-500' },
@@ -80,10 +79,10 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles, settings }) => 
         };
 
         const phaseMoodCounts: Record<string, Record<string, number>> = {
-            menstrual: {},
-            follicular: {},
-            ovulation: {},
-            luteal: {},
+            menstrual: Object.create(null),
+            follicular: Object.create(null),
+            ovulation: Object.create(null),
+            luteal: Object.create(null),
         };
 
         // Initialize counts for all moods
@@ -95,38 +94,24 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles, settings }) => 
 
         // Go through each cycle and count moods by phase
         cycles.forEach(cycle => {
-            // Same reason as the trends heatmaps: phaseForCycleDay would file almost the
-            // whole of a 600-day span under "luteal".
-            if (cycle.isOutlier) return;
+            // Same reason as the trends heatmaps: a 600-day span would file almost all
+            // of its days under "luteal".
+            if (cycle.isOutlier || !cycle.length) return;
 
-            const [y, m, d] = cycle.startDate.split('-').map(Number);
-            const cycleStart = new Date(y, m - 1, d);
-            const cycleLength = cycle.length || 28;
-
-            for (let dayNum = 1; dayNum <= cycleLength; dayNum++) {
-                const date = new Date(cycleStart);
-                date.setDate(date.getDate() + (dayNum - 1));
-                const dateStr = toLocalISOString(date);
+            for (let i = 0; i < cycle.length; i++) {
+                const dateStr = addDays(cycle.startDate, i);
                 const log = logs[dateStr];
+                if (!log?.mood) continue;
 
-                if (log?.mood) {
-                    const actualPhase = phaseForCycleDay(
-                        dayNum,
-                        cycleLength,
-                        cycle.periodLength || settings.periodLength,
-                        settings.lutealPhaseLength,
-                        settings.pmsLength,
-                        settings.showPMS,
-                    );
-                    const phaseKey = actualPhase === 'pms' ? 'luteal' : actualPhase;
+                // No phase: the cycle is too short to have an ovulation day, so only its period is known.
+                const phase = cycleModel.at(dateStr).phase;
+                const phaseKey = phase === 'pms' ? 'luteal' : phase;
+                if (!phaseKey || !phaseMoodCounts[phaseKey]) continue;
 
-                    const logMoods = log.mood;
-                    logMoods.forEach(m => {
-                        if (phaseMoodCounts[phaseKey] && phaseMoodCounts[phaseKey][m] !== undefined) {
-                            phaseMoodCounts[phaseKey][m]++;
-                        }
-                    });
-                }
+                log.mood.forEach(m => {
+                    if (phaseMoodCounts[phaseKey][m] !== undefined) phaseMoodCounts[phaseKey][m]++;
+                    else if (isCustomMood(m)) phaseMoodCounts[phaseKey][m] = 1;
+                });
             }
         });
 
@@ -163,20 +148,22 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles, settings }) => 
 
             const percentage = Math.round((maxCount / total) * 100);
             const moodConfig = MOOD_OPTIONS.find(opt => opt.id === maxMood) || MOOD_OPTIONS[0];
+            // A custom mood has no config: its name as typed, in the neutral grey.
+            const custom = !MOOD_OPTIONS.some(opt => opt.id === maxMood) && isCustomMood(maxMood);
 
             results.push({
                 phase: phaseData.name,
                 icon: phaseData.icon,
                 iconColor: phaseData.iconColor,
-                dominantMood: t(moodConfig.labelKey),
+                dominantMood: custom ? maxMood : t(moodConfig.labelKey),
                 percentage,
-                color: moodConfig.color, // Return hex directly
-                glowColor: moodConfig.shadow
+                color: custom ? CUSTOM_MOOD_COLORS.color : moodConfig.color, // Return hex directly
+                glowColor: custom ? CUSTOM_MOOD_COLORS.shadow : moodConfig.shadow
             });
         }
 
         return results;
-    }, [logs, cycles, settings]);
+    }, [logs, cycles, cycleModel]);
 
     if (cycles.length === 0) {
         return (

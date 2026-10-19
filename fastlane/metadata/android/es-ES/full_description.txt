@@ -17,7 +17,7 @@ La mayoría de las apps de seguimiento de regla suben tus datos de ciclo a servi
 <li>Modo discreto: disfraza la app como lista de tareas, con icono y nombre incluidos</li>
 <li>Bloqueo por PIN con tiempo de espera configurable</li>
 <li>Copia de seguridad y restauración cifradas</li>
-<li>Importa tu historial desde drip, Flo y Clue</li>
+<li>Importa tu historial desde drip, Flo, Clue y SimpleInnovation</li>
 <li>Calendario persa (Jalaali) y soporte completo de derecha a izquierda</li>
 <li>Primer día de la semana configurable</li>
 <li>Tema oscuro</li>

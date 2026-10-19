@@ -39,16 +39,19 @@ public class CycleBarWidgetProvider extends AppWidgetProvider {
 
         int cycleDay = prefs.getInt(KEY_CYCLE_DAY, 1);
         int cycleLength = prefs.getInt(KEY_CYCLE_LENGTH, 28);
-        int daysUntilPeriod = prefs.getInt(KEY_DAYS_UNTIL_PERIOD, 14);
+        int daysUntilPeriod = prefs.getInt(KEY_DAYS_UNTIL_PERIOD, -1);
         String currentPhase = prefs.getString(KEY_CURRENT_PHASE, "follicular");
         boolean discreteMode = prefs.getBoolean(KEY_DISCRETE_MODE, false);
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.cycle_bar_widget);
 
         // Set cycle day text
+        // cycleDay < 1 means unknown (stale, paused, no data): show "--", like ovulation.
+        boolean dayKnown = cycleDay >= 1;
+        String dayLabel = dayKnown ? String.valueOf(cycleDay) : "--";
         String cycleDayText = discreteMode
-                ? cycleDay + " / " + cycleLength
-                : "Day " + cycleDay;
+                ? dayLabel + " / " + cycleLength
+                : "Day " + dayLabel;
         views.setTextViewText(R.id.cycle_day_text, cycleDayText);
 
         // Set status text based on phase
@@ -58,11 +61,18 @@ public class CycleBarWidgetProvider extends AppWidgetProvider {
 
         if (discreteMode) {
             // Discrete mode: show generic text without period/ovulation labels
-            pText = (daysUntilPeriod <= 0) ? "Task due" : (daysUntilPeriod + " days");
+            // daysUntilPeriod: -1 = no forecast (stale, paused, no data), 0 = due today or overdue.
+            if (daysUntilPeriod < 0) {
+                pText = "--";
+            } else {
+                pText = (daysUntilPeriod == 0) ? "Task due" : (daysUntilPeriod + " days");
+            }
             oText = "";
         } else {
             // P: Next Period
-            if (daysUntilPeriod <= 0) {
+            if (daysUntilPeriod < 0) {
+                pText = "P: --";
+            } else if (daysUntilPeriod == 0) {
                 pText = "P: Due";
             } else if (daysUntilPeriod == 1) {
                 pText = "P: 1 day";
@@ -89,7 +99,7 @@ public class CycleBarWidgetProvider extends AppWidgetProvider {
         views.setTextViewText(R.id.status_text_o, oText);
 
         // Set progress bar value (0-100)
-        int progress = (int) Math.round((double) cycleDay / cycleLength * 100);
+        int progress = dayKnown ? (int) Math.round((double) cycleDay / cycleLength * 100) : 0;
         progress = Math.max(0, Math.min(100, progress)); // Clamp to 0-100
         views.setProgressBar(R.id.progress_bar, 100, progress, false);
 

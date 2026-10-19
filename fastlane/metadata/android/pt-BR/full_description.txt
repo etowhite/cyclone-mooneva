@@ -17,7 +17,7 @@ A maioria dos aplicativos de rastreamento de menstruação envia os dados do seu
 <li>Modo discreto do app — disfarça o app como lista de tarefas, com ícone e nome incluídos</li>
 <li>Bloqueio por PIN com tempo limite configurável</li>
 <li>Backup e restauração criptografados</li>
-<li>Importe seu histórico do drip, Flo e Clue</li>
+<li>Importe seu histórico do drip, Flo, Clue e SimpleInnovation</li>
 <li>Calendário persa (Jalaali) e suporte completo da direita para a esquerda</li>
 <li>Primeiro dia da semana configurável</li>
 <li>Tema escuro</li>

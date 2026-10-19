@@ -22,7 +22,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
     setView,
     isCloaked
 }) => {
-    const { settings, actions, periods } = useMooneva();
+    const { settings, actions, periods, model } = useMooneva();
     const { updateSettings, updatePeriodWithdrawalBleed } = actions;
 
     return (
@@ -37,10 +37,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
                     onUpdatePeriodWithdrawalBleed={updatePeriodWithdrawalBleed}
                     onViewChange={setView}
                     runBackupNow={actions.runBackupNow}
-                    onClose={() => {
-                        setSubView('main');
-                        setView('calendar');
-                    }}
+                    pregnancyAwaitingPeriod={model.pregnancySpans.some(sp => sp.awaitingPeriod)}
                 />
             </div>
 

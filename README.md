@@ -74,6 +74,8 @@ There are no analytics, no crash reporters, and no third-party SDKs that phone h
 - **Cycle and period tracking** with smart predictions
 - **Fertile window and ovulation** estimates
 - **Daily log**: mood, symptoms, flow intensity, discharge, medications
+- **Custom symptoms and moods**: add your own, shown in Trends and the clinical report like the built-in ones
+- **Mooneva Lab** (experimental, off by default): a timer for your cup, disc, pad or tampon, with reminders, and an estimate of blood loss per period
 - **PMS window** warnings
 - **Trends and history** across multiple cycles
 - **Pregnancy logging**: mark the start, the span is shown on the calendar and named in your history and clinical report
@@ -87,7 +89,7 @@ There are no analytics, no crash reporters, and no third-party SDKs that phone h
 - **Birth control mode**: hides fertile window, tags bleeds as withdrawal
 - **Pill tracking**: log intake time, see adherence per cycle day in Trends
 - **Dark theme**
-- **Data import** from drip, Flo, and Clue
+- **Data import** from drip, Flo, Clue, and SimpleInnovation
 - **14 languages**: English, German, Spanish, Swedish, Chinese, Persian, Arabic, Turkish, French, Ukrainian, Italian, Hungarian, Russian, Portuguese
 - **Persian (Jalaali) calendar** and full RTL support for Persian and Arabic
 

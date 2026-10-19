@@ -25,7 +25,7 @@ interface UsePersistenceResult {
     toggleBleedingDay: (date: string, effectivePeriodLength?: number) => Promise<void>;
     updatePeriodWithdrawalBleed: (id: string, isWithdrawalBleed: boolean) => Promise<void>;
     updatePeriodIgnoreForAverages: (id: string, ignoreForAverages: boolean) => Promise<void>;
-    restorePeriods: (snapshot: PeriodRecord[]) => void;
+    restorePeriods: (snapshot: PeriodRecord[], logsSnapshot?: Record<string, DailyLog>) => void;
 }
 
 export const usePersistence = (): UsePersistenceResult => {
@@ -268,22 +268,26 @@ export const usePersistence = (): UsePersistenceResult => {
                         changed = true;
                     }
                 } else {
-                    // Check for trailing flow (immediately after a period ends)
-                    const nearbyPeriod = updated.find(p => {
-                        const periodEnd = addDays(p.startDate, p.days - 1);
-                        const daysAfter = diffInDays(date, periodEnd);
-                        return daysAfter === 1; // Only 1 day (24h) merge window
-                    });
+                    // Spotting only joins a period the day after it ends. Real flow uses the
+                    // same nearby rule as toggleBleedingDay (both directions, MIN_GAP_DAYS).
+                    const nearbyPeriod = data.flow === 'spotting'
+                        ? updated.find(p => diffInDays(date, addDays(p.startDate, p.days - 1)) === 1)
+                        : findNearbyPeriod(date, updated);
 
                     if (nearbyPeriod) {
                         const nIdx = updated.findIndex(p => p.id === nearbyPeriod.id);
                         const p = updated[nIdx];
-                        const newDays = diffInDays(date, p.startDate) + 1;
-                        const dayIdx = diffInDays(date, p.startDate);
-                        let activeDays = p.activeDays ? [...p.activeDays] : Array.from({ length: p.days }, (_, i) => i);
-                        activeDays.push(dayIdx);
-                        activeDays.sort((a, b) => a - b);
-                        updated[nIdx] = { ...p, days: newDays, activeDays };
+                        const baseDays = p.activeDays ? [...p.activeDays] : Array.from({ length: p.days }, (_, i) => i);
+                        if (date < p.startDate) {
+                            const shift = diffInDays(p.startDate, date);
+                            const newDays = diffInDays(addDays(p.startDate, p.days - 1), date) + 1;
+                            const activeDays = [0, ...baseDays.map(d => d + shift)];
+                            updated[nIdx] = { ...p, startDate: date, days: newDays, activeDays };
+                        } else {
+                            const dayIdx = diffInDays(date, p.startDate);
+                            const activeDays = [...baseDays, dayIdx].sort((a, b) => a - b);
+                            updated[nIdx] = { ...p, days: dayIdx + 1, activeDays };
+                        }
                         changed = true;
 
                         // Recursive merge: check if extending this period now pulls in more existing flow logs
@@ -294,7 +298,8 @@ export const usePersistence = (): UsePersistenceResult => {
                             const newEnd = addDays(currentPeriod.startDate, currentPeriod.days - 1);
                             const nextDay = addDays(newEnd, 1);
 
-                            if (logsRef.current[nextDay]?.flow) {
+                            if (logsRef.current[nextDay]?.flow
+                                && !updated.some(q => q.id !== currentPeriod.id && isDateInPeriod(q, nextDay))) {
                                 const extendedDays = currentPeriod.days + 1;
                                 const extendedDayIdx = diffInDays(nextDay, currentPeriod.startDate);
                                 let extActiveDays = currentPeriod.activeDays ? [...currentPeriod.activeDays] : [];
@@ -309,7 +314,12 @@ export const usePersistence = (): UsePersistenceResult => {
                         // FIX: Only create a new period if the flow is NOT spotting.
                         // Spotting alone should not trigger a new cycle/period.
                         if (data.flow !== 'spotting') {
-                            const defaultLen = settings.periodLength || 5;
+                            // Cap the span so it stops before the next period starts.
+                            const nextStart = updated.map(p => p.startDate).filter(d => d > date).sort()[0];
+                            const defaultLen = Math.min(
+                                settings.periodLength || 5,
+                                nextStart ? diffInDays(nextStart, date) : Infinity
+                            );
                             const newPeriod: PeriodRecord = {
                                 id: crypto.randomUUID(),
                                 startDate: date,
@@ -494,7 +504,12 @@ export const usePersistence = (): UsePersistenceResult => {
                     }
                 } else {
                     // Start new period — prefer adaptive length if provided, fall back to settings
-                    const defaultLen = effectivePeriodLength || settings.periodLength || 5;
+                    // Cap the span so it stops before the next period starts, like updateLog.
+                    const nextStart = updated.map(p => p.startDate).filter(d => d > date).sort()[0];
+                    const defaultLen = Math.min(
+                        effectivePeriodLength || settings.periodLength || 5,
+                        nextStart ? diffInDays(nextStart, date) : Infinity
+                    );
                     updated.push({
                         id: crypto.randomUUID(),
                         startDate: date,
@@ -516,8 +531,9 @@ export const usePersistence = (): UsePersistenceResult => {
         });
     }, [periods, logs, settings.periodLength, settings.isOnBirthControl]);
 
-    const restorePeriods = useCallback((snapshot: PeriodRecord[]) => {
+    const restorePeriods = useCallback((snapshot: PeriodRecord[], logsSnapshot?: Record<string, DailyLog>) => {
         setPeriods(snapshot);
+        if (logsSnapshot) setLogs(logsSnapshot);
     }, []);
 
 

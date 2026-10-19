@@ -31,8 +31,10 @@ export const fingerprintBackupData = (backup: BackupData): string => {
     // timestamp is excluded on purpose: it is minted fresh for every run, so
     // including it would make the payload look changed every single time and the
     // "nothing changed, skip it" rule would never fire.
-    const { data, settings, periods } = backup;
-    const json = JSON.stringify({ data, settings, periods });
+    // lab is undefined (so omitted from the JSON) unless the Lab key exists, which keeps
+    // the string, and so the fingerprint, identical to the pre-Lab formula.
+    const { data, settings, periods, lab } = backup;
+    const json = JSON.stringify({ data, settings, periods, lab });
     let hash = 0x811c9dc5;
     for (let i = 0; i < json.length; i++) {
         hash ^= json.charCodeAt(i);

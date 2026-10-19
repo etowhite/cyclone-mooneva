@@ -28,6 +28,7 @@ export const TrendsScreen: React.FC<TrendsScreenProps> = ({
                     cycles={pastCycles}
                     periods={periods}
                     settings={settings}
+                    cycleModel={model.cycleModel}
                     onBack={() => setView('calendar')}
                     availableSymptoms={settings.symptoms}
                 />

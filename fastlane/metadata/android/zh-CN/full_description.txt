@@ -17,7 +17,7 @@ Mooneva Cycle 是一款私密、完全离线的经期追踪器和月经周期日
 <li>伪装模式——将应用伪装成待办事项列表，包括图标和名称</li>
 <li>可配置超时的 PIN 锁</li>
 <li>加密备份与恢复</li>
-<li>从 drip、Flo 和 Clue 导入历史记录</li>
+<li>从 drip、Flo、Clue 和 SimpleInnovation 导入历史记录</li>
 <li>波斯（贾拉利）历法及完整的从右到左支持</li>
 <li>可配置的每周起始日</li>
 <li>深色主题</li>

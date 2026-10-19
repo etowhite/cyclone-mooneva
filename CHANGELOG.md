@@ -2,6 +2,29 @@
 
 All notable changes to Mooneva Cycle. Versions follow the Android `versionCode` / iOS build numbers used at release time.
 
+## 3.0.0 (Android versionCode 26, iOS build 29)
+
+- **New: Mooneva Lab (experimental, English only, off by default).** Turn it on in Settings to get a Lab tab with a timer for the cup, disc, pad or tampon you are using, a reminder before it is full and again 1, 3 and 6 hours after it was due, and an estimate of the blood lost per period, with the studies it is based on. Mooneva discs come as presets in both sizes (Small 30 mL, Regular 60 mL). An overdue timer stays on screen until you log a change or say you stopped. Lab data is part of the backup, and the tab is hidden in discrete mode.
+- **New: your own symptoms and moods.** Add them in the day log. They appear in Trends, the heatmaps and the clinical report like the built-in ones.
+- **New: import from SimpleInnovation Period Tracker.** "Import from another app" is now its own block in Data Management. Clue and Drip imports keep items the app has no match for as custom symptoms and moods instead of dropping them.
+- **Pregnancy.** You can set the end date yourself, and each pregnancy gets its own row in History. Starting a period inside a pregnancy asks first. While a pregnancy runs, the app forecasts nothing (no periods, fertile days, PMS or ovulation) and starts again from the first period after it. Marking a pregnancy no longer changes your settings.
+- **New: discreet notifications on their own.** Neutral reminder text, hidden on the lock screen, without disguising the app icon.
+- **New: "Show ovulation day"** marks the ovulation day without any fertility wording.
+- Period length can be set up to 15 days and PMS up to 12.
+- The top card follows the day you tap: past days show their own cycle, future days the predicted one.
+- A late period shows "Day N" and how many days overdue, instead of a day count past the cycle length.
+- Cycle history shows the year when a row is not in the current year.
+- Pill and withdrawal-bleed items show in the day log only when they apply. Nothing is deleted when birth control is switched off.
+- Persian and Arabic use their own digits, and "day/total" reads with the day first.
+- The widget shows "--" when there is no forecast, instead of an invented ovulation date.
+- The clinical report counts the current period's bleeding days, not the expected length.
+- Screen readers: switches, calendar days, day log choices and Trends charts now read their names and states. Larger tap targets, the back button closes popups, and "Remove animations" is respected.
+- Cancel in period editing restores the flow you logged, and logged flow next to a period joins it instead of overlapping.
+- Imports never create overlapping or future periods, and broken files are rejected. Restore and "delete all data" are safer.
+- Dates no longer show a day early after a time zone change.
+- Dark mode: period bars in History are red again, and every tab shows the active dot.
+- iOS: the "You have changed the icon" alert no longer appears every time the app opens.
+
 ## 2.5.0 — Android versionCode 23, iOS build 26
 
 - **New: automatic encrypted backups.** Choose a folder once and the app writes an encrypted backup there by itself, at most once a day and only when something has actually changed. Old backups are pruned, and the destination, last run time and any error are shown in Settings.

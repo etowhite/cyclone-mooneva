@@ -1,7 +1,7 @@
 import { Share } from '@capacitor/share';
 import { version } from '../package.json';
 import Logger from '../services/logger';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import type { AppSettings, FirstDayOfWeek, PeriodRecord } from '../types';
 import { useTranslation } from 'react-i18next';
@@ -12,21 +12,24 @@ import { ClinicalReportView } from './settings/ClinicalReportView';
 import { getTodayStr } from '../utils/dateUtils';
 import { PIN_MAX_LENGTH, isValidPin, normalizePinInput, hasPin, hashPin } from '../utils/pin';
 import { FIRST_DAY_OPTIONS, resolveFirstDayOfWeek } from '../utils/weekStart';
-import { applySettingsInterlocks } from '../services/logic/settingsInterlocks';
-import { findActivePeriod } from '../services/logic/cycle';
+import { applySettingsInterlocks, getCycleVisibility } from '../services/logic/settingsInterlocks';
+import { findActivePeriod, settingBounds } from '../services/logic/cycle';
+import { LabPausedNote } from './lab';
+import { PregnancyPredictionsNote } from './settings/PregnancyPredictionsNote';
 
-import { SubViewType, ViewType } from '../hooks/useAppNavigation';
+import { SubViewType, ViewType, pushBackInterceptor } from '../hooks/useAppNavigation';
 
 interface SettingsProps {
   settings: AppSettings;
   onUpdate: (s: AppSettings) => void;
-  onClose: () => void;
   subView: SubViewType;
   onSubViewChange: (v: SubViewType) => void;
   periods: PeriodRecord[];
   onUpdatePeriodWithdrawalBleed: (id: string, isWithdrawalBleed: boolean) => Promise<void>;
   onViewChange: (v: ViewType) => void;
   runBackupNow: () => Promise<'written' | 'skipped' | 'failed'>;
+  /** A pregnancy has no period after it, so nothing is forecast. Shows a note in the predictions area. */
+  pregnancyAwaitingPeriod?: boolean;
 }
 
 const Icons = {
@@ -35,6 +38,7 @@ const Icons = {
   Brain: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.5 2A5 5 0 0 1 12 4a5 5 0 0 1 2.5-2 5.5 5.5 0 0 1 5.5 5.5c0 1.38-.5 2.63-1.32 3.58.11.16.21.32.32.42A4.5 4.5 0 1 1 12 18a4.5 4.5 0 1 1-7-3.5c.11-.1.21-.26.32-.42A5.48 5.48 0 0 1 4 7.5 5.5 5.5 0 0 1 9.5 2z" /><path d="M12 11V8" /><path d="M12 18v-3" /></svg>,
   Rotate: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M3 21v-5h5" /></svg>,
   Droplets: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 16.3c2.2 0 4-1.8 4-4 0-3.3-4-6.3-4-6.3s-4 3-4 6.3c0 2.2 1.8 4 4 4z" /><path d="M17 19.3c1.7 0 3-1.3 3-3 0-2.5-3-4.8-3-4.8s-3 2.3-3 4.8c0 1.7 1.3 3 3 3z" /></svg>,
+  Flask: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2" /><path d="M6.453 15h11.094" /><path d="M8.5 2h7" /></svg>,
   Egg: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22a8 8 0 0 0 8-8c0-4.42-3.58-12-8-12s-8 7.58-8 12a8 8 0 0 0 8 8z" /></svg>,
   Alert: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>,
   Sparkles: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /><path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" /></svg>,
@@ -53,7 +57,8 @@ const Icons = {
   Gift: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
 };
 
-const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subView, onSubViewChange, periods, onUpdatePeriodWithdrawalBleed, onViewChange, runBackupNow }) => {
+const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubViewChange, periods, onUpdatePeriodWithdrawalBleed, onViewChange, runBackupNow, pregnancyAwaitingPeriod }) => {
+  const bounds = settingBounds(settings);
   const { t, i18n } = useTranslation();
   const [pinInput, setPinInput] = useState('');
   const [pinConfirm, setPinConfirm] = useState('');
@@ -69,6 +74,25 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
   const [showAdaptiveOffWarning, setShowAdaptiveOffWarning] = useState(false);
   const [pendingAction, setPendingAction] = useState<'bc' | 'pause' | null>(null);
   const [periodForDialog, setPeriodForDialog] = useState<PeriodRecord | null>(null);
+
+  // Android back closes the open dialog instead of leaving Settings.
+  const birthControlDialogOpen = showBirthControlDialog && !!periodForDialog;
+  useEffect(() => {
+    if (!birthControlDialogOpen) return;
+    return pushBackInterceptor(() => { setShowBirthControlDialog(false); setPeriodForDialog(null); });
+  }, [birthControlDialogOpen]);
+  useEffect(() => {
+    if (!showAdaptiveOffWarning) return;
+    return pushBackInterceptor(() => { setShowAdaptiveOffWarning(false); setPendingAction(null); });
+  }, [showAdaptiveOffWarning]);
+  useEffect(() => {
+    if (!showPrivacyWarning) return;
+    return pushBackInterceptor(() => setShowPrivacyWarning(false));
+  }, [showPrivacyWarning]);
+  useEffect(() => {
+    if (!showGiftModal) return;
+    return pushBackInterceptor(() => setShowGiftModal(false));
+  }, [showGiftModal]);
   const effectiveFirstDayOfWeek = resolveFirstDayOfWeek(i18n.language, settings.firstDayOfWeek);
   const pinEntryReady = isValidPin(pinInput) && isValidPin(pinConfirm);
   const updateInterlockedSettings = (change: Partial<AppSettings>) => {
@@ -105,7 +129,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
           <div className="max-w-lg mx-auto space-y-8">
             <SettingCard title={t('settings.cycle_config_section')}>
               <SettingRow label={t('settings.adaptive_prediction_label')} desc={settings.isOnBirthControl ? t('settings.on_bc_disabled') : t('settings.adaptive_prediction_desc_long')} icon={<Icons.Brain />}>
-                <Toggle
+                <Toggle label={t('settings.adaptive_prediction_label')}
                   active={!!settings.adaptivePrediction && !settings.isOnBirthControl}
                   onClick={() => {
                     if (!settings.isOnBirthControl) {
@@ -124,8 +148,8 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                     icon={<Icons.Rotate />}
                     value={settings.cycleLength}
                     onChange={(val) => onUpdate({ ...settings, cycleLength: val })}
-                    min={21}
-                    max={45}
+                    min={bounds.cycle.min}
+                    max={bounds.cycle.max}
                     defaultValue={28}
                   />
 
@@ -135,8 +159,8 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                     icon={<Icons.Droplets />}
                     value={settings.periodLength}
                     onChange={(val) => onUpdate({ ...settings, periodLength: val })}
-                    min={2}
-                    max={10}
+                    min={bounds.period.min}
+                    max={bounds.period.max}
                     defaultValue={5}
                   />
 
@@ -146,8 +170,8 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                     icon={<Icons.Egg />}
                     value={settings.lutealPhaseLength}
                     onChange={(val) => onUpdate({ ...settings, lutealPhaseLength: val })}
-                    min={10}
-                    max={Math.min(18, settings.cycleLength - settings.periodLength)}
+                    min={bounds.luteal.min}
+                    max={bounds.luteal.max}
                     defaultValue={14}
                   />
                 </>
@@ -161,7 +185,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                 icon={<Icons.Egg />}
                 mergeWithNext
               >
-                <Toggle
+                <Toggle label={t('settings.show_fertile_window')}
                   active={settings.showFertileWindow && !settings.isOnBirthControl}
                   onClick={() => !settings.isOnBirthControl && onUpdate({
                     ...settings,
@@ -212,13 +236,25 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                   </div>
                 </div>
               )}
+              <div className="flex items-center justify-between gap-3 px-4 py-2.5 border-t border-slate-200/40">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold text-slate-500">{t('settings.show_ovulation')}</p>
+                  <p className="text-[10px] text-slate-400 leading-snug">{t('settings.show_ovulation_desc')}</p>
+                </div>
+                <Toggle label={t('settings.show_ovulation')}
+                  small
+                  active={getCycleVisibility(settings).ovulation}
+                  onClick={() => onUpdate({ ...settings, showOvulation: !settings.showOvulation })}
+                  disabled={settings.isOnBirthControl || settings.predictionsPaused || settings.showFertileWindow}
+                />
+              </div>
               {settings.showFertileWindow && !settings.isOnBirthControl && (
                 <div className="flex items-center justify-between gap-3 px-4 py-2.5 border-t border-slate-200/40">
                   <div className="min-w-0">
                     <p className="text-[11px] font-semibold text-slate-500">{t('settings.show_fertility_level')}</p>
                     <p className="text-[10px] text-slate-400 leading-snug">{t('settings.show_fertility_level_desc')}</p>
                   </div>
-                  <Toggle
+                  <Toggle label={t('settings.show_fertility_level')}
                     small
                     active={!settings.hideFertilityLevel}
                     onClick={() => onUpdate({ ...settings, hideFertilityLevel: !settings.hideFertilityLevel })}
@@ -229,7 +265,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
 
             <SettingCard title={t('settings.pms_window_section')}>
               <SettingRow label={t('settings.show_pms_window')} desc={t('settings.show_pms_window_desc')} icon={<Icons.Alert />} mergeWithNext>
-                <Toggle active={!!settings.showPMS} onClick={() => onUpdate({ ...settings, showPMS: !settings.showPMS })} />
+                <Toggle label={t('settings.show_pms_window')} active={!!settings.showPMS} onClick={() => onUpdate({ ...settings, showPMS: !settings.showPMS })} />
               </SettingRow>
 
               {settings.showPMS && (
@@ -239,8 +275,8 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                   icon={<Icons.Alert />}
                   value={settings.pmsLength}
                   onChange={(val) => onUpdate({ ...settings, pmsLength: val })}
-                  min={1}
-                  max={7}
+                  min={bounds.pms.min}
+                  max={bounds.pms.max}
                   defaultValue={3}
                   mergeWithPrevious
                 />
@@ -254,7 +290,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                 icon={<Icons.Pill />}
                 mergeWithNext
               >
-                <Toggle
+                <Toggle label={t('settings.birth_control')}
                   active={settings.isOnBirthControl}
                   onClick={() => {
                     if (!settings.isOnBirthControl) {
@@ -293,7 +329,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                 icon={<Icons.Pause />}
                 last
               >
-                <Toggle
+                <Toggle label={t('settings.pause_predictions')}
                   active={settings.predictionsPaused}
                   onClick={() => {
                     const nextVal = !settings.predictionsPaused;
@@ -310,11 +346,12 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                   }}
                 />
               </SettingRow>
+              {pregnancyAwaitingPeriod && <PregnancyPredictionsNote />}
             </SettingCard>
 
             <SettingCard title={t('settings.kid_mode_section')}>
               <SettingRow label={t('settings.kid_mode_label')} desc={t('settings.kid_mode_desc')} icon={<Icons.Eye />} last>
-                <Toggle active={!!settings.kidMode} onClick={() => onUpdate({ ...settings, kidMode: !settings.kidMode })} />
+                <Toggle label={t('settings.kid_mode_label')} active={!!settings.kidMode} onClick={() => onUpdate({ ...settings, kidMode: !settings.kidMode })} />
               </SettingRow>
             </SettingCard>
 
@@ -325,8 +362,8 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
         {showBirthControlDialog && periodForDialog && createPortal(
           <>
             <div className="fixed inset-0 bg-black/40 z-[301]" onClick={() => { setShowBirthControlDialog(false); setPeriodForDialog(null); }} />
-            <div className="fixed left-4 right-4 top-1/2 -translate-y-1/2 z-[302] bg-[#F0F2F5] rounded-2xl p-5 max-w-sm mx-auto" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
-              <h3 className="text-base font-bold text-slate-700 mb-1">{t('settings.birth_control_dialog_title', 'Current Period')}</h3>
+            <div role="dialog" aria-modal="true" aria-labelledby="bc-dialog-title" className="fixed left-4 right-4 top-1/2 -translate-y-1/2 z-[302] bg-[#F0F2F5] rounded-2xl p-5 max-w-sm mx-auto" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
+              <h3 id="bc-dialog-title" className="text-base font-bold text-slate-700 mb-1">{t('settings.birth_control_dialog_title', 'Current Period')}</h3>
               <p className="text-xs text-slate-500 mb-4">
                 {t('settings.birth_control_dialog_message', 'You have an active period. How should it be tagged?')}
               </p>
@@ -372,11 +409,11 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
         {showAdaptiveOffWarning && createPortal(
           <>
             <div className="fixed inset-0 bg-black/40 z-[301]" onClick={() => { setShowAdaptiveOffWarning(false); setPendingAction(null); }} />
-            <div className="fixed left-4 right-4 top-1/2 -translate-y-1/2 z-[302] bg-[#F0F2F5] rounded-3xl p-6 max-w-sm mx-auto overflow-hidden" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
+            <div role="dialog" aria-modal="true" aria-labelledby="adaptive-off-title" className="fixed left-4 right-4 top-1/2 -translate-y-1/2 z-[302] bg-[#F0F2F5] rounded-3xl p-6 max-w-sm mx-auto overflow-hidden" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
               <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-amber-500 mb-4" style={{ boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.8)' }}>
                 <Icons.Brain />
               </div>
-              <h3 className="text-lg font-extrabold text-slate-700 mb-2 leading-tight">{t('settings.adaptive_prediction_off_title')}</h3>
+              <h3 id="adaptive-off-title" className="text-lg font-extrabold text-slate-700 mb-2 leading-tight">{t('settings.adaptive_prediction_off_title')}</h3>
               <p className="text-sm text-slate-500 mb-6 leading-relaxed">
                 {t('settings.adaptive_prediction_off_desc')}
               </p>
@@ -542,11 +579,28 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
             </SettingCard>
           </section>
 
+          {/* 1.6 Lab (optional tab). Nothing Lab-related shows while discrete mode is on. */}
+          {!settings.discreteMode && (
+            <section>
+              <SettingCard title={t('lab.settings_section')}>
+                <SettingRow label={t('lab.toggle_label')} desc={t('lab.toggle_desc')} icon={<Icons.Flask />} last>
+                  <Toggle label={t('lab.toggle_label')} active={!!settings.labEnabled} onClick={() => {
+                    // Turning Lab off removes its pending reminder.
+                    if (settings.labEnabled) void import('../services/lab').then(m => m.cancelLabReminder());
+                    onUpdate({ ...settings, labEnabled: !settings.labEnabled });
+                  }} />
+                </SettingRow>
+                {settings.labEnabled && <LabPausedNote />}
+              </SettingCard>
+            </section>
+          )}
+
           {/* 2. Language */}
           <section>
             <SettingCard title={t('settings.language')}>
               <SettingRow label={t('settings.language')} icon={<Icons.Globe />} mergeWithNext>
                 <select
+                  aria-label={t('settings.language')}
                   value={i18n.language}
                   onChange={(e) => {
                     const lang = e.target.value;
@@ -640,7 +694,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                 icon={<Icons.Moon />}
                 last
               >
-                <Toggle active={!!settings.darkNeumorphism} onClick={() => onUpdate({ ...settings, darkNeumorphism: !settings.darkNeumorphism })} />
+                <Toggle label={t('settings.dark_neumorphism')} active={!!settings.darkNeumorphism} onClick={() => onUpdate({ ...settings, darkNeumorphism: !settings.darkNeumorphism })} />
               </SettingRow>
             </SettingCard>
           </section>
@@ -654,7 +708,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                 icon={<Icons.Eye />}
                 last
               >
-                <Toggle active={settings.discreteMode} onClick={() => onUpdate({ ...settings, discreteMode: !settings.discreteMode })} />
+                <Toggle label={t('settings.discrete_mode')} active={settings.discreteMode} onClick={() => onUpdate({ ...settings, discreteMode: !settings.discreteMode })} />
               </SettingRow>
             </SettingCard>
           </section>
@@ -666,7 +720,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                 label={t('settings.pin_lock')}
                 desc={hasPin(settings) ? t('settings.pin_active') : t('settings.pin_disabled_desc')}
                 icon={<Icons.Lock />}
-                onClick={() => !hasPin(settings) && setPinExpanded(!pinExpanded)}
+                onClick={hasPin(settings) ? undefined : () => setPinExpanded(!pinExpanded)}
                 last={!pinExpanded || hasPin(settings)}
                 mergeWithNext={!hasPin(settings) && pinExpanded}
                 rightElement={
@@ -878,11 +932,11 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
       {/* PRIVACY WARNING MODAL */}
       {showPrivacyWarning && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl scale-100 animate-scale-in">
+          <div role="dialog" aria-modal="true" aria-labelledby="privacy-warning-title" className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl scale-100 animate-scale-in">
             <div className="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center text-rose-500 mx-auto mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
             </div>
-            <h3 className="text-xl font-bold text-center text-slate-800 mb-2">{t('settings.medical_privacy_warning')}</h3>
+            <h3 id="privacy-warning-title" className="text-xl font-bold text-center text-slate-800 mb-2">{t('settings.medical_privacy_warning')}</h3>
             <p className="text-sm text-slate-500 text-center leading-relaxed mb-6">
               {t('settings.medical_privacy_desc')}
             </p>
@@ -911,14 +965,14 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
             className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 animate-fade-in"
             onClick={() => setShowGiftModal(false)}
           />
-          <div className="fixed inset-x-4 top-1/2 -translate-y-1/2 max-w-sm mx-auto bg-white rounded-3xl p-6 z-50 shadow-2xl animate-scale-up border border-slate-100">
+          <div role="dialog" aria-modal="true" aria-labelledby="gift-modal-title" className="fixed inset-x-4 top-1/2 -translate-y-1/2 max-w-sm mx-auto bg-white rounded-3xl p-6 z-50 shadow-2xl animate-scale-up border border-slate-100">
             <div className="text-center space-y-3.5">
               <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
               </div>
 
               <div className="space-y-1">
-                <h3 className="text-lg font-bold text-slate-800 tracking-tight">
+                <h3 id="gift-modal-title" className="text-lg font-bold text-slate-800 tracking-tight">
                   {t('branding.gift_modal_title', 'Sustainable Period Care')}
                 </h3>
                 <span className="inline-block text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 shadow-xs">

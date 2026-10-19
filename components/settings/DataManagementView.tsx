@@ -1,10 +1,18 @@
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppSettings } from '../../types';
-import { shareOrDownloadBackup, loadData, wipeAllData, saveData, generateBackup, restoreBackup, loadPeriods, savePeriods, parseExternalImport, MAX_IMPORT_FILE_SIZE_BYTES, mergeRestoredSettings, writeAutoBackupPassword, clearAutoBackupPassword } from '../../services/logic';
+import { shareOrDownloadBackup, loadData, wipeAllData, saveData, generateBackup, restoreBackup, loadPeriods, savePeriods, parseExternalImport, MAX_IMPORT_FILE_SIZE_BYTES, mergeRestoredSettings, saveSettings, writeAutoBackupPassword, clearAutoBackupPassword } from '../../services/logic';
+import { cancelLabReminder, loadLabForBackup, saveLabFromBackup } from '../../services/lab';
 import Logger from '../../services/logger';
-import { toLocalISOString } from '../../utils/dateUtils';
+import { addDays, parseLocalDate, toLocalISOString } from '../../utils/dateUtils';
+import { useDisplayFormat } from '../../services/displayFormat';
 import { PICKER_SESSION_KEY } from '../../hooks/useAutoLock';
+import { useMooneva } from '../../contexts/MoonevaContext';
+
+/** The live app state, or undefined when this view renders outside the provider. */
+const useLiveState = () => {
+    try { return useMooneva(); } catch { return undefined; }
+};
 
 interface DataManagementViewProps {
     settings: AppSettings;
@@ -16,6 +24,10 @@ interface DataManagementViewProps {
 
 const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpdate, onBack, runBackupNow }) => {
     const { t } = useTranslation();
+    const fmt = useDisplayFormat();
+    // Live in-memory data, so an edit made under a second ago is in the export. Without a provider
+    // (or while loading, or after a failed load) the data comes from disk instead.
+    const live = useLiveState();
     const [backupPassword, setBackupPassword] = useState('');
     const [backupPasswordConfirm, setBackupPasswordConfirm] = useState('');
     const [backupMismatch, setBackupMismatch] = useState(false);
@@ -42,7 +54,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
     // confirm the feature works or to recover a skipped day. force=true bypasses the
     // once-a-day and nothing-changed gates; failures land in the existing error banner.
     // One implementation, shared with the calendar header's shortcut. See
-    // MoonevaContext.runBackupNow for why it reads the datasets from disk.
+    // MoonevaContext.runBackupNow for where it reads the datasets from.
     const handleBackupNow = async () => {
         setIsProcessing(true);
         setAutoBackupSetupError('');
@@ -163,11 +175,13 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
 
         setIsProcessing(true);
         try {
-            const allData = await loadData();
-            const allPeriods = await loadPeriods();
+            const useLive = !!live && !live.isLoading && !live.loadError;
+            const allData = useLive ? live.logs : await loadData();
+            const allPeriods = useLive ? live.periods : await loadPeriods();
+            const lab = await loadLabForBackup();
 
             const { blob, filename } = await generateBackup(
-                { data: allData, settings, timestamp: new Date().toISOString(), periods: allPeriods },
+                { data: allData, settings, timestamp: new Date().toISOString(), periods: allPeriods, ...(lab !== undefined && { lab }) },
                 isBackupEncrypted ? backupPassword : undefined
             );
             shareOrDownloadBackup(blob, `${filename.split('.')[0]}-${toLocalISOString(new Date())}.${filename.split('.')[1]}`);
@@ -190,14 +204,42 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
         setIsProcessing(true);
         try {
             const restored = await restoreBackup(file, passwordToUse);
+            // Check every part before writing any of it, so a bad file leaves nothing half-written.
+            // Only the Lab part is allowed to be bad: it is skipped and the user is told.
+            if (restored.periods !== undefined && !Array.isArray(restored.periods)) {
+                alert(t('settings.invalid_backup'));
+                return;
+            }
             if (restored.data && restored.settings && confirm(t('settings.import_confirm'))) {
+                const mergedSettings = mergeRestoredSettings(restored.settings, settings);
                 await saveData(restored.data);
                 // A backup always fully replaces periods (including a legitimate empty list);
                 // only a genuinely absent field (old-format backup) leaves existing periods alone.
                 if (Array.isArray(restored.periods)) {
                     await savePeriods(restored.periods);
                 }
-                onUpdate(mergeRestoredSettings(restored.settings, settings));
+                // A backup without Lab data leaves the current Lab data alone. Lab comes after the
+                // core data, so a failed core write never leaves new Lab data beside old core data;
+                // an invalid Lab part writes nothing and the user is told.
+                let labKept = false;
+                if (restored.lab !== undefined) {
+                    try {
+                        labKept = !(await saveLabFromBackup(restored.lab));
+                    } catch (e) {
+                        Logger.error('Lab restore failed:', e);
+                        labKept = true;
+                    }
+                }
+                // A restored file may switch Lab off or change Lab data. Drop the pending Lab reminder;
+                // after the reload the app-level effect schedules it again if Lab is on.
+                await cancelLabReminder();
+                await saveSettings(mergedSettings);
+                onUpdate(mergedSettings);
+                if (labKept) {
+                    alert(t('settings.import_lab_kept', {
+                        defaultValue: 'Backup restored. The Lab data in the file could not be used, so your current Lab data was kept.',
+                    }));
+                }
                 window.location.reload();
             } else {
                 // If decryptBackup returns null or incomplete structure
@@ -222,7 +264,8 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
 
         setIsProcessing(true);
         try {
-            const parsed = parseExternalImport(await file.text());
+            let parsed: ReturnType<typeof parseExternalImport> = null;
+            try { parsed = parseExternalImport(await file.text()); } catch (e) { Logger.warn('Could not read the import file', e); }
             if (!parsed) {
                 alert(t('settings.import_unrecognized'));
                 return;
@@ -238,10 +281,11 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
             const existingPeriods = await loadPeriods();
             // Existing entries win on conflict; imported data only fills gaps
             const mergedLogs = { ...parsed.logs, ...existingData };
-            const existingStarts = new Set(existingPeriods.map(p => p.startDate));
+            const endOf = (p: { startDate: string; days: number }) => addDays(p.startDate, Math.max(p.days, 1) - 1);
             const mergedPeriods = [
                 ...existingPeriods,
-                ...parsed.periods.filter(p => !existingStarts.has(p.startDate)),
+                ...parsed.periods.filter(p => !existingPeriods.some(e =>
+                    p.startDate <= endOf(e) && e.startDate <= endOf(p))),
             ];
             await saveData(mergedLogs);
             await savePeriods(mergedPeriods);
@@ -369,7 +413,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                             </p>
                                             {settings.autoBackupLastRunAt && (
                                                 <p data-testid="auto-backup-last-run" className="text-[10px] text-slate-400 px-1">
-                                                    {t('settings.auto_backup_last_run', { defaultValue: 'Last backup' })}: {new Date(settings.autoBackupLastRunAt).toLocaleString()}
+                                                    {t('settings.auto_backup_last_run', { defaultValue: 'Last backup' })}: {fmt.dateTime(new Date(settings.autoBackupLastRunAt))}
                                                 </p>
                                             )}
                                             <button
@@ -529,7 +573,6 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                 <input
                                     // generateBackup writes .enc with a password and .json without,
                                     // so restore has to offer both or the plaintext one is unpickable.
-                                    accept=".enc,.json,application/json"
                                     accept=".enc,.json,application/json,application/octet-stream"
                                     className="hidden"
                                     type="file"
@@ -537,14 +580,29 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                     onChange={handleImport}
                                 />
 
+                            </div>
+
+                            <div className="h-px bg-slate-200/50 w-full" />
+
+                            {/* IMPORT FROM ANOTHER APP: its own block, apart from restoring a Mooneva backup */}
+                            <div className="space-y-4" data-testid="import-from-app">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 shrink-0 rounded-xl bg-[#F0F2F5] flex items-center justify-center text-[#5a7d87]" style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3), inset -2px -2px 4px rgba(255, 255, 255, 0.8)' }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14 3h7v7" /><path d="M21 3l-9 9" /><path d="M5 5h6" /><path d="M5 5v14h14v-6" /></svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-sm font-bold text-slate-700">{t('settings.import_from_app')}</h3>
+                                        <p className="text-xs text-slate-400">{t('settings.import_app_desc')}</p>
+                                    </div>
+                                </div>
+
                                 <button
                                     onClick={() => triggerFileInput(appImportInputRef)}
                                     disabled={isProcessing}
                                     className="w-full py-3 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-sm"
                                 >
-                                    {t('settings.import_from_app')}
+                                    {t('settings.import_app_choose')}
                                 </button>
-                                <p className="text-[10px] text-slate-400 text-center -mt-2">{t('settings.import_app_desc')}</p>
 
                                 <input
                                     accept=".csv,.json,text/csv,application/json"
@@ -569,7 +627,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                 <div className="mb-3 p-3 bg-white/50 border border-indigo-100 rounded-xl flex items-center justify-between shadow-sm">
                                     <div>
                                         <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">{t('settings.archive_active')}</p>
-                                        <p className="text-xs font-semibold text-slate-600">{t('settings.restricting_logs', { date: settings.historyArchivedDate })}</p>
+                                        <p className="text-xs font-semibold text-slate-600">{t('settings.restricting_logs', { date: fmt.dayMonthYear(parseLocalDate(settings.historyArchivedDate)) })}</p>
                                     </div>
                                     <button
                                         onClick={() => {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface NumberSettingRowProps {
     label: string;
@@ -27,6 +28,7 @@ const NumberSettingRow: React.FC<NumberSettingRowProps> = ({
     isLast = false,
     mergeWithPrevious = false
 }) => {
+    const { t } = useTranslation();
     const handleDecrement = () => {
         onChange(Math.max(min, value - 1));
     };
@@ -53,6 +55,7 @@ const NumberSettingRow: React.FC<NumberSettingRowProps> = ({
                     <div className="w-10 flex flex-col items-center justify-center border-r border-slate-100">
                         <input
                             type="number"
+                            aria-label={label}
                             min={min}
                             max={max}
                             value={value}
@@ -71,7 +74,7 @@ const NumberSettingRow: React.FC<NumberSettingRowProps> = ({
                             onClick={handleIncrement}
                             disabled={value >= max}
                             className="flex-1 flex items-center justify-center hover:bg-slate-50 active:bg-slate-100 disabled:opacity-20 disabled:cursor-not-allowed transition-colors border-b border-slate-100"
-                            aria-label="Increase value"
+                            aria-label={`${t('common.increase', 'Increase')} ${label}`}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="text-slate-500"><path d="m18 15-6-6-6 6" /></svg>
                         </button>
@@ -79,7 +82,7 @@ const NumberSettingRow: React.FC<NumberSettingRowProps> = ({
                             onClick={handleDecrement}
                             disabled={value <= min}
                             className="flex-1 flex items-center justify-center hover:bg-slate-50 active:bg-slate-100 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-                            aria-label="Decrease value"
+                            aria-label={`${t('common.decrease', 'Decrease')} ${label}`}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="text-slate-500"><path d="m6 9 6 6 6-6" /></svg>
                         </button>

@@ -1,16 +1,19 @@
 import { useMemo, useCallback, useEffect, useState } from 'react';
-import { DailyLog, AppSettings, Cycle, PredictionResults, DayMeta, PeriodRecord } from '../types';
+import { DailyLog, AppSettings, Cycle, DayMeta, PeriodRecord } from '../types';
 import {
     getPastCycles,
-    getCyclePredictions,
     findActivePeriod,
     getPregnancySpans,
     findPregnancySpan,
     markPregnancyCycles,
 } from '../services/logic';
+import { periodBleedingDays } from '../services/logic/cycle';
 import type { PregnancySpan } from '../services/logic/cycle';
 import { toLocalISOString, addDays, diffInDays } from '../utils/dateUtils';
-import { calculateCycleStatus, computeDayOfCycle } from '../services/logic/status';
+import { buildCycleModel } from '../services/logic/cycleModel';
+import type { CycleModel } from '../services/logic/cycleModel';
+import { getCycleVisibility } from '../services/logic/settingsInterlocks';
+import { calculateCycleStatus } from '../services/logic/status';
 import type { CycleStatusData } from '../services/logic/status';
 import { useTranslation } from 'react-i18next';
 
@@ -46,27 +49,13 @@ const findTrailingSpottingPeriod = (
     return null;
 };
 
-/**
- * Latest period starting on or before dateStr. A single pass rather than
- * filter().sort()[0]: same answer, no sortedness assumption, and no two throwaway
- * arrays per calendar cell.
- */
-const findAnchorStart = (periods: PeriodRecord[], dateStr: string): string | undefined => {
-    let anchor: string | undefined;
-    for (const p of periods) {
-        if (p.startDate <= dateStr && (anchor === undefined || p.startDate > anchor)) {
-            anchor = p.startDate;
-        }
-    }
-    return anchor;
-};
-
 export interface MoonevaModel {
     // Data
     cycles: Cycle[];
-    predictions: PredictionResults;
-    /** Pregnancy spans, newest last. History renders the ones no cycle covers. */
+    /** Pregnancy spans, newest last, all of them (TimelineView applies the archive date). History renders the ones no cycle covers. */
     pregnancySpans: PregnancySpan[];
+    /** The one cycle model, built once per data change. Reminders, the widget and Trends read it. */
+    cycleModel: CycleModel;
 
     // Helpers
     getDayMeta: (dateStr: string) => DayMeta;
@@ -113,7 +102,7 @@ export const useMoonevaModel = (
         return markPregnancyCycles(past, pregnancySpans);
     }, [periods, settings.historyArchivedDate, settings.lutealPhaseLength, pregnancySpans]);
 
-    // 2. Predictions (Future)
+    // 2. The cycle model: every forecast (next period, windows, per-day flags) comes from it.
     const {
         cycleLength,
         periodLength,
@@ -121,30 +110,28 @@ export const useMoonevaModel = (
         pmsLength,
         predictionsPaused,
         isOnBirthControl,
-        showFertileWindow,
         adaptivePrediction,
         historyArchivedDate,
     } = settings;
 
-    const predictions = useMemo(() => {
-        return getCyclePredictions(
-            periods,
-            {
-                cycleLength,
-                periodLength,
-                lutealPhaseLength,
-                pmsLength,
-                isPaused: predictionsPaused,
-                isOnBirthControl,
-                showFertileWindow,
-                adaptivePrediction
-            },
-            historyArchivedDate,
-            6 // Predict 6 months ahead for Calendar
-        );
-    }, [periods, cycleLength, periodLength, lutealPhaseLength, pmsLength,
-        predictionsPaused, isOnBirthControl, showFertileWindow, adaptivePrediction,
-        historyArchivedDate]);
+    // A pregnancy no period has followed forecasts nothing from its start (the latest one counts).
+    const awaitingPregnancyStart = useMemo(
+        () => pregnancySpans.filter(sp => sp.awaitingPeriod).pop()?.start,
+        [pregnancySpans]
+    );
+
+    // The model only reads where each span starts, so a log edit that moves no start keeps the same model.
+    const spanStartsKey = pregnancySpans.map(sp => sp.start).join(',');
+    const modelSpans = useMemo(() => pregnancySpans, [spanStartsKey]);
+
+    const cycleModel = useMemo(
+        () => buildCycleModel(periods, {
+            cycleLength, periodLength, lutealPhaseLength, pmsLength, adaptivePrediction,
+            isOnBirthControl, predictionsPaused, historyArchivedDate,
+        }, todayStr, awaitingPregnancyStart, modelSpans),
+        [periods, cycleLength, periodLength, lutealPhaseLength, pmsLength, adaptivePrediction,
+            isOnBirthControl, predictionsPaused, historyArchivedDate, todayStr, awaitingPregnancyStart, modelSpans]);
+
 
     // 3. Day Meta Factory (The single source of truth for UI data)
     const getDayMeta = useCallback((dateStr: string): DayMeta => {
@@ -212,86 +199,36 @@ export const useMoonevaModel = (
                 meta.dayOfPeriod = diffInDays(dateStr, activePeriod.startDate) + 1;
             } else if (trailingSpottingPeriod) {
                 // For trailing spotting, calculate day relative to the period it extends
-                const periodActiveDays = trailingSpottingPeriod.activeDays?.length || trailingSpottingPeriod.days;
+                const periodActiveDays = periodBleedingDays(trailingSpottingPeriod);
                 const daysAfterPeriod = diffInDays(dateStr, addDays(trailingSpottingPeriod.startDate, trailingSpottingPeriod.days - 1));
                 meta.dayOfPeriod = periodActiveDays + daysAfterPeriod;
             }
         }
 
 
-        // Overlay Historical Fertile Window
-        if (!settings.isOnBirthControl && settings.showFertileWindow) {
-            cycles.forEach(cycle => {
-                if (cycle.isOutlier) return; // Skip outliers
-
-                if (cycle.fertileStart && cycle.fertileEnd) {
-                    if (dateStr >= cycle.fertileStart && dateStr <= cycle.fertileEnd) {
-                        meta.isFertile = true;
-                    }
-                }
-                if (cycle.ovulationDate === dateStr) {
-                    meta.isOvulation = true;
-                }
-            });
-        }
-
-        // Overlay Predictions
-        if (!settings.predictionsPaused) {
-            if (predictions.nextPeriodStart && predictions.nextPeriodEnd) {
-                if (dateStr >= predictions.nextPeriodStart && dateStr <= predictions.nextPeriodEnd) {
-                    meta.isForecastPeriod = true;
-                }
-            }
-
-            predictions.futurePredictions?.forEach(fp => {
-                if (dateStr >= fp.startDate && dateStr <= fp.endDate) meta.isForecastPeriod = true;
-                if (fp.ovulationDate === dateStr) meta.isOvulation = true;
-                if (!settings.isOnBirthControl && settings.showFertileWindow) {
-                    if (fp.fertileStart && fp.fertileEnd && dateStr >= fp.fertileStart && dateStr <= fp.fertileEnd) {
-                        meta.isFertile = true;
-                    }
-                }
-            });
-
-            if (!settings.isOnBirthControl && settings.showFertileWindow && predictions.fertileWindow) {
-                if (dateStr >= predictions.fertileWindow.start && dateStr <= predictions.fertileWindow.end) {
-                    meta.isFertile = true;
-                }
-            }
-            if (predictions.ovulationDate === dateStr) meta.isOvulation = true;
-
-            if (settings.showPMS && predictions.pmsWindow) {
-                if (dateStr >= predictions.pmsWindow.start && dateStr <= predictions.pmsWindow.end) {
-                    meta.isPMS = true;
-                }
-            }
-        }
-
-        // Anchor on the latest period starting on or before this date, not the global
-        // latest, so dates before a future period don't get negative cycle days.
-        // Cells only need the day number; the full status is getDayStatus below.
-        if (!settings.predictionsPaused && !predictions.isStale) {
-            meta.dayOfCycle = computeDayOfCycle(
-                dateStr,
-                findAnchorStart(periods, dateStr) ?? predictions.lastPeriodStart,
-                predictions.cycleLengthUsed || predictions.effective?.cycleLength || 28,
-                todayStr
-            );
+        // The model gives the facts; the settings decide what is shown.
+        const day = cycleModel.at(dateStr);
+        meta.isForecastPeriod = day.isForecastPeriod;
+        const vis = getCycleVisibility(settings);
+        if (vis.fertile) meta.isFertile = day.isFertile;
+        if (vis.ovulation) meta.isOvulation = day.isOvulation;
+        if (vis.pms) meta.isPMS = day.isPms;
+        if (!settings.predictionsPaused && !cycleModel.isStale) {
+            meta.dayOfCycle = day.cycleDay ?? undefined;
         }
 
         return meta;
-    }, [logs, periods, settings, cycles, predictions, t, todayStr, pregnancySpans]);
+    }, [logs, periods, settings, cycleModel, pregnancySpans]);
 
     const getDayStatus = useCallback((dateStr: string): CycleStatusData => {
-        const anchorDate = findAnchorStart(periods, dateStr);
-        return calculateCycleStatus(getDayMeta(dateStr), predictions, settings, t, anchorDate);
-    }, [getDayMeta, periods, predictions, settings, t]);
+        return calculateCycleStatus(getDayMeta(dateStr), cycleModel.at(dateStr), cycleModel.rules.periodLength, settings, t);
+    }, [getDayMeta, cycleModel, settings, t]);
 
     return useMemo(() => ({
         cycles,
-        predictions,
         pregnancySpans,
+        cycleModel,
         getDayMeta,
         getDayStatus,
-    }), [cycles, predictions, pregnancySpans, getDayMeta, getDayStatus]);
+    }), [cycles, pregnancySpans, cycleModel, getDayMeta, getDayStatus]);
 };

@@ -6,6 +6,7 @@ import { useMoonevaModel } from '../hooks/useMoonevaModel';
 import type { MoonevaModel } from '../hooks/useMoonevaModel';
 import { DailyLog, AppSettings, PeriodRecord } from '../types';
 import Logger from '../services/logger';
+import { getCycleVisibility } from '../services/logic/settingsInterlocks';
 import { toLocalISOString, diffInDays } from '../utils/dateUtils';
 import { PICKER_SESSION_KEY, PICKER_GRACE_PERIOD_MS } from '../utils/pickerSession';
 
@@ -31,7 +32,7 @@ interface MoonevaContextType {
         toggleBleedingDay: (date: string, effectivePeriodLength?: number) => Promise<void>;
         updatePeriodWithdrawalBleed: (id: string, isWithdrawalBleed: boolean) => Promise<void>;
         updatePeriodIgnoreForAverages: (id: string, ignoreForAverages: boolean) => Promise<void>;
-        restorePeriods: (snapshot: PeriodRecord[]) => void;
+        restorePeriods: (snapshot: PeriodRecord[], logsSnapshot?: Record<string, DailyLog>) => void;
     };
 }
 
@@ -64,12 +65,11 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
 
         let cancelled = false;
 
-        // Sync notifications whenever settings or predictions change
-        // We pass the full predictions to enable date-specific one-shot reminders
+        // Sync notifications whenever settings or the cycle model change.
         import('../services/notifications')
             .then(({ syncReminderNotifications }) => {
                 if (cancelled) return;
-                return syncReminderNotifications(settings, model.predictions);
+                return syncReminderNotifications(settings, model.cycleModel);
             })
             .catch(() => {
                 if (!cancelled) Logger.warn('Failed to sync reminder notifications');
@@ -78,7 +78,29 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
         return () => {
             cancelled = true;
         };
-    }, [loading, settings, model.predictions]);
+    }, [loading, settings, model.cycleModel]);
+
+    // Sync the Lab reminder (seam S6). Runs only while Lab is on, so Lab-off users never load
+    // Lab code. Discrete mode stays in the deps: turning it on makes the sync cancel the reminder.
+    const { labEnabled, discreteMode, discreetNotifications } = settings;
+    React.useEffect(() => {
+        if (loading || labEnabled !== true) return;
+
+        let cancelled = false;
+
+        import('../services/lab')
+            .then(({ syncLabReminderFromStore }) => {
+                if (cancelled) return;
+                return syncLabReminderFromStore(periods, logs, { labEnabled, discreteMode, discreetNotifications });
+            })
+            .catch(() => {
+                if (!cancelled) Logger.warn('Failed to sync Lab reminder');
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [loading, labEnabled, discreteMode, discreetNotifications, periods, logs]);
 
     // Sync App Icon (Discrete Mode)
     React.useEffect(() => {
@@ -90,18 +112,22 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
 
     // Sync Android Widget Data
     React.useEffect(() => {
+        // Before the data has loaded (or after a failed load) every value would be "--".
+        if (loading || loadError) return;
         import('../services/widgetSync').then(({ WidgetSync }) => {
             const today = toLocalISOString(new Date());
             const todayMeta = model.getDayMeta(today);
+            const vis = getCycleVisibility(settings);
 
-            const cycleDay = todayMeta.dayOfCycle ?? 1;
-            const cycleLength = settings.cycleLength ?? 28;
+            // -1 = no cycle day today (stale, paused, no data): the widget shows "Day --".
+            const cycleDay = todayMeta.dayOfCycle ?? -1;
+            // The length the forecast really uses (adaptive and clamps applied), not the setting.
+            const cycleLength = model.cycleModel.rules.cycleLength;
 
-            // Calculate days until next period
-            let daysUntilPeriod = 14;
-            if (model.predictions.nextPeriodStart) {
-                daysUntilPeriod = diffInDays(model.predictions.nextPeriodStart, today);
-            }
+            // Days until the forecast period. 0 = due today or overdue, -1 = no forecast
+            // (stale, paused, no data): the widget shows "P: --" (CycleBarWidgetProvider).
+            const { nextPeriod, ovulationNext } = model.cycleModel;
+            const daysUntilPeriod = nextPeriod ? Math.max(0, diffInDays(nextPeriod.start, today)) : -1;
 
             // Determine current phase
             let currentPhase: 'period' | 'fertile' | 'ovulation' | 'luteal' | 'follicular' | 'pms' = 'follicular';
@@ -120,17 +146,18 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
                 cycleLength,
                 daysUntilPeriod,
                 currentPhase,
-                daysUntilOvulation: model.predictions.ovulationDate ? diffInDays(model.predictions.ovulationDate, today) : 14,
+                // -1 = hidden or unknown: the widget shows "O: --" (CycleBarWidgetProvider).
+                daysUntilOvulation: vis.ovulation && ovulationNext ? diffInDays(ovulationNext, today) : -1,
                 discreteMode: settings.discreteMode ?? false
             }).catch(err => Logger.warn('Failed to sync widget data:', err));
         }).catch(() => {
             // Plugin not available (e.g., web platform) - silently ignore
         });
-        // ponytail: depends on predictions/settings, not getDayMeta's identity (which
+        // ponytail: depends on the cycle model/settings, not getDayMeta's identity (which
         // changes on every log edit, including notes unrelated to the widget's phase
         // display) - getDayMeta is still called fresh above, so this only narrows how
         // often the sync runs, not what it computes when it does.
-    }, [settings, model.predictions]);
+    }, [loading, loadError, settings, model.cycleModel]);
 
     // Automatic Encrypted Backup to the user's chosen folder
     // Backgrounding is the trigger because it is the last reliable moment before
@@ -146,9 +173,9 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
     // updates (updateSettings(prev => ...)), which usePersistence does not expose.
     // The window only opens right after backgrounding, when the user is not in
     // the app, so it is left as-is deliberately.
-    const backupState = React.useRef({ settings, logs, periods, updateSettings });
+    const backupState = React.useRef({ settings, logs, periods, updateSettings, loaded: !loading && !loadError });
     React.useEffect(() => {
-        backupState.current = { settings, logs, periods, updateSettings };
+        backupState.current = { settings, logs, periods, updateSettings, loaded: !loading && !loadError };
     });
 
     React.useEffect(() => {
@@ -166,12 +193,13 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
             const pickerTime = Number(sessionStorage.getItem(PICKER_SESSION_KEY) || 0);
             if (pickerTime && Date.now() - pickerTime < PICKER_GRACE_PERIOD_MS) return;
 
-            import('../services/autoBackup')
-                .then(({ runAutoBackup }) => runAutoBackup(live, {
+            Promise.all([import('../services/autoBackup'), import('../services/lab')])
+                .then(async ([{ runAutoBackup }, { loadLabForBackup }]) => runAutoBackup(live, {
                     data: liveLogs,
                     periods: livePeriods,
                     settings: live,
                     timestamp: new Date().toISOString(),
+                    lab: await loadLabForBackup(),
                 }))
                 .then(({ status, ...bookkeeping }) => {
                     // A skipped run changed nothing, so writing settings back would
@@ -187,24 +215,25 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
     }, [loading]);
 
     /**
-     * "Back up now". Reads the datasets from disk rather than from React state, because
-     * an import or an archive writes straight to storage and leaves the in-memory copies
-     * behind until the next load. The background trigger above can use live state; a
-     * user-initiated run has to be right whatever they did a moment ago.
+     * "Back up now". Uses the live state, like the background trigger, so an edit still
+     * inside the 1 s save delay is included. Only when the load did not finish cleanly
+     * does it read from disk instead, because empty in-memory data must never be backed up.
      *
      * `force` skips the once-a-day and nothing-changed gates, not the in-flight lock.
      */
     const runBackupNow = useCallback(async (): Promise<'written' | 'skipped' | 'failed'> => {
-        const { settings: live } = backupState.current;
-        const [{ runAutoBackup }, { loadData, loadPeriods }] = await Promise.all([
+        const { settings: live, logs: liveLogs, periods: livePeriods, loaded } = backupState.current;
+        const [{ runAutoBackup }, { loadData, loadPeriods }, { loadLabForBackup }] = await Promise.all([
             import('../services/autoBackup'),
             import('../services/logic/storage'),
+            import('../services/lab'),
         ]);
         const { status, ...bookkeeping } = await runAutoBackup(live, {
-            data: await loadData(),
-            periods: await loadPeriods(),
+            data: loaded ? liveLogs : await loadData(),
+            periods: loaded ? livePeriods : await loadPeriods(),
             settings: live,
             timestamp: new Date().toISOString(),
+            lab: await loadLabForBackup(),
         }, Date.now(), true);
 
         if (status !== 'skipped') {

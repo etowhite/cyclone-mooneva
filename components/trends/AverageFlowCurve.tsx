@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react';
 import { DailyLog, PeriodRecord } from '../../types';
 import { useTranslation } from 'react-i18next';
+import { formatNumber } from '../../services/displayFormat';
 import { addDays } from '../../utils/dateUtils';
+import { MAX_PERIOD_DAYS } from '../../services/logic/cycle';
 
 interface AverageFlowCurveProps {
     logs: Record<string, DailyLog>;
@@ -22,10 +24,10 @@ const flowToValue = (flow: string | null | undefined): number => {
 /** How wide this period should make the chart. A record can span days that never bled
  *  (a 14 day span with 3 bleeding days), and one sloppily logged 20 day span used to
  *  stretch the whole chart to 20 columns. Stop at the last day that actually bled, and
- *  never past the 10 day clamp the averages already use. */
+ *  never past MAX_PERIOD_DAYS, the clamp the averages already use. */
 const bleedingSpan = (p: PeriodRecord): number => {
     const last = p.activeDays?.length ? Math.max(...p.activeDays) + 1 : p.days;
-    return Math.min(Math.max(1, last), 10);
+    return Math.min(Math.max(1, last), MAX_PERIOD_DAYS);
 };
 
 const AverageFlowCurve: React.FC<AverageFlowCurveProps> = ({ logs, periods }) => {
@@ -159,7 +161,14 @@ const AverageFlowCurve: React.FC<AverageFlowCurveProps> = ({ logs, periods }) =>
                     <span className="leading-tight">{t('trends.lighter')}</span>
                 </div>
 
-                <svg width="100%" height={chartHeight} viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="xMidYMid meet">
+                <svg
+                    role="img"
+                    aria-label={[
+                        t('trends.flow_pattern'),
+                        t('trends.based_on_periods', { count: recentPeriods.length }),
+                        curveData[peakIdx] ? t('trends.flow_peak_day', 'Heaviest on day {{day}}', { day: formatNumber(curveData[peakIdx].day) }) : '',
+                    ].filter(Boolean).join('. ')}
+                    width="100%" height={chartHeight} viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="xMidYMid meet">
                     {/* Gradient definition */}
                     <defs>
                         <linearGradient id="flowGradient" x1="0%" y1="0%" x2="0%" y2="100%">

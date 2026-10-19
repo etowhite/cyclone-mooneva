@@ -13,8 +13,10 @@ import { useTranslation } from 'react-i18next';
 import { useDiscreteMode } from '../../hooks/useDiscreteMode';
 import { SubViewType, ViewType } from '../../hooks/useAppNavigation';
 import { toLocalISOString } from '../../utils/dateUtils';
+import { getCycleVisibility } from '../../services/logic/settingsInterlocks';
 import { hasDailyLogContent } from '../../utils/dailyLogContent';
-import { PeriodRecord } from '../../types';
+import { DailyLog, PeriodRecord } from '../../types';
+import { findActivePeriod, findPregnancySpan, getPregnancySpans } from '../../services/logic/cycle';
 
 interface CalendarScreenProps {
     setSubView: (view: SubViewType) => void;
@@ -33,34 +35,68 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
 }) => {
     const { t } = useTranslation();
     const { logs, periods, settings, model, actions } = useMooneva();
-    const { cycles: pastCycles, predictions, getDayMeta, getDayStatus } = model;
+    const { cycles: pastCycles, cycleModel, getDayMeta, getDayStatus } = model;
 
     const [currentDate, setCurrentDate] = useState(new Date());
     const [previewDate, setPreviewDate] = useState<string | null>(null);
     const [editDate, setEditDate] = useState<string | null>(null);
     const [isCalendarEditMode, setIsCalendarEditMode] = useState(false);
     const [periodsSnapshot, setPeriodsSnapshot] = useState<PeriodRecord[] | null>(null);
+    const [logsSnapshot, setLogsSnapshot] = useState<Record<string, DailyLog> | null>(null);
 
     // Capture periods snapshot when entering edit mode
     React.useEffect(() => {
         if (isCalendarEditMode && !periodsSnapshot) {
             setPeriodsSnapshot([...periods]);
+            setLogsSnapshot(logs);
         } else if (!isCalendarEditMode) {
             setPeriodsSnapshot(null);
+            setLogsSnapshot(null);
         }
-    }, [isCalendarEditMode, periods, periodsSnapshot]);
+    }, [isCalendarEditMode, periods, logs, periodsSnapshot]);
+
+    // The day panel saves its pending text when it unmounts, which is the same render that
+    // enters edit mode, so the snapshot above can miss that save. Take it again once the save
+    // has landed (before any tap in edit mode), or Cancel would drop the just-typed edit.
+    const latestRef = React.useRef({ periods, logs });
+    latestRef.current = { periods, logs };
+    React.useEffect(() => {
+        if (!isCalendarEditMode) return;
+        const id = setTimeout(() => {
+            setPeriodsSnapshot([...latestRef.current.periods]);
+            setLogsSnapshot(latestRef.current.logs);
+        }, 0);
+        return () => clearTimeout(id);
+    }, [isCalendarEditMode]);
+
+    // A tap that would start a period inside a pregnancy ends that pregnancy the day
+    // before, so ask first. Removing a period day never asks.
+    const handleToggleBleedingDay = (date: string) => {
+        const span = findActivePeriod(periods, date) ? undefined : findPregnancySpan(getPregnancySpans(logs, periods), date);
+        // A period on the start day itself does not end the pregnancy: pregnancies are dated from the last period.
+        if (
+            span && span.start !== date &&
+            !confirm(t(
+                'calendar.period_in_pregnancy_confirm',
+                'This day is inside a pregnancy. A period starting here ends the pregnancy the day before. Continue?'
+            ))
+        ) return;
+        actions.toggleBleedingDay(date, cycleModel.rules.periodLength);
+    };
 
     const handleEditDone = () => {
         setIsCalendarEditMode(false);
         setPeriodsSnapshot(null);
+        setLogsSnapshot(null);
     };
 
     const handleEditCancel = () => {
         if (periodsSnapshot) {
-            actions.restorePeriods(periodsSnapshot);
+            actions.restorePeriods(periodsSnapshot, logsSnapshot ?? undefined);
         }
         setIsCalendarEditMode(false);
         setPeriodsSnapshot(null);
+        setLogsSnapshot(null);
     };
 
 
@@ -84,8 +120,14 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
         }
     };
 
-    // --- Status for Today ---
-    const cycleStatus = getDayStatus(toLocalISOString(new Date()));
+    // --- Status for the selected day (today when nothing is selected) ---
+    const todayStr = toLocalISOString(new Date());
+    const shownDate = previewDate ?? editDate ?? todayStr;
+    const cycleStatus = getDayStatus(shownDate);
+    const clearSelection = () => {
+        setPreviewDate(null);
+        setEditDate(null);
+    };
 
     // Handle date click - skip preview for empty days
     const handleDateClick = (dateStr: string) => {
@@ -151,10 +193,6 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
     };
 
     // --- Timeline Data ---
-    const timelinePreds = {
-        nextPeriodStart: predictions.nextPeriodStart,
-        fertileWindow: predictions.fertileWindow
-    };
 
     return (
         <ScreenWrapper>
@@ -188,7 +226,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
             )}
 
             <main
-                className="flex-1 overflow-y-auto overflow-x-hidden px-[16px] pt-[20px] pb-32 relative z-10 no-scrollbar"
+                className="flex-1 overflow-y-auto overflow-x-hidden px-[max(16px,calc((100%_-_32rem)/2))] pt-[20px] pb-32 relative z-10 no-scrollbar"
             >
                 {!isCloaked && (
                     <Calendar
@@ -197,11 +235,13 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                         onDateClick={handleDateClick}
                         selectedDate={editDate || previewDate}
                         cycleStatus={cycleStatus}
+                        statusDate={shownDate === todayStr ? null : shownDate}
+                        onShowToday={clearSelection}
                         getDayMeta={getDayMeta}
                         settings={settings}
                         isCloaked={isCloaked}
                         onMonthChange={setCurrentDate}
-                        onToggleBleedingDay={(date) => actions.toggleBleedingDay(date, predictions.effective.periodLength)}
+                        onToggleBleedingDay={handleToggleBleedingDay}
                         onNextMonth={nextMonth}
                         onPrevMonth={prevMonth}
                         isEditMode={isCalendarEditMode}
@@ -218,10 +258,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                             <div className="pt-6">
                                 <DailyLogPanel
                                     date={editDate}
-                                    onClose={() => {
-                                        setEditDate(null);
-                                        setPreviewDate(null);
-                                    }}
+                                    onClose={clearSelection}
                                     onEditPeriod={() => {
                                         setIsCalendarEditMode(true);
                                         setEditDate(null);
@@ -243,8 +280,9 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                             <div className="pt-14">
                                 <TimelineView
                                     cycles={pastCycles}
-                                    predictions={timelinePreds}
+                                    showFertile={getCycleVisibility(settings).fertile}
                                     pregnancySpans={model.pregnancySpans}
+                                    archivedBefore={settings.historyArchivedDate}
                                 />
                             </div>
                         )}

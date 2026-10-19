@@ -9,6 +9,9 @@ interface TrendsFilterDrawerProps {
     searchQuery: string;
     setSearchQuery: (q: string) => void;
     availableSymptoms: SymptomConfig[];
+    /** Custom names logged inside the selected range, as typed. */
+    customSymptoms: string[];
+    customMoods: string[];
     selectedSymptoms: string[];
     toggleSymptomFilter: (s: string) => void;
     selectedMoods: string[];
@@ -22,6 +25,8 @@ const TrendsFilterDrawer: React.FC<TrendsFilterDrawerProps> = ({
     searchQuery,
     setSearchQuery,
     availableSymptoms,
+    customSymptoms,
+    customMoods,
     selectedSymptoms,
     toggleSymptomFilter,
     selectedMoods,
@@ -66,11 +71,23 @@ const TrendsFilterDrawer: React.FC<TrendsFilterDrawerProps> = ({
                                 key={sym.id}
                                 onClick={() => toggleSymptomFilter(sym.label)}
                                 className={`px-4 py-2 rounded-2xl text-[11px] font-bold transition-all border ${selectedSymptoms.includes(sym.label)
-                                    ? 'bg-[#7598a0] text-white border-[#7598a0] shadow-md scale-105'
+                                    ? 'bg-[#5b7a82] text-white border-[#5b7a82] shadow-md scale-105'
                                     : 'bg-slate-50 text-slate-600 border-transparent hover:bg-slate-100'
                                     }`}
                             >
                                 {sym.label}
+                            </button>
+                        ))}
+                        {customSymptoms.map(name => (
+                            <button
+                                key={`custom:${name}`}
+                                onClick={() => toggleSymptomFilter(name)}
+                                className={`px-4 py-2 rounded-2xl text-[11px] font-bold transition-all border ${selectedSymptoms.includes(name)
+                                    ? 'bg-[#5b7a82] text-white border-[#5b7a82] shadow-md scale-105'
+                                    : 'bg-slate-50 text-slate-600 border-transparent hover:bg-slate-100'
+                                    }`}
+                            >
+                                {name}
                             </button>
                         ))}
                     </div>
@@ -98,6 +115,22 @@ const TrendsFilterDrawer: React.FC<TrendsFilterDrawerProps> = ({
                             </button>
                         ))}
                     </div>
+                    {customMoods.length > 0 && (
+                        <div className="flex flex-wrap gap-2.5 mt-4">
+                            {customMoods.map(name => (
+                                <button
+                                    key={`custom:${name}`}
+                                    onClick={() => toggleMoodFilter(name)}
+                                    className={`px-4 py-2 rounded-2xl text-[11px] font-bold transition-all border ${selectedMoods.includes(name)
+                                        ? 'bg-slate-500 text-white border-slate-500 shadow-md scale-105'
+                                        : 'bg-slate-50 text-slate-600 border-transparent hover:bg-slate-100'
+                                        }`}
+                                >
+                                    {name}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
         </section>

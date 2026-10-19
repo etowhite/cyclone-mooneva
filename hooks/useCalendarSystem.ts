@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { toJalaali, toGregorian, jalaaliMonthLength, isLeapJalaaliYear, jalaaliMonths } from '../utils/jalaali';
+import { toJalaali, toGregorian, jalaaliMonthLength } from '../utils/jalaali';
+import { isPersian } from '../services/displayFormat';
 import type { FirstDayOfWeek } from '../types';
 import { getLeadingDayCount, getWeekDayKeys, resolveFirstDayOfWeek } from '../utils/weekStart';
 
@@ -15,20 +16,15 @@ export interface CalendarSystem {
     getDaysInMonth: (year: number, month: number) => number;
     toCalendarDate: (date: Date) => CalendarDateParts;
     fromCalendarDate: (year: number, month: number, day: number) => Date;
-    formatMonthYear: (year: number, month: number) => string;
-    formatMonth: (year: number, month: number) => string;
     addMonths: (dateParts: CalendarDateParts, amount: number) => CalendarDateParts;
     getFirstDayOfWeek: (year: number, month: number) => number;
     weekDayKeys: string[];
     getMonthGrid: (year: number, month: number) => { date: Date; isCurrentMonth: boolean; label: number }[];
 }
 
-const jalaaliMonthName = (month: number): string =>
-    jalaaliMonths[month]?.fa || jalaaliMonths[month]?.name;
-
 export const useCalendarSystem = (firstDayOfWeek?: FirstDayOfWeek): CalendarSystem => {
     const { i18n } = useTranslation();
-    const isJalaali = i18n.language === 'fa';
+    const isJalaali = isPersian(i18n.language);
     const effectiveFirstDayOfWeek = resolveFirstDayOfWeek(i18n.language, firstDayOfWeek);
     const weekDayKeys = getWeekDayKeys(effectiveFirstDayOfWeek);
 
@@ -56,12 +52,6 @@ export const useCalendarSystem = (firstDayOfWeek?: FirstDayOfWeek): CalendarSyst
                 const g = toGregorian(year, month + 1, day);
                 return new Date(g.gy, g.gm - 1, g.gd);
             },
-
-            formatMonthYear: (year: number, month: number) => {
-                return `${jalaaliMonthName(month)} ${year}`;
-            },
-
-            formatMonth: (year: number, month: number) => jalaaliMonthName(month),
 
             addMonths: (dateParts: CalendarDateParts, amount: number) => {
                 let { year, month, day } = dateParts;
@@ -148,16 +138,6 @@ export const useCalendarSystem = (firstDayOfWeek?: FirstDayOfWeek): CalendarSyst
 
         fromCalendarDate: (year: number, month: number, day: number) => {
             return new Date(year, month, day);
-        },
-
-        formatMonthYear: (year: number, month: number) => {
-            const d = new Date(year, month, 1);
-            return d.toLocaleDateString(i18n.language, { month: 'short', year: 'numeric' });
-        },
-
-        formatMonth: (year: number, month: number) => {
-            const d = new Date(year, month, 1);
-            return d.toLocaleDateString(i18n.language, { month: 'short' });
         },
 
         addMonths: (dateParts: CalendarDateParts, amount: number) => {

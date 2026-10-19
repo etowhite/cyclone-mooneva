@@ -9,6 +9,7 @@ import OnboardingWizard from './OnboardingWizard';
 import PinLock from './PinLock';
 import { WhatsNewModal } from './WhatsNewModal';
 import LoadErrorScreen from './LoadErrorScreen';
+import { LabRoute, useLabVisible } from './lab';
 
 import { CalendarScreen } from './screens/CalendarScreen';
 import { TrendsScreen } from './screens/TrendsScreen';
@@ -16,7 +17,7 @@ import { SettingsScreen } from './screens/SettingsScreen';
 import { NotificationManagerScreen } from './screens/NotificationManagerScreen';
 
 type PendingPinAction = 'exitDiscreteMode' | null;
-const WHATS_NEW_VERSION = '2.5.0';
+const WHATS_NEW_VERSION = '3.0.0';
 const WHATS_NEW_STORAGE_KEY = `mooneva_whats_new_seen_${WHATS_NEW_VERSION}`;
 
 export const AppRouter = () => {
@@ -33,6 +34,7 @@ export const AppRouter = () => {
     const { view, setView, subView, setSubView, openSubViewFrom, closeSubView, previousView } = useAppNavigation();
     useAppTheme({ view, discreteMode: !!settings.discreteMode, darkNeumorphism: !!settings.darkNeumorphism });
     useAppReview();
+    const labVisible = useLabVisible();
 
     // --- Auto Lock Hook ---
     const { isLocked, setIsLocked, isPinConfigured } = useAutoLock({ settings, loading });
@@ -42,6 +44,11 @@ export const AppRouter = () => {
     const [showWhatsNew, setShowWhatsNew] = useState(false);
     const hasData = Object.keys(logs).length > 0;
     const showOnboarding = !settings.onboardingCompleted && !hasData;
+
+    // Lab turned off, discrete mode on or a pregnancy started while Lab was open: leave it.
+    useEffect(() => {
+        if (view === 'lab' && !labVisible) setView('calendar');
+    }, [view, labVisible]);
 
     useEffect(() => {
         if (loading || showOnboarding || (isPinConfigured && isLocked)) return;
@@ -113,6 +120,10 @@ export const AppRouter = () => {
 
         if (view === 'notifications') {
             return <NotificationManagerScreen setView={setView} returnTo={previousView ?? 'calendar'} isCloaked={settings.discreteMode} />;
+        }
+
+        if (view === 'lab' && labVisible) {
+            return <LabRoute setSubView={setSubView} setView={setView} isCloaked={settings.discreteMode} />;
         }
 
         if (view === 'trends') {

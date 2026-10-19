@@ -6,6 +6,10 @@ const MAX_CYCLE_LENGTH = 45;
 /** Cycles longer than this are treated as tracking gaps (e.g. 153 days); excluded from averages, fertile hidden in UI */
 const OUTLIER_THRESHOLD_DAYS = 60;
 export const MIN_GAP_DAYS = 3;
+/** Longest period the model accepts (days). */
+export const MAX_PERIOD_DAYS = 15;
+/** Longest PMS window the UI offers (days). resolveCycleRules still cuts it to luteal - 1. */
+export const MAX_PMS_DAYS = 12;
 
 // --- Date Utils ---
 import { addDays, diffInDays, getTodayStr } from '../../utils/dateUtils';
@@ -39,6 +43,15 @@ export const isFullFlowDay = (log: DailyLog): boolean => {
 export const isDateInPeriod = (period: PeriodRecord, date: string): boolean =>
     date >= period.startDate && date <= addDays(period.startDate, period.days - 1);
 
+/**
+ * How many days of a period actually bled: the count of `activeDays`, or the whole
+ * span when the record has none (legacy records). `cycle.ts` getPastCycles and
+ * AverageFlowCurve ask different questions (clamped length, last bled index) and keep
+ * their own rules.
+ */
+export const periodBleedingDays = (period: PeriodRecord): number =>
+    period.activeDays?.length || period.days;
+
 export const findActivePeriod = (
     periods: PeriodRecord[],
     date: string
@@ -50,17 +63,20 @@ export interface PregnancySpan {
     start: string;
     /** Last day of the span, inclusive. */
     end: string;
-    /** No period has started since `start`, so the span is still running. */
+    /** Nothing has ended the span: no period since `start` and no `pregnancyEnd` marker. */
     isOngoing: boolean;
+    /** No period has started since `start`: ongoing, or ended by the marker alone. */
+    awaitingPeriod: boolean;
 }
 
 /**
- * A pregnancy is one marker on the day it started. The end is never stored: it is the
- * day before the next period, because that period *is* the cycle coming back. Storing
- * an end date would be a second copy of something `periods` already says, and the two
- * copies could disagree.
+ * A pregnancy is a start marker (`pregnancyStart`) and an optional end marker
+ * (`pregnancyEnd`, the last pregnancy day). The span ends at the earlier of the first end
+ * marker on or after the start and the day before the next period: a period is the cycle
+ * coming back, so it wins over a later (or missing) marker.
  *
  * An open span is closed at `todayStr` so callers can range-check without special-casing.
+ * An end marker before every start, or after a span already closed, belongs to no span.
  */
 export const getPregnancySpans = (
     logs: Record<string, DailyLog>,
@@ -68,6 +84,7 @@ export const getPregnancySpans = (
     todayStr: string = getTodayStr()
 ): PregnancySpan[] => {
     const starts = Object.keys(logs).filter(d => logs[d]?.pregnancyStart).sort();
+    const ends = Object.keys(logs).filter(d => logs[d]?.pregnancyEnd === true).sort();
     const periodStarts = periods.map(p => p.startDate).sort();
 
     const spans: PregnancySpan[] = [];
@@ -77,19 +94,31 @@ export const getPregnancySpans = (
         if (spans.length > 0 && start <= spans[spans.length - 1].end) continue;
 
         const nextPeriod = periodStarts.find(s => s > start);
+        const explicitEnd = ends.find(e => e >= start);
+        const periodEnd = nextPeriod ? addDays(nextPeriod, -1) : undefined;
+        const end = [explicitEnd, periodEnd].filter((d): d is string => !!d).sort()[0] ?? todayStr;
         spans.push({
             start,
-            end: nextPeriod ? addDays(nextPeriod, -1) : todayStr,
-            isOngoing: !nextPeriod,
+            end,
+            isOngoing: !nextPeriod && !explicitEnd,
+            awaitingPeriod: !nextPeriod,
         });
     }
     return spans;
 };
 
+/** How far past today an ongoing pregnancy shows: the same 7-day horizon the log allows. */
+const PREGNANCY_FUTURE_DAYS = 7;
+
+/**
+ * The span covering a date. An ongoing span has no end, so it runs to today plus 7 days
+ * (its `end` is today). Lab callers pass today, which this does not change.
+ */
 export const findPregnancySpan = (
     spans: PregnancySpan[],
     date: string
-): PregnancySpan | undefined => spans.find(s => date >= s.start && date <= s.end);
+): PregnancySpan | undefined =>
+    spans.find(s => date >= s.start && date <= (s.isOngoing ? addDays(s.end, PREGNANCY_FUTURE_DAYS) : s.end));
 
 /**
  * Tags the cycle a pregnancy started inside, so history and the clinical report can say
@@ -147,11 +176,54 @@ const clampAndRound = (value: number, min: number, max: number): number => {
 const normalizeCycleLength = (length: number): number => clampAndRound(length, MIN_CYCLE_LENGTH, MAX_CYCLE_LENGTH);
 
 /**
- * Normalizes and clamps period length to typical ranges (1-10 days).
+ * Normalizes and clamps period length to typical ranges (1-MAX_PERIOD_DAYS days).
  */
-const normalizePeriodLength = (length: number): number => clampAndRound(length, 1, 10);
+const normalizePeriodLength = (length: number): number => clampAndRound(length, 1, MAX_PERIOD_DAYS);
 
 
+
+/**
+ * The one place lengths are clamped and conflicts resolved. Luteal can never be longer
+ * than the cycle minus the period (ovulation would land inside the period), and PMS must
+ * leave at least one luteal day before it.
+ */
+export const resolveCycleRules = (raw: {
+    cycleLength: number;
+    periodLength: number;
+    lutealPhaseLength: number;
+    pmsLength: number;
+}) => {
+    const cycleLength = normalizeCycleLength(raw.cycleLength);
+    const periodLength = normalizePeriodLength(raw.periodLength);
+    const luteal = fitLuteal(raw.lutealPhaseLength, cycleLength, periodLength);
+    const pms = Math.max(0, Math.min(raw.pmsLength, luteal - 1));
+    return { cycleLength, periodLength, luteal, pms };
+};
+
+/** Luteal never exceeds the room left after the period (see resolveCycleRules), so the range shrinks with it. */
+const lutealBounds = (room: number) => {
+    const max = Math.max(1, Math.min(18, room));
+    return { min: Math.min(10, max), max };
+};
+
+/**
+ * The luteal length that fits one cycle: never longer than the cycle minus its period, at least 1.
+ * resolveCycleRules (settings cycle) and getPastCycles (a real cycle) both use it.
+ */
+export const fitLuteal = (luteal: number, cycleLength: number, periodDays: number): number =>
+    Math.max(1, Math.min(luteal, cycleLength - periodDays));
+
+/**
+ * Stepper limits for the four length settings, derived from the same rules as
+ * resolveCycleRules so a stepper can never offer a value the model would cut or an
+ * inverted range. The cycle minimum stays 21 (stored values below it are never blocked).
+ */
+export const settingBounds = (s: { cycleLength: number; periodLength: number; lutealPhaseLength: number }) => ({
+    cycle: { min: 21, max: MAX_CYCLE_LENGTH },
+    period: { min: 2, max: MAX_PERIOD_DAYS },
+    luteal: lutealBounds(s.cycleLength - s.periodLength),
+    pms: { min: 1, max: Math.max(1, Math.min(MAX_PMS_DAYS, s.lutealPhaseLength - 1)) },
+});
 
 /**
  * True if cycle length indicates a tracking gap (e.g. 153 days); exclude from averages, hide fertile in UI.
@@ -219,7 +291,7 @@ export const getPastCycles = (
         } else if (lutealPhaseLength) {
             // Next period start is next.startDate
             // Ovulation = Next Period Start - Luteal
-            ovulationDate = addDays(next.startDate, -lutealPhaseLength);
+            ovulationDate = addDays(next.startDate, -fitLuteal(lutealPhaseLength, cycleLength, spanDays));
             fertileStart = addDays(ovulationDate, -5);
             fertileEnd = ovulationDate; // window closes at ovulation
         }
@@ -280,7 +352,7 @@ export const averagePeriodLength = (cycles: Cycle[]): number | null => {
     const eligible = getEligibleCycles(cycles);
     if (eligible.length === 0) return null;
 
-    return Math.round(eligible.reduce((sum, cycle) => sum + Math.min(cycle.periodLength || 0, 10), 0) / eligible.length);
+    return Math.round(eligible.reduce((sum, cycle) => sum + Math.min(cycle.periodLength || 0, MAX_PERIOD_DAYS), 0) / eligible.length);
 };
 
 /**
@@ -301,7 +373,7 @@ export const computeAdaptiveLengths = (eligibleCycles: Cycle[]) => {
     };
 
     const cycleLengths = recent.map(c => c.length || 28);
-    const periodLengths = recent.map(c => Math.max(1, Math.min(10, c.periodLength || 5)));
+    const periodLengths = recent.map(c => Math.max(1, Math.min(MAX_PERIOD_DAYS, c.periodLength || 5)));
 
     const adaptiveCycle = getSimpleMean(cycleLengths);
     const adaptivePeriod = getSimpleMean(periodLengths);
@@ -310,186 +382,5 @@ export const computeAdaptiveLengths = (eligibleCycles: Cycle[]) => {
         cycleLength: adaptiveCycle,
         periodLength: adaptivePeriod,
         source: 'adaptive' as const
-    };
-};
-
-/**
- * Generates cycle predictions based on logged data and user settings.
- */
-export const getCyclePredictions = (
-    periods: PeriodRecord[],
-    settings: {
-        cycleLength: number;
-        periodLength: number;
-        lutealPhaseLength: number;
-        pmsLength: number;
-        isPaused: boolean;
-        isOnBirthControl: boolean;
-        showFertileWindow: boolean;
-        adaptivePrediction?: boolean;
-    },
-    archivedBeforeDate?: string,
-    futureMonthsToPredict: number = 0
-) => {
-    // Helper for empty/paused states
-    const emptyMeta = {
-        effective: {
-            cycleLength: settings.cycleLength,
-            periodLength: settings.periodLength,
-            source: 'settings' as const
-        },
-        userSettings: {
-            cycleLength: settings.cycleLength,
-            periodLength: settings.periodLength
-        }
-    };
-
-    if (settings.isPaused) {
-        return {
-            lastPeriodStart: null,
-            nextPeriodStart: null,
-            nextPeriodEnd: null,
-            fertileWindow: null,
-            pmsWindow: null,
-            ovulationDate: null,
-            isStale: false,
-            periodLength: settings.periodLength || 5, // Placeholder for strict mode
-            cycleLengthUsed: settings.cycleLength || 28, // Placeholder for strict mode
-            futurePredictions: [],
-            ...emptyMeta
-        };
-    }
-
-    // 1. Get Sorted Periods (Newest First)
-    // Note: arrays are usually Oldest->Newest. Reverse for "Latest" access.
-    const sortedPeriods = [...periods].sort((a, b) => b.startDate.localeCompare(a.startDate)); // Descending
-
-    if (sortedPeriods.length === 0) {
-        return {
-            lastPeriodStart: null, nextPeriodStart: null, nextPeriodEnd: null,
-            fertileWindow: null, pmsWindow: null, ovulationDate: null, isStale: false,
-            periodLength: settings.periodLength || 5,
-            cycleLengthUsed: settings.cycleLength || 28,
-            futurePredictions: [],
-            ...emptyMeta
-        };
-    }
-
-    // 2. Forecast Next Cycle
-    const lastPeriod = sortedPeriods[0]; // Newest
-    const todayStr = getTodayStr();
-
-    // --- Adaptive Logic ---
-    let forecastedCycleLength = settings.cycleLength;
-    let forecastedPeriodLength = settings.periodLength;
-    let predictionSource: 'settings' | 'adaptive' = 'settings';
-
-    if (settings.adaptivePrediction && !settings.isOnBirthControl) {
-        // Selection Rule: filter first, then takeLast
-        const pastCycles = getPastCycles(periods, archivedBeforeDate);
-        const eligible = getEligibleCycles(pastCycles);
-        const adaptive = computeAdaptiveLengths(eligible);
-
-        if (adaptive) {
-            forecastedCycleLength = normalizeCycleLength(adaptive.cycleLength);
-            forecastedPeriodLength = normalizePeriodLength(adaptive.periodLength);
-            predictionSource = adaptive.source;
-        }
-    }
-    // Constants for return
-    const effectiveCycleLength = forecastedCycleLength;
-    const effectivePeriodLength = forecastedPeriodLength;
-
-    // Ovulation is nextPeriodStart - lutealPhaseLength with no natural relationship
-    // to periodLength/cycleLength otherwise - an unclamped long luteal phase on a
-    // short cycle can put ovulation before the current period even ends. Clamp so
-    // ovulation never lands earlier than the period's last day.
-    const effectiveLutealPhaseLength = Math.min(
-        settings.lutealPhaseLength,
-        Math.max(1, effectiveCycleLength - effectivePeriodLength)
-    );
-
-    // Note: Adaptive or Settings 
-    // Predictions now rely on either strictly user settings or strictly adaptive history.
-
-    // 3. Construct Prediction Results
-    //
-    // How stale the underlying record is, so the UI can say "no recent data" instead of
-    // counting an overdue figure nobody should act on.
-    const daysSinceLastPeriod = diffInDays(todayStr, lastPeriod.startDate);
-    const isStale = daysSinceLastPeriod > OUTLIER_THRESHOLD_DAYS;
-
-    // Only roll the forecast forward by whole cycles once the record is genuinely
-    // stale (isStale). Otherwise a merely-overdue period (a few days late) would
-    // vanish from its expected spot and jump a full cycle ahead - the forecast
-    // should stay put and simply read as overdue until it's actually stale.
-    const cyclesElapsed = isStale
-        ? Math.max(0, Math.floor(daysSinceLastPeriod / effectiveCycleLength))
-        : 0;
-    const nextPeriodStart = addDays(
-        lastPeriod.startDate,
-        effectiveCycleLength * (cyclesElapsed + 1)
-    );
-    // Use effectiveLength
-    const nextPeriodEnd = addDays(nextPeriodStart, effectivePeriodLength - 1);
-
-    const ovulationDateStr = addDays(nextPeriodStart, -effectiveLutealPhaseLength);
-
-    // Future Chain
-    const futurePredictions = [];
-    if (futureMonthsToPredict > 0) {
-        let currentStart = nextPeriodStart;
-        for (let i = 0; i < futureMonthsToPredict; i++) {
-            // For future, use effective setting
-            const pStart = addDays(currentStart, effectiveCycleLength);
-
-            // Safety: Don't project if we are already in outlier territory (e.g. extremely long cycle setting)
-            // But here we rely on effectiveCycleLength which is clamped. 
-            // Just ensure we don't project indefinitely if something is broken.
-
-            const pEnd = addDays(pStart, effectivePeriodLength - 1);
-            const ov = addDays(pStart, -effectiveLutealPhaseLength);
-
-            futurePredictions.push({
-                startDate: pStart,
-                endDate: pEnd,
-                ovulationDate: ov,
-                fertileStart: addDays(ov, -5),
-                fertileEnd: ov,
-                pmsStart: addDays(pStart, -settings.pmsLength),
-                pmsEnd: addDays(pStart, -1)
-            });
-            currentStart = pStart;
-        }
-    }
-
-    return {
-        lastPeriodStart: lastPeriod.startDate,
-        periodLength: effectivePeriodLength,
-        cycleLengthUsed: effectiveCycleLength,
-        effective: {
-            cycleLength: effectiveCycleLength,
-            periodLength: effectivePeriodLength,
-            source: predictionSource
-        },
-        userSettings: {
-            cycleLength: settings.cycleLength,
-            periodLength: settings.periodLength
-        },
-        nextPeriodStart,
-        nextPeriodEnd,
-        isStale,
-        fertileWindow: (settings.isOnBirthControl || !settings.showFertileWindow) ? null : {
-            start: addDays(ovulationDateStr, -5),
-            end: ovulationDateStr
-        },
-        ovulationDate: (settings.isOnBirthControl || !settings.showFertileWindow) ? null : ovulationDateStr,
-        pmsWindow: {
-            start: addDays(nextPeriodStart, -settings.pmsLength),
-            end: addDays(nextPeriodStart, -1)
-        },
-        futurePredictions: (settings.isOnBirthControl || !settings.showFertileWindow)
-            ? futurePredictions.map(p => ({ ...p, ovulationDate: null, fertileStart: null, fertileEnd: null }))
-            : futurePredictions
     };
 };

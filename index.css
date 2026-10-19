@@ -272,6 +272,10 @@ body[data-theme="dark-neumorphism"] .mooneva-bottom-nav-wrap {
   box-shadow: none !important;
 }
 
+body[data-theme="dark-neumorphism"] .mooneva-nav-dot {
+  background-color: var(--text-primary) !important;
+}
+
 body[data-theme="dark-neumorphism"] .mooneva-bottom-nav {
   isolation: isolate;
   overflow: hidden;
@@ -837,6 +841,12 @@ body[data-theme="dark-neumorphism"] [class*="text-[#7598a0]"]:not([class*="text-
   color: var(--accent-soft);
 }
 
+/* The calendar status Today chip and backup toast: #5a7d87 is 3.4:1 on the dark card. Lab's text teal #4a6b73 gets the same light teal. */
+body[data-theme="dark-neumorphism"] [class*="text-[#5a7d87]"],
+body[data-theme="dark-neumorphism"] [class*="text-[#4a6b73]"] {
+  color: var(--accent-soft);
+}
+
 body[data-theme="dark-neumorphism"] a[class*="bg-"],
 body[data-theme="dark-neumorphism"] button[class*="bg-"][class*="text-white"],
 body[data-theme="dark-neumorphism"] [class*="!text-white"] {
@@ -1198,4 +1208,63 @@ body[data-theme="dark-neumorphism"] #report-content [class*="border-slate-"] {
    fallback fonts. */
 #report-content.report-rtl * {
     text-transform: none !important;
+}
+
+/* Light theme: text-slate-400 uses #5b6b82 for WCAG AA contrast (4.8:1 on #F0F2F5).
+   Text colour only; bg-slate-400 and border-slate-400 are unchanged.
+   The dark theme override (!important, near text-muted) still wins. */
+/* Plain rule, not @layer: a layered rule would also leak into placeholder:text-slate-400. */
+.text-slate-400 {
+  color: #5b6b82;
+}
+
+/* Reduced motion: stop all animations and transitions and smooth scrolling.
+   Exception: animate-spin (backup progress spinner in Header.tsx) keeps running
+   because it signals that work is in progress. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *:not(.animate-spin),
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* Lab, dark theme. Lab cards use bg-[#F0F2F5], which the rules above already darken; these cover its
+   SVG parts, the fullness slider and the "Active" pill, none of which a text-/bg- rule reaches. */
+body[data-theme="dark-neumorphism"] .lab-gauge-track {
+  stroke: #36424b;
+}
+
+body[data-theme="dark-neumorphism"] .lab-bar-value {
+  fill: var(--text-primary);
+}
+
+body[data-theme="dark-neumorphism"] .lab-bar-label {
+  fill: var(--text-muted);
+}
+
+body[data-theme="dark-neumorphism"] .lab-active-pill {
+  background-color: rgba(143, 184, 180, 0.2);
+  color: var(--accent-soft);
+}
+
+body[data-theme="dark-neumorphism"] .lab-active-pill > span {
+  background-color: var(--accent-soft);
+}
+
+body[data-theme="dark-neumorphism"] .lab-paused-note {
+  background-color: rgba(251, 191, 36, 0.12) !important;
+  border-color: rgba(251, 191, 36, 0.32) !important;
+  color: #f5d9a0 !important;
+}
+
+/* The Lab dialog's backdrop dims the form behind it more in dark mode, so the dialog does not sit on readable text. */
+body[data-theme="dark-neumorphism"] .lab-dialog-backdrop {
+  background-color: rgba(4, 7, 10, 0.72) !important;
 }

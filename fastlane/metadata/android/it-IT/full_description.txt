@@ -17,7 +17,7 @@ La maggior parte delle app di tracciamento del ciclo carica i tuoi dati sui serv
 <li>Modalità app discreta — traveste l'app da lista di attività, icona e nome inclusi</li>
 <li>Blocco con PIN con timeout configurabile</li>
 <li>Backup e ripristino crittografati</li>
-<li>Importa la cronologia da drip, Flo e Clue</li>
+<li>Importa la cronologia da drip, Flo, Clue e SimpleInnovation</li>
 <li>Calendario persiano (Jalaali) e supporto completo da destra a sinistra</li>
 <li>Primo giorno della settimana configurabile</li>
 <li>Tema scuro</li>

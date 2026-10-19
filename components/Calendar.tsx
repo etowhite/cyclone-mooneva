@@ -2,8 +2,9 @@ import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { Trans, useTranslation } from 'react-i18next';
 import { DailyLog, AppSettings, DayMeta } from '../types';
 import { toLocalISOString, parseLocalDate } from '../utils/dateUtils';
-import { formatNumber } from '../services/i18n';
+import { formatNumber, useDisplayFormat } from '../services/displayFormat';
 import { CycleStatusData } from '../services/logic/status';
+import { getCycleVisibility } from '../services/logic/settingsInterlocks';
 import { DayCell } from './calendar/DayCell';
 import { SexMarkerIcon } from './calendar/SexMarkerIcon';
 import { CycleInsightModal } from './calendar/CycleInsightModal';
@@ -46,6 +47,10 @@ interface CalendarProps {
   onDateClick: (dateStr: string) => void;
   selectedDate: string | null;
   cycleStatus: CycleStatusData;
+  /** Date the status card shows when it is not today. Null means today. */
+  statusDate?: string | null;
+  /** Clears the selection so the card goes back to today. */
+  onShowToday?: () => void;
   logs: Record<string, DailyLog>;
   getDayMeta: (dateStr: string) => DayMeta;
   settings: AppSettings;
@@ -66,6 +71,8 @@ const Calendar: React.FC<CalendarProps> = ({
   onDateClick,
   selectedDate,
   cycleStatus,
+  statusDate,
+  onShowToday,
   logs,
   getDayMeta,
   settings,
@@ -79,11 +86,13 @@ const Calendar: React.FC<CalendarProps> = ({
   todayIsPeriod
 }) => {
   const { t, i18n } = useTranslation();
+  const cycleVis = getCycleVisibility(settings);
   const [showLegend, setShowLegend] = useState(false);
   const [showInsight, setShowInsight] = useState(false);
   const [localEditMode, setLocalEditMode] = useState(false);
   const [showSavedToast, setShowSavedToast] = useState(false);
   const calendarSystem = useCalendarSystem(settings.firstDayOfWeek);
+  const fmt = useDisplayFormat();
 
   const [showHint, setShowHint] = useState<boolean>(() => !isHintDismissed() && isWithinHintPeriod());
 
@@ -135,6 +144,11 @@ const Calendar: React.FC<CalendarProps> = ({
   useEffect(() => {
     if (showMonthPicker) setPickerYear(year);
   }, [showMonthPicker, year]);
+
+  useEffect(() => {
+    if (!showLegend) return;
+    return pushBackInterceptor(() => setShowLegend(false));
+  }, [showLegend]);
 
   useEffect(() => {
     if (!showMonthPicker) return;
@@ -192,11 +206,31 @@ const Calendar: React.FC<CalendarProps> = ({
             style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
           >
             <div className="flex flex-col items-center z-10 w-full px-2">
+              {statusDate && (() => {
+                return (
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <span data-testid="status-date" className="text-[11px] font-bold text-slate-500">
+                      {fmt.dayMonthYear(parseLocalDate(statusDate))}
+                    </span>
+                    <button
+                      type="button"
+                      data-testid="status-today-chip"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onShowToday?.();
+                      }}
+                      className="relative px-2 py-0.5 rounded-full bg-[#7598a0]/15 text-[#5a7d87] text-[10px] font-bold uppercase tracking-wider after:content-[''] after:absolute after:-inset-x-2 after:-inset-y-2"
+                    >
+                      {t('common.today')}
+                    </button>
+                  </div>
+                );
+              })()}
               <h1 className={`text-[clamp(18px,6vw,42px)] ${i18n.dir?.() === 'rtl' ? 'font-bold' : 'font-extrabold'} text-slate-800 leading-none tracking-tight text-center px-1 whitespace-nowrap w-full overflow-visible`}>
                 {/* The day/total pair is composed inside the translation so each language
                     can place it: number-first languages (tr, hu) keep "8/28" glued together
-                    instead of stranding "/28" after the noun, and RTL locales control the
-                    order of the pair themselves. */}
+                    instead of stranding "/28" after the noun. Every locale writes day first:
+                    a digits-and-slash run always displays left to right, also in RTL. */}
                 {cycleStatus.titleIsCycleDay && cycleStatus.dayOfCycle != null && cycleStatus.cycleLength != null ? (
                   <Trans
                     i18nKey="dashboard.cycle_day_progress"
@@ -212,7 +246,7 @@ const Calendar: React.FC<CalendarProps> = ({
                       <div className="flex min-w-0 items-center gap-2 whitespace-nowrap">
                         <span className="h-2 w-2 shrink-0 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]" />
                         <p className="text-rose-500 font-bold text-[clamp(11px,3.2vw,15px)] tracking-wide">
-                          {t('calendar.period_progress')} {formatNumber(cycleStatus.dayOfPeriod)} / {formatNumber(cycleStatus.periodLength)}
+                          {`${t('calendar.period_progress')} ${formatNumber(cycleStatus.dayOfPeriod)}${i18n.dir?.() === 'rtl' ? '\u200f/\u200f' : '/'}${formatNumber(cycleStatus.periodLength)}`}
                         </p>
                       </div>
                     ) : (
@@ -229,7 +263,7 @@ const Calendar: React.FC<CalendarProps> = ({
                     <span className="relative flex h-6 w-6 shrink-0 items-center justify-center">
                       <button
                         type="button"
-                        className="cycle-insight-bulb period-action-icon animate-period-button h-5 w-5 p-0 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-110 active:scale-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7598a0] focus-visible:ring-offset-2"
+                        className="cycle-insight-bulb period-action-icon animate-period-button relative h-5 w-5 p-0 after:content-[''] after:absolute after:-inset-2 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-110 active:scale-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7598a0] focus-visible:ring-offset-2"
                         onClick={(event) => {
                           event.stopPropagation();
                           setShowInsight(true);
@@ -296,7 +330,7 @@ const Calendar: React.FC<CalendarProps> = ({
               onClick={() => setShowLegend(!showLegend)}
               aria-label={showLegend ? t('calendar.guide.hide') : t('calendar.guide.show')}
               style={{ boxShadow: showLegend ? 'var(--shadow-inset-xs)' : 'var(--shadow-raised-xs)' }}
-              className="calendar-guide-trigger animate-guide-button rounded-full bg-[#F0F2F5] px-2 py-1 text-[9px] font-bold uppercase tracking-[0.1em] transition-shadow"
+              className="calendar-guide-trigger animate-guide-button relative rounded-full bg-[#F0F2F5] px-2 py-1 text-[9px] after:content-[''] after:absolute after:-inset-x-1 after:-inset-y-2 font-bold uppercase tracking-[0.1em] transition-shadow"
             >
               {t('calendar.guide.label')}
             </button>
@@ -310,13 +344,13 @@ const Calendar: React.FC<CalendarProps> = ({
             className="calendar-month-title text-xs font-black uppercase tracking-[0.18em] text-slate-800 text-center transition-opacity active:opacity-60"
           >
             {/* Use the hook to format month/year */}
-            {calendarSystem.formatMonthYear(year, month)}
+            {fmt.monthYear(year, month)}
           </button>
           <button
             onClick={() => onMonthChange(new Date())}
-            className={`text-[8px] uppercase tracking-[0.12em] transition-all justify-self-end font-bold mr-1 ${isTodayMonth
+            className={`relative text-[10px] uppercase tracking-[0.12em] transition-all justify-self-end font-bold mr-1 after:content-[''] after:absolute after:-inset-x-2 after:-inset-y-2.5 ${isTodayMonth
               ? 'text-slate-600 hover:text-slate-800'
-              : 'bg-[#fb7185] text-white px-1.5 py-[2px] rounded-[4px] shadow-sm active:scale-95'
+              : 'bg-[#e11d48] text-white px-1.5 py-[2px] rounded-[4px] shadow-sm active:scale-95'
               }`}
           >
             {t('common.today') || 'Today'}
@@ -374,7 +408,7 @@ const Calendar: React.FC<CalendarProps> = ({
                       }`}
                       style={isCurrent ? undefined : { boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.35), -2px -2px 4px rgba(255, 255, 255, 0.85)' }}
                     >
-                      {calendarSystem.formatMonth(pickerYear, m)}
+                      {fmt.monthName(pickerYear, m)}
                     </button>
                   );
                 })}
@@ -385,7 +419,7 @@ const Calendar: React.FC<CalendarProps> = ({
 
         <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {calendarSystem.weekDayKeys.map((d) => (
-            <div key={d} className="calendar-weekday text-center text-[10px] sm:text-xs text-slate-500 font-black uppercase tracking-[0.18em] pt-2 pb-2">
+            <div key={d} className="calendar-weekday text-center text-[10px] sm:text-xs text-slate-600 font-black uppercase tracking-[0.18em] pt-2 pb-2">
               {t(`calendar.days.${d}`)}
             </div>
           ))}
@@ -443,7 +477,7 @@ const Calendar: React.FC<CalendarProps> = ({
           </div>
         )}
 
-        <div className="grid grid-cols-3 items-center mt-2 pb-0">
+        <div className="grid grid-cols-[2rem_minmax(0,1fr)_2rem] items-center mt-2 pb-0">
           <button
             type="button"
             onClick={goToPrevMonth}
@@ -455,10 +489,10 @@ const Calendar: React.FC<CalendarProps> = ({
             </svg>
           </button>
           {isEditMode ? (
-            <div className="flex items-center gap-2 justify-self-center">
+            <div className="flex items-center gap-2 justify-self-center max-w-full">
               <button
                 onClick={onEditCancel || (() => setIsEditMode(false))}
-                className="px-4 py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-[0.15em] transition-all duration-300 active:scale-[0.98] text-slate-600"
+                className="px-4 py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-[0.12em] whitespace-nowrap transition-all duration-300 active:scale-[0.98] text-slate-600"
                 style={{
                   backgroundColor: '#F0F2F5',
                   boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.4), -4px -4px 8px rgba(255, 255, 255, 0.8)'
@@ -468,7 +502,7 @@ const Calendar: React.FC<CalendarProps> = ({
               </button>
               <button
                 onClick={handleDone}
-                className="px-5 py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-[0.15em] transition-all duration-300 active:scale-[0.98] bg-[#8aacac] text-white shadow-[4px_4px_10px_rgba(138,172,172,0.4)]"
+                className="px-5 py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-[0.12em] whitespace-nowrap transition-all duration-300 active:scale-[0.98] bg-[#8aacac] text-white shadow-[4px_4px_10px_rgba(138,172,172,0.4)]"
               >
                 {t('calendar.done', 'Done')}
               </button>
@@ -476,7 +510,7 @@ const Calendar: React.FC<CalendarProps> = ({
           ) : (
             <button
               onClick={() => setIsEditMode(true)}
-              className={`period-action-button min-w-[140px] px-[15px] py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-[0.2em] active:scale-[0.98] justify-self-center flex items-center justify-center gap-2 animate-period-button text-[#5b7a82]`}
+              className={`period-action-button min-w-[140px] max-w-full px-[15px] py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-[0.12em] max-[340px]:tracking-[0.04em] whitespace-nowrap active:scale-[0.98] justify-self-center flex items-center justify-center gap-2 animate-period-button text-[#5b7a82]`}
               style={{
                 backgroundColor: '#F0F2F5',
                 boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)'
@@ -496,7 +530,7 @@ const Calendar: React.FC<CalendarProps> = ({
                   <path d="M12 21.5c-3.59 0-6.5-2.91-6.5-6.5 0-3.59 4-9.5 6.5-12.5 2.5 3 6.5 8.91 6.5 12.5 0 3.59-2.91 6.5-6.5 6.5z" />
                 </svg>
               )}
-              {todayIsPeriod ? t('calendar.edit_period', 'Edit Period') : t('calendar.period_question', 'Period?')}
+              <span className="min-w-0 truncate">{todayIsPeriod ? t('calendar.edit_period', 'Edit Period') : t('calendar.period_question', 'Period?')}</span>
             </button>
           )}
           <button
@@ -522,7 +556,7 @@ const Calendar: React.FC<CalendarProps> = ({
           />
           <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 pointer-events-none">
             <div
-              className="calendar-guide-modal bg-white rounded-[32px] p-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden w-full max-w-[320px] max-h-[68vh] flex flex-col pointer-events-auto animate-scale-in"
+              className="calendar-guide-modal bg-white rounded-[32px] p-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden w-full max-w-[400px] max-h-[68vh] flex flex-col pointer-events-auto animate-scale-in"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -595,7 +629,7 @@ const Calendar: React.FC<CalendarProps> = ({
                     <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.predicted_period', 'Expected Period')}</span>
                   </div>
 
-                  {settings.showFertileWindow && (
+                  {cycleVis.fertile && (
                     <div className="flex items-center gap-3">
                       <div className="calendar-guide-fertile-marker relative w-9 h-9 shrink-0 rounded-full border-2 border-[#b0f4eb] bg-transparent flex items-center justify-center">
                         <span className="text-[10px] font-semibold text-teal-500">12</span>
@@ -604,6 +638,18 @@ const Calendar: React.FC<CalendarProps> = ({
                         </div>
                       </div>
                       <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.fertile_window')}</span>
+                    </div>
+                  )}
+
+                  {cycleVis.ovulation && (
+                    <div className="flex items-center gap-3">
+                      <div className="calendar-guide-ovulation-marker relative w-9 h-9 shrink-0 rounded-full border-2 border-teal-300 bg-transparent flex items-center justify-center">
+                        <span className="text-[10px] font-semibold text-teal-700">14</span>
+                        <div className="absolute top-0 right-0 translate-x-[15%] -translate-y-[15%] bg-white rounded-full p-0.5 shadow-sm border border-[#b0f4eb]">
+                          <div className="w-3 h-3 bg-teal-500 rounded-full" />
+                        </div>
+                      </div>
+                      <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.ovulation_day')}</span>
                     </div>
                   )}
 
@@ -700,6 +746,19 @@ const Calendar: React.FC<CalendarProps> = ({
                       </div>
                     </div>
                     <span className="text-[11px] text-slate-600 font-bold">{t('dashboard.pregnancy')}</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="calendar-guide-pregnancy-end-marker relative w-9 h-9 shrink-0 rounded-full bg-violet-50 border border-violet-200/60 flex items-center justify-center">
+                      <span className="text-[10px] font-bold text-violet-700">14</span>
+                      <div className="absolute top-0 right-0 translate-x-[15%] -translate-y-[15%] bg-white rounded-full p-0.5 shadow-sm border border-violet-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-violet-500">
+                          <path d="M6 22a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1Z" />
+                          <path d="M8 4h11l-3 4.5 3 4.5H8V4Z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.pregnancy_end')}</span>
                   </div>
 
                   <div className="flex items-center gap-3">

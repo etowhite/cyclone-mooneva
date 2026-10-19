@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatNumber } from '../../services/i18n';
+import { formatNumber } from '../../services/displayFormat';
 
 interface TrendStatCardsProps {
     rangeAverages: {

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DailyLog, Cycle, SymptomConfig, PeriodRecord, AppSettings, MOOD_OPTIONS } from '../types';
 import { toLocalISOString, getTimestamp, diffInDays, addDays } from '../utils/dateUtils';
+import { CUSTOM_MOOD_COLORS, isCustomMood, isCustomSymptom } from '../services/logic/logNames';
 import { averageCycleLength, averagePeriodLength, getEligibleCycles, getPregnancySpans, isCycleOutlier } from '../services/logic/cycle';
 
 /** The heatmaps run to the longest cycle in range, never past this. 45 is where
@@ -38,6 +39,29 @@ const useTrendStats = ({
     return toLocalISOString(cutoffDate);
   }, [range]);
 
+  // Custom symptoms and moods logged inside the selected range, for the filter drawer.
+  // Built-ins are listed there already. Most used first, one entry per name ignoring case.
+  const customNamesInRange = useMemo(() => {
+    const tally = (pick: (log: DailyLog) => string[], isCustom: (n: string) => boolean) => {
+      const seen = new Map<string, { name: string; count: number }>();
+      Object.entries(logs).forEach(([date, log]) => {
+        if (date < cutoffStr) return;
+        pick(log).filter(isCustom).forEach(name => {
+          const hit = seen.get(name.toLowerCase());
+          if (hit) hit.count++;
+          else seen.set(name.toLowerCase(), { name, count: 1 });
+        });
+      });
+      return [...seen.values()]
+        .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+        .map(x => x.name);
+    };
+    return {
+      symptoms: tally(l => l.symptoms || [], isCustomSymptom),
+      moods: tally(l => (Array.isArray(l.mood) ? l.mood : []), isCustomMood),
+    };
+  }, [logs, cutoffStr]);
+
   // Search/symptom/mood filters only. The date range is applied to cycles and periods
   // instead, so a cycle that reaches into the window is counted whole rather than
   // sliced at the cutoff, which would empty its first columns for no real reason.
@@ -61,7 +85,9 @@ const useTrendStats = ({
         const query = searchQuery.toLowerCase();
         const noteMatch = log.notes?.toLowerCase().includes(query);
         const symptomMatch = log.symptoms.some(s => s.toLowerCase().includes(query));
-        if (!noteMatch && !symptomMatch) return;
+        // Custom moods are matched by name too; built-in moods are not searchable text.
+        const moodMatch = Array.isArray(log.mood) && log.mood.some(m => isCustomMood(m) && m.toLowerCase().includes(query));
+        if (!noteMatch && !symptomMatch && !moodMatch) return;
       }
       result[date] = log;
     });
@@ -205,7 +231,7 @@ const useTrendStats = ({
   // Statistics for main charts. Counted over the days the filtered cycles cover, so the
   // rows listed here are exactly the rows the heatmap below can fill.
   const statistics = useMemo(() => {
-    const symptomCounts: Record<string, number> = {};
+    const symptomCounts: Record<string, number> = Object.create(null);
 
     const todayStatsStr = toLocalISOString(new Date());
 
@@ -232,7 +258,7 @@ const useTrendStats = ({
 
   // Mood vs Day of Cycle Heatmap
   const moodHeatmap = useMemo(() => {
-    const data: Record<string, Record<number, number>> = {};
+    const data: Record<string, Record<number, number>> = Object.create(null);
     MOOD_OPTIONS.forEach(opt => { data[opt.id] = {}; });
 
     const todayMoodStr = toLocalISOString(new Date());
@@ -252,6 +278,7 @@ const useTrendStats = ({
         if (log && log.mood) {
           const logMoods = log.mood;
           logMoods.forEach(mood => {
+            if (!data[mood] && isCustomMood(mood)) data[mood] = {};
             if (data[mood]) {
               data[mood][day] = (data[mood][day] || 0) + 1;
             }
@@ -267,7 +294,7 @@ const useTrendStats = ({
 
   // Symptom vs Day of Cycle Heatmap
   const symptomHeatmap = useMemo(() => {
-    const data: Record<string, Record<number, number>> = {};
+    const data: Record<string, Record<number, number>> = Object.create(null);
     topSymptomNames.forEach(name => { data[name] = {}; });
 
     const todaySymptomStr = toLocalISOString(new Date());
@@ -327,7 +354,7 @@ const useTrendStats = ({
   // Medications vs Day of Cycle: one row per medication, built only from the selected
   // range, so old one-off medications simply have no data here and never show up.
   const medsHeatmap = useMemo(() => {
-    const data: Record<string, Record<number, number>> = {};
+    const data: Record<string, Record<number, number>> = Object.create(null);
 
     const todayMedsStr = toLocalISOString(new Date());
 
@@ -356,6 +383,7 @@ const useTrendStats = ({
     filteredLogs,
     filteredCycles,
     filteredPeriods,
+    customNamesInRange,
     rangeAverages,
     statistics,
     moodHeatmap,
@@ -376,17 +404,19 @@ import HeatmapSection from './trends/HeatmapSection';
 import CycleHistoryChart from './trends/CycleHistoryChart';
 import AverageFlowCurve from './trends/AverageFlowCurve';
 import MoodByPhase from './trends/MoodByPhase';
+import type { CycleModel } from '../services/logic/cycleModel';
 
 interface TrendsViewProps {
   logs: Record<string, DailyLog>;
   cycles: Cycle[];
   periods: PeriodRecord[];
   settings: AppSettings;
+  cycleModel: CycleModel;
   onBack: () => void;
   availableSymptoms: SymptomConfig[];
 }
 
-const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings, onBack, availableSymptoms }) => {
+const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings, cycleModel, onBack, availableSymptoms }) => {
   const { t } = useTranslation();
 
   // Local UI State
@@ -408,6 +438,7 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
     heatmapDayCount,
     pillHeatmap,
     medsHeatmap,
+    customNamesInRange,
     filteredCycles,
     filteredPeriods
   } = useTrendStats({
@@ -423,7 +454,7 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
   // Cycle-day charts have nothing to say during a pregnancy: there is no cycle to
   // count days against. The date-based charts above are unaffected and keep working.
   const pregnancyOpen = useMemo(
-    () => getPregnancySpans(logs, periods).some(sp => sp.isOngoing),
+    () => getPregnancySpans(logs, periods).some(sp => sp.awaitingPeriod),
     [logs, periods]
   );
 
@@ -459,7 +490,7 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
         <div className={`absolute bottom-0 left-0 w-[400px] h-[400px] phase-accent-ovulation blur-[120px] opacity-30 animate-blob-pulse delay-700`} />
       </div>
 
-      <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar px-6 pt-4 pb-32 space-y-6 relative z-10">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar px-[max(24px,calc((100%_-_32rem)/2))] pt-4 pb-32 space-y-6 relative z-10">
 
         {/* Range selector + stat cards grouped with tight spacing */}
         <div className="space-y-3">
@@ -476,7 +507,7 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
                   : 'text-slate-500 hover:text-slate-700'
                   }`}
                 style={range === days ? {
-                  backgroundColor: '#7598a0',
+                  backgroundColor: '#5b7a82',
                   boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.5), -2px -2px 6px rgba(255, 255, 255, 0.8), 0 0 12px rgba(117, 152, 160, 0.3)'
                 } : {}}
               >
@@ -543,6 +574,8 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           availableSymptoms={availableSymptoms}
+          customSymptoms={customNamesInRange.symptoms}
+          customMoods={customNamesInRange.moods}
           selectedSymptoms={selectedSymptoms}
           toggleSymptomFilter={toggleSymptomFilter}
           selectedMoods={selectedMoods}
@@ -556,7 +589,7 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
         <AverageFlowCurve logs={logs} periods={filteredPeriods} />
 
         {/* Mood by Phase Breakdown */}
-        <MoodByPhase logs={logs} cycles={filteredCycles} settings={settings} />
+        <MoodByPhase logs={logs} cycles={filteredCycles} cycleModel={cycleModel} />
 
         {/* Mood Timeline Heatmap */}
         {Object.values(moodHeatmap).some(days => Object.keys(days).length > 0) && (
@@ -570,17 +603,36 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
             dayCount={heatmapDayCount}
             lowLabel={t('trends.rare')}
             highLabel={t('trends.likely')}
-            rows={MOOD_OPTIONS.map((opt, idx) => ({
-              id: opt.id,
-              label: `${opt.emoji} ${t(opt.labelKey)}`,
-              data: moodHeatmap[opt.id],
-              config: {
-                color: opt.color,
-                secondary: opt.dark,
-                wash: opt.shadow,
-                blob: `blob-${(idx % 3) + 1}`
-              }
-            }))}
+            rows={[
+              ...MOOD_OPTIONS.map((opt, idx) => ({
+                id: opt.id,
+                label: `${opt.emoji} ${t(opt.labelKey)}`,
+                data: moodHeatmap[opt.id],
+                config: {
+                  color: opt.color,
+                  secondary: opt.dark,
+                  wash: opt.shadow,
+                  blob: `blob-${(idx % 3) + 1}`
+                }
+              })),
+              // Custom moods: one grey row per name as typed, most logged first.
+              ...Object.keys(moodHeatmap)
+                .filter(name => !MOOD_OPTIONS.some(opt => opt.id === name))
+                .map(name => ({ name, total: Object.values(moodHeatmap[name]).reduce((a, b) => a + b, 0) }))
+                .sort((a, b) => b.total - a.total || a.name.localeCompare(b.name))
+                .map(({ name }, idx) => ({
+                  id: `custom:${name}`,
+                  label: name,
+                  literal: true,
+                  data: moodHeatmap[name],
+                  config: {
+                    color: CUSTOM_MOOD_COLORS.color,
+                    secondary: CUSTOM_MOOD_COLORS.dark,
+                    wash: CUSTOM_MOOD_COLORS.shadow,
+                    blob: `blob-${(idx % 3) + 1}`
+                  }
+                }))
+            ]}
           />
         )}
 
@@ -599,6 +651,7 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
             rows={topSymptomNames.map((symName, idx) => ({
               id: symName,
               label: symName,
+              literal: isCustomSymptom(symName),
               data: symptomHeatmap[symName],
               config: {
                 color: 'rgb(129, 140, 248)',

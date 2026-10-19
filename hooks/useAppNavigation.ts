@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { App as CapApp } from '@capacitor/app';
 
-export type ViewType = 'calendar' | 'trends' | 'settings' | 'notifications';
+export type ViewType = 'calendar' | 'trends' | 'settings' | 'notifications' | 'lab';
 export type SubViewType = 'main' | 'predictions' | 'data_management';
 
 /**

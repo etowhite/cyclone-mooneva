@@ -3,10 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { ScreenWrapper } from '../ScreenWrapper';
 import { useMooneva } from '../../contexts/MoonevaContext';
 import { SettingRow, Toggle } from '../settings/SettingsUI';
+import { getCycleVisibility } from '../../services/logic/settingsInterlocks';
 import type { ViewType } from '../../hooks/useAppNavigation';
 import {
   canScheduleExactAlarms,
   isContraceptionReminderSchedulable,
+  isDiscreetNotifications,
   openExactAlarmSettings,
   openNotificationSettings,
   REMINDER_DEFAULT_TIMES,
@@ -49,7 +51,8 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
   React.useEffect(() => {
     settingsRef.current = settings;
   }, [settings]);
-  const discrete = !!settings.discreteMode;
+  const discrete = isDiscreetNotifications(settings);
+  const cycleVis = getCycleVisibility(settings);
   const DEFAULT_REMINDER_TIME = '09:00';
   const contraceptionReminder = settings.contraceptionReminder ?? {
     enabled: false,
@@ -200,6 +203,19 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
               {t('notifications.discrete_mode_note')}
             </p>
 
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
+              <SettingRow
+                label={t('notifications.discreet_toggle', 'Discreet notifications')}
+                desc={t('notifications.discreet_toggle_desc', 'Neutral reminder texts, hidden on the lock screen. The app itself stays as it is.')}
+                last
+              >
+                <Toggle label={t('notifications.discreet_toggle', 'Discreet notifications')}
+                  active={discrete}
+                  disabled={!!settings.discreteMode}
+                  onClick={() => updateSettings({ ...settings, discreetNotifications: settings.discreetNotifications !== true })}
+                />
+              </SettingRow>
+            </div>
 
             {/* 2. Action Reminders */}
             <section className="space-y-3">
@@ -225,7 +241,7 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
                         desc={descKey ? t(descKey) : undefined}
                         last={index === arr.length - 1 && !isOn}
                       >
-                        <Toggle
+                        <Toggle label={t(item.labelKey)}
                           active={isOn}
                           onClick={() => handleToggle(item.key as keyof AppSettings, isOn)}
                         />
@@ -235,6 +251,7 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
                           <span className="text-[13px] text-slate-600 font-medium">{t('notifications.remind_at')}</span>
                           <input
                             type="time"
+                            aria-label={`${t(item.labelKey)} ${t('notifications.remind_at')}`}
                             value={timeValue}
                             onChange={(e) => updateSettings({ ...settings, [item.timeKey]: e.target.value })}
                             className="text-[13px] font-bold text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-[#7598a0]/30 outline-none"
@@ -359,7 +376,7 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
                 >
                   <label>
                     <span className="sr-only">{t('notifications.contraception_reminder')}</span>
-                    <Toggle
+                    <Toggle label={t('notifications.contraception_reminder')}
                       active={contraceptionReminder.enabled}
                       onClick={handleContraceptionToggle}
                     />
@@ -379,7 +396,8 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
                   { key: 'reminderPMS', timeKey: 'reminderPMSTime', labelKey: 'notifications.pms_reminder', descKey: 'notifications.pms_reminder_desc' },
                   { key: 'reminderFertility', timeKey: 'reminderFertilityTime', labelKey: 'notifications.fertility_reminder', descKey: 'notifications.fertility_reminder_desc' },
                   { key: 'reminderOvulation', timeKey: 'reminderOvulationTime', labelKey: 'notifications.ovulation_reminder', descKey: 'notifications.ovulation_reminder_desc' },
-                ].map((item, index, arr) => {
+                ].filter(item => item.key === 'reminderPMS' ? cycleVis.pms : item.key === 'reminderFertility' ? cycleVis.fertile : item.key === 'reminderOvulation' ? cycleVis.ovulation : true)
+                  .map((item, index, arr) => {
                   const isOn = !!(settings[item.key as keyof typeof settings]);
                   const timeValue = (settings[item.timeKey as keyof typeof settings] as string) || DEFAULT_REMINDER_TIME;
                   const descKey = item.descKey ? (discrete ? item.descKey.replace('_desc', '_desc_discrete') : item.descKey) : undefined;
@@ -391,7 +409,7 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
                         desc={desc}
                         last={index === arr.length - 1 && !isOn}
                       >
-                        <Toggle
+                        <Toggle label={t(item.labelKey)}
                           active={isOn}
                           onClick={() => handleToggle(item.key as keyof AppSettings, isOn)}
                         />
@@ -401,6 +419,7 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
                           <span className="text-[13px] text-slate-600 font-medium">{t('notifications.remind_at')}</span>
                           <input
                             type="time"
+                            aria-label={`${t(item.labelKey)} ${t('notifications.remind_at')}`}
                             value={timeValue}
                             onChange={(e) => updateSettings({ ...settings, [item.timeKey]: e.target.value })}
                             className="text-[13px] font-bold text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-[#7598a0]/30 outline-none"

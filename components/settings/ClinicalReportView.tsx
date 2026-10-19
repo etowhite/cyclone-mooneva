@@ -4,11 +4,12 @@ import Logger from '../../services/logger';
 import { useMooneva } from '../../contexts/MoonevaContext';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
-import { addDays, diffInDays, getTodayStr, toLocalISOString } from '../../utils/dateUtils';
+import { addDays, diffInDays, getTodayStr, parseLocalDate, toLocalISOString } from '../../utils/dateUtils';
 import { hasDailyLogContent } from '../../utils/dailyLogContent';
-import { formatNumber } from '../../services/i18n';
+import { formatNumber, useDisplayFormat } from '../../services/displayFormat';
 import { Cycle, DailyLog, MOOD_OPTIONS } from '../../types';
-import { averageCycleLength, averagePeriodLength } from '../../services/logic/cycle';
+import { averageCycleLength, averagePeriodLength, periodBleedingDays } from '../../services/logic/cycle';
+import { symptomLabel } from '../../services/logic/logNames';
 
 // Rasterising the report is the expensive step (html2canvas over the whole DOM), so the
 // window is capped rather than left open-ended: a multi-year export on a phone with a
@@ -73,6 +74,7 @@ interface CycleDetail {
 
 export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose }) => {
     const { t, i18n } = useTranslation();
+    const fmt = useDisplayFormat();
     const { logs, model, settings, periods } = useMooneva();
     const [isSharing, setIsSharing] = React.useState(false);
     const [includeSymptoms, setIncludeSymptoms] = React.useState(true);
@@ -216,7 +218,10 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                     startDate: lastPeriodStart,
                     isOngoing: true,
                     length: diffDays + 1, // Include today
-                    periodLength: periods.find(p => p.startDate === lastPeriodStart)?.days || 5
+                    periodLength: (() => {
+                        const p = periods.find(x => x.startDate === lastPeriodStart);
+                        return (p && periodBleedingDays(p)) || 5;
+                    })()
                 };
                 allCycles.push(ongoingCycle);
             }
@@ -269,10 +274,8 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
         };
     }, [model.cycles, fromDate, toDate]);
 
-    const formatDate = (dateStr: string) => {
-        const [y, m, d] = dateStr.split('-').map(Number);
-        return new Date(y, m - 1, d).toLocaleDateString(i18n.language, { month: 'short', day: 'numeric' });
-    };
+    const formatDate = (dateStr: string) => fmt.dayMonth(parseLocalDate(dateStr));
+    const formatFullDate = (dateStr: string) => fmt.dayMonthYear(parseLocalDate(dateStr));
 
     const getFlowLabel = (flow: string | null) => {
         if (!flow) return '-';
@@ -286,7 +289,7 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
     // Formatting Helpers
     const formatSymptoms = (symptoms: string[] = []) => {
         if (!symptoms.length) return '-';
-        const display = symptoms.slice(0, 3).map(s => t(`symptom.${s.toLowerCase()}`, s));
+        const display = symptoms.slice(0, 3).map(s => symptomLabel(s, t));
         if (symptoms.length > 3) display.push('...');
         return display.join(', ');
     };
@@ -321,7 +324,7 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
             <div className="no-print sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md text-white shadow-md px-4 pb-3 pt-[calc(env(safe-area-inset-top)+12px)] border-b border-slate-700/50">
                 <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center gap-2">
-                        <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors active:scale-90">
+                        <button onClick={onClose} aria-label={t('common.close', 'Close')} className="p-2 hover:bg-white/10 rounded-full transition-colors active:scale-90">
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                         <span className="font-bold text-sm tracking-tight text-slate-200 uppercase">{t('settings.report_preview')}</span>
@@ -338,7 +341,7 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 border-t border-white/5 pt-2 pb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t('settings.report_range')}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-200">{t('settings.report_range')}</span>
                     <input
                         type="date"
                         value={fromDate}
@@ -418,12 +421,12 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                 <div className="mb-4 border-b-2 border-slate-900 pb-4">
                     <div className="flex justify-between items-baseline mb-2">
                         <span className="font-black text-[22px] tracking-tight text-slate-900 uppercase">{t('settings.clinical_report')}</span>
-                        <span className="font-mono text-slate-500">{new Date().toLocaleDateString(i18n.language)}</span>
+                        <span className="font-mono text-slate-500">{fmt.dayMonthYear(new Date())}</span>
                     </div>
                     <div className="flex justify-between items-baseline text-slate-600 font-medium">
                         <span>{t('settings.patient_id')}: <span className="text-slate-900 font-bold">{settings.userName || 'Anonymous'}</span></span>
                         <div className={`${isRtl ? 'text-left' : 'text-right'}`}>
-                            <div className="text-[9px] uppercase tracking-wider">{t('settings.report_range')}: <span className="font-bold text-slate-900">{fromDate} – {toDate}</span></div>
+                            <div className="text-[9px] uppercase tracking-wider">{t('settings.report_range')}: <span className="font-bold text-slate-900">{formatFullDate(fromDate)} – {formatFullDate(toDate)}</span></div>
                             <div className="text-[9px] uppercase tracking-wider">{t('settings.source')}: <span className="font-bold">Mooneva Cycle: private period tracker</span></div>
                         </div>
                     </div>
@@ -439,11 +442,11 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                         <div className="flex gap-4 text-[9px]">
                             <div>
                                 <span className={`text-slate-500 uppercase font-bold ${isRtl ? 'ml-1' : 'mr-1'}`}>{t('settings.cycle_length_label')}:</span>
-                                <span className="font-black text-slate-800">{averages.avgCycle}</span>
+                                <span className="font-black text-slate-800">{typeof averages.avgCycle === 'number' ? formatNumber(averages.avgCycle) : averages.avgCycle}</span>
                             </div>
                             <div>
                                 <span className={`text-slate-500 uppercase font-bold ${isRtl ? 'ml-1' : 'mr-1'}`}>{t('settings.period_length_label')}:</span>
-                                <span className="font-black text-slate-800">{averages.avgPeriod}</span>
+                                <span className="font-black text-slate-800">{typeof averages.avgPeriod === 'number' ? formatNumber(averages.avgPeriod) : averages.avgPeriod}</span>
                             </div>
                         </div>
                     </div>
@@ -460,16 +463,16 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                         <tbody className="text-slate-700">
                             {cycleDetails.map(({ cycle }, i) => (
                                 <tr key={i} className="border-t border-slate-100">
-                                    <td className="py-2 px-2 font-mono text-[10px]">{cycle.startDate}</td>
+                                    <td className="py-2 px-2 font-mono text-[10px]">{formatFullDate(cycle.startDate)}</td>
                                     <td className="py-2 px-2 text-[10px]">
                                         {getCycleLabel(cycle)}
                                     </td>
                                     <td className="py-2 px-2 font-bold">
                                         {cycle.isOngoing
                                             ? <span className="text-slate-400 font-normal">{t('settings.cycle_day_n', { count: cycle.length ?? 0 })}</span>
-                                            : <>{cycle.length || '-'} <span className="text-[8px] font-normal text-slate-400">{t('common.days_short')}</span></>}
+                                            : <>{cycle.length ? formatNumber(cycle.length) : '-'} <span className="text-[8px] font-normal text-slate-400">{t('common.days_short')}</span></>}
                                     </td>
-                                    <td className="py-2 px-2 font-bold">{cycle.periodLength || '-'} <span className="text-[8px] font-normal text-slate-400">{t('common.days_short')}</span></td>
+                                    <td className="py-2 px-2 font-bold">{cycle.periodLength ? formatNumber(cycle.periodLength) : '-'} <span className="text-[8px] font-normal text-slate-400">{t('common.days_short')}</span></td>
                                 </tr>
                             ))}
                         </tbody>
@@ -484,8 +487,7 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                             <div className="report-cycle-head bg-slate-50 p-3 rounded-t-lg border border-slate-200 border-b-0 flex justify-between items-baseline mb-0">
                                 <div>
                                     <span className="font-bold text-slate-900 text-[13px]">
-                                        {t('settings.cycle_num', { count: cycleDetails.length - i })}: {formatDate(cycle.startDate)}
-                                        {cycle.endDate ? ` – ${formatDate(cycle.endDate)}` : ''}
+                                        {t('settings.cycle_num', { count: cycleDetails.length - i })}: {cycle.endDate ? fmt.dateRange(parseLocalDate(cycle.startDate), parseLocalDate(cycle.endDate)) : formatDate(cycle.startDate)}
                                     </span>
                                     <div className="text-[9px] text-slate-500 mt-1 uppercase tracking-wide font-medium">
                                         {getCycleLabel(cycle)}
@@ -494,8 +496,8 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                                 <div className={`text-[10px] text-slate-600 ${isRtl ? 'text-left' : 'text-right'}`}>
                                     {cycle.isOngoing
                                         ? <span className="font-semibold">{t('settings.cycle_day_n', { count: cycle.length ?? 0 })}</span>
-                                        : <><span className="font-semibold">{cycle.length} {t('common.days_short')}</span> {cycle.isPregnancy ? t('settings.pregnancy', 'Pregnancy') : cycle.isOutlier ? t('settings.tracking_gap', 'Tracking gap (not logged)') : t('dashboard.cycle_active')}</>}
-                                    , <span className="font-semibold">{cycle.periodLength} {t('common.days_short')}</span> {t('settings.flow')}
+                                        : <><span className="font-semibold">{cycle.length ? formatNumber(cycle.length) : '-'} {t('common.days_short')}</span> {cycle.isPregnancy ? t('settings.pregnancy', 'Pregnancy') : cycle.isOutlier ? t('settings.tracking_gap', 'Tracking gap (not logged)') : t('dashboard.cycle_active')}</>}
+                                    , <span className="font-semibold">{cycle.periodLength ? formatNumber(cycle.periodLength) : '-'} {t('common.days_short')}</span> {t('settings.flow')}
                                 </div>
                             </div>
 
@@ -516,7 +518,7 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                                 <tbody className="text-slate-700">
                                     {days.length > 0 ? days.map((day, dIdx) => (
                                         <tr key={dIdx} className="border-t border-slate-100 hover:bg-slate-50">
-                                            <td className={`py-2 px-2 font-mono text-slate-400 ${isRtl ? 'border-l' : 'border-r'} border-slate-100`}>{day.cycleDay}</td>
+                                            <td className={`py-2 px-2 font-mono text-slate-400 ${isRtl ? 'border-l' : 'border-r'} border-slate-100`}>{formatNumber(day.cycleDay)}</td>
                                             <td className={`py-2 px-2 font-mono ${isRtl ? 'border-l' : 'border-r'} border-slate-100`}>{formatDate(day.date)}</td>
 
                                             {/* Flow */}
@@ -543,7 +545,7 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                                                             const config = MOOD_OPTIONS.find(opt => opt.id === m);
                                                             return (
                                                                 <span key={m} className="text-[8px] font-bold text-slate-600 uppercase">
-                                                                    {config ? config.emoji : ''} {t(`log.mood_${m}`, m)}
+                                                                    {config ? config.emoji : ''} {config ? t(`log.mood_${m}`, m) : m}
                                                                 </span>
                                                             );
                                                         })}
