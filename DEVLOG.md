@@ -29,3 +29,9 @@ JDK21/SDK36/Gradle8.14.3 в ../.toolchain. На 8GB машине не запус
 - Финальный code/source head d0fbd7b, оба CI SUCCESS. Проверенный APK 5 890 342 bytes, SHA256 b610d48146bf8a428fa905940b305638224d42cc320d70778950d4763d7e6fbe. Собственный5574 выключен, forwarding9223 снят. Публикуем prerelease v3.0.0-beta.1 с exact target d0fbd7b, APK и SHA256SUMS; source archives по этому тегу. Локальный файл ../releases/cyclone-mooneva-3.0.0-beta.1/.
 
 - ГОТОВО: prerelease опубликован https://github.com/etowhite/cyclone-mooneva/releases/tag/v3.0.0-beta.1 . GitHub подтвердил isPrerelease=true, оба assets uploaded; server SHA256 APK совпадает с локальным b610d48146bf8a428fa905940b305638224d42cc320d70778950d4763d7e6fbe. Release source target d0fbd7b. Проверенный screenshot ../verification/fork-beta-launch.png показывает читаемый onboarding. Текущая цель beta завершена; дальше issues #2/#3, без обещаний ещё не перенесённых функций.
+
+- 2026-10-28: пользователь запросил защиту main по предупреждению GitHub. Подтверждено: default main, public, protection отсутствует, rulesets пусты. Настраиваем обязательный PR (0 чужих approvals для одиночного владельца), успешный web CI с актуальной main, разрешённые discussions, enforcement admins, запрет force push/deletion. Проверить API после применения; код приложения не менять.
+
+- GitHub PUT отклонил simultaneous contexts+checks (422 schema oneOf). Изменений защиты не применено. Повторяем с checks только, сохраняя привязку к GitHub Actions app15368.
+
+- ГОТОВО: API подтвердил main protected=true. Обязательный PR, web от GitHub Actions app15368, strict up-to-date=true, resolved conversations=true; force push/deletion=false; enforce_admins=true. Для одиночного владельца approvals0, поэтому второй участник не требуется. Настройки действуют на main, development ветка cyclone/design остаётся доступна. Приложение/APK не менялись.

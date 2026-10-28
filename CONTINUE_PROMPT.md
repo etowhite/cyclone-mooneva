@@ -15,3 +15,5 @@ Beta checkpoint: Android build SUCCESS 1m15s; v2 signature valid; version/packag
 
 ## RELEASE COMPLETE — supersedes pending beta steps above
 Published https://github.com/etowhite/cyclone-mooneva/releases/tag/v3.0.0-beta.1 (prerelease), exact source d0fbd7b1160946d4a934e1280e4747636f2cc885, both CI SUCCESS. APK5890342bytes, SHA256 b610d48146bf8a428fa905940b305638224d42cc320d70778950d4763d7e6fbe matched GitHub asset digest. APK+SHA256SUMS uploaded. Install/launch on ownAPI35 succeeded; CDP complete onboarding and screenshot fork-beta-launch.png checked, no native crash. Own5574 OFF, forwarding9223 removed. Beta user request DONE. Continue issues2/3 for full QA and native feature/data migration; no need rebuild this beta without code changes. PR1 stays open for review.
+
+Main branch protection ENABLED (verified via API): PR required, GitHub Actions web/app15368 required, strict up-to-date, conversations resolved, enforce_admins true, force pushes and deletion blocked. Required approvals0 for solo owner. Develop on cyclone/design or feature branches; do not push directly to main. App/APK unchanged by this configuration.
