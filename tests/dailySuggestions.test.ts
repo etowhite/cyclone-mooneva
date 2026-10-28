@@ -1,8 +1,9 @@
 import {describe,it,expect} from 'vitest';
-import {dailySuggestions} from '../services/dailySuggestions';
+import {dailySuggestions,hasCycleForSuggestions} from '../services/dailySuggestions';
 import type {CycleStatusData} from '../services/logic/status';
 const status:CycleStatusData={title:'',subtitle:'',phaseKey:'follicular',dayOfCycle:1};
 describe('daily suggestions',()=>{
+ it('requires an actual cycle day before displaying suggestions',()=>{for(const dayOfCycle of [undefined,0,-1,NaN])expect(hasCycleForSuggestions({...status,dayOfCycle})).toBe(false);expect(hasCycleForSuggestions(status)).toBe(true);});
  it('provides three stable translated categories with no repeated full tips over 56 cycle days',()=>{
   for(const language of ['ru','en']){
    const texts=[new Set<string>(),new Set<string>(),new Set<string>()];

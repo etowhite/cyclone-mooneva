@@ -1,23 +1,15 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMooneva } from '../contexts/MoonevaContext';
-import { isLabVisible } from '../services/lab';
-import { getTodayStr } from '../utils/dateUtils';
 
 interface BottomNavProps {
-    currentView: 'calendar' | 'trends' | 'settings' | 'lab';
-    onViewChange: (view: 'calendar' | 'trends' | 'lab') => void;
+    currentView: 'calendar' | 'trends' | 'settings';
+    onViewChange: (view: 'calendar' | 'trends') => void;
     onSettingsClick: () => void;
     isCloaked: boolean;
 }
 
 const BottomNav: React.FC<BottomNavProps> = ({ currentView, onViewChange, onSettingsClick, isCloaked }) => {
     const { t } = useTranslation();
-    // Not useLabVisible from components/lab: that barrel imports LabRoute, which imports this file.
-    const { settings, logs, periods } = useMooneva();
-    const today = getTodayStr();
-    const labVisible = useMemo(() => isLabVisible(settings, logs, periods, today), [settings, logs, periods, today]);
-
     const navWrapperClass = 'mooneva-bottom-nav-wrap fixed bottom-0 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 pointer-events-auto';
 
     return (
@@ -85,36 +77,6 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, onViewChange, onSett
                     </svg>
                     <span className="cyclone-nav-label">{t('common.calendar')}</span>
                 </button>
-
-                {/* Lab (only when switched on in Settings) */}
-                {labVisible && (
-                    <button
-                        onClick={() => onViewChange('lab')}
-                        className={`relative cyclone-nav-item flex flex-col items-center justify-center rounded-xl transition-all ${currentView === 'lab'
-                            ? (isCloaked ? 'text-white' : 'text-slate-700')
-                            : (isCloaked ? 'text-white/40' : 'text-slate-400 hover:text-slate-600')
-                            }`}
-                        aria-label={t('lab.nav')}
-                        aria-current={currentView === 'lab' ? 'page' : undefined}
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        >
-                            <path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2" />
-                            <path d="M6.453 15h11.094" />
-                            <path d="M8.5 2h7" />
-                        </svg>
-                        <span className="cyclone-nav-label">{t('lab.nav')}</span>
-                    </button>
-                )}
 
                 {/* Settings */}
                 <button

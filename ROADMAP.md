@@ -12,3 +12,5 @@
 - [ ] Android emulator regression checks, signed APK and corresponding source release.
 
 Progress is recorded in DEVLOG.md and GitHub issues/PRs. Checked means implemented and verified at the stated scope; test beta releases are available, while full regression and production signing remain pending.
+
+Beta3 removes Lab entirely and adds optional0–10 daily pain, interactive date-range pain analytics, first-run/controls consistency and kid-mode explanations. Legacy backup core data remains compatible; native cyclone JSON migration/biometrics are still pending.

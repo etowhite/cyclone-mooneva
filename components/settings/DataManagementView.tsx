@@ -3,7 +3,6 @@ import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppSettings } from '../../types';
 import { shareOrDownloadBackup, loadData, wipeAllData, saveData, generateBackup, restoreBackup, loadPeriods, savePeriods, parseExternalImport, MAX_IMPORT_FILE_SIZE_BYTES, mergeRestoredSettings, saveSettings, writeAutoBackupPassword, clearAutoBackupPassword } from '../../services/logic';
-import { cancelLabReminder, loadLabForBackup, saveLabFromBackup } from '../../services/lab';
 import Logger from '../../services/logger';
 import { addDays, parseLocalDate, toLocalISOString } from '../../utils/dateUtils';
 import { useDisplayFormat } from '../../services/displayFormat';
@@ -179,10 +178,9 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
             const useLive = !!live && !live.isLoading && !live.loadError;
             const allData = useLive ? live.logs : await loadData();
             const allPeriods = useLive ? live.periods : await loadPeriods();
-            const lab = await loadLabForBackup();
 
             const { blob, filename } = await generateBackup(
-                { data: allData, settings, timestamp: new Date().toISOString(), periods: allPeriods, ...(lab !== undefined && { lab }) },
+                { data: allData, settings, timestamp: new Date().toISOString(), periods: allPeriods },
                 isBackupEncrypted ? backupPassword : undefined
             );
             shareOrDownloadBackup(blob, `${filename.split('.')[0]}-${toLocalISOString(new Date())}.${filename.split('.')[1]}`);
@@ -206,7 +204,6 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
         try {
             const restored = await restoreBackup(file, passwordToUse);
             // Check every part before writing any of it, so a bad file leaves nothing half-written.
-            // Only the Lab part is allowed to be bad: it is skipped and the user is told.
             if (restored.periods !== undefined && !Array.isArray(restored.periods)) {
                 alert(t('settings.invalid_backup'));
                 return;
@@ -219,28 +216,8 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                 if (Array.isArray(restored.periods)) {
                     await savePeriods(restored.periods);
                 }
-                // A backup without Lab data leaves the current Lab data alone. Lab comes after the
-                // core data, so a failed core write never leaves new Lab data beside old core data;
-                // an invalid Lab part writes nothing and the user is told.
-                let labKept = false;
-                if (restored.lab !== undefined) {
-                    try {
-                        labKept = !(await saveLabFromBackup(restored.lab));
-                    } catch (e) {
-                        Logger.error('Lab restore failed:', e);
-                        labKept = true;
-                    }
-                }
-                // A restored file may switch Lab off or change Lab data. Drop the pending Lab reminder;
-                // after the reload the app-level effect schedules it again if Lab is on.
-                await cancelLabReminder();
                 await saveSettings(mergedSettings);
                 onUpdate(mergedSettings);
-                if (labKept) {
-                    alert(t('settings.import_lab_kept', {
-                        defaultValue: 'Backup restored. The Lab data in the file could not be used, so your current Lab data was kept.',
-                    }));
-                }
                 window.location.reload();
             } else {
                 // If decryptBackup returns null or incomplete structure

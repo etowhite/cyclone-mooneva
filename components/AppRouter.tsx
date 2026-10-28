@@ -9,7 +9,6 @@ import OnboardingWizard from './OnboardingWizard';
 import PinLock from './PinLock';
 import { WhatsNewModal } from './WhatsNewModal';
 import LoadErrorScreen from './LoadErrorScreen';
-import { LabRoute, useLabVisible } from './lab';
 
 import { CalendarScreen } from './screens/CalendarScreen';
 import { TrendsScreen } from './screens/TrendsScreen';
@@ -34,7 +33,6 @@ export const AppRouter = () => {
     const { view, setView, subView, setSubView, openSubViewFrom, closeSubView, previousView } = useAppNavigation();
     useAppTheme({ view, discreteMode: !!settings.discreteMode, darkNeumorphism: !!settings.darkNeumorphism });
     useAppReview();
-    const labVisible = useLabVisible();
 
     // --- Auto Lock Hook ---
     const { isLocked, setIsLocked, isPinConfigured } = useAutoLock({ settings, loading });
@@ -45,10 +43,6 @@ export const AppRouter = () => {
     const hasData = Object.keys(logs).length > 0;
     const showOnboarding = !settings.onboardingCompleted && !hasData;
 
-    // Lab turned off, discrete mode on or a pregnancy started while Lab was open: leave it.
-    useEffect(() => {
-        if (view === 'lab' && !labVisible) setView('calendar');
-    }, [view, labVisible]);
 
     useEffect(() => {
         if (loading || showOnboarding || (isPinConfigured && isLocked)) return;
@@ -122,9 +116,6 @@ export const AppRouter = () => {
             return <NotificationManagerScreen setView={setView} returnTo={previousView ?? 'calendar'} isCloaked={settings.discreteMode} />;
         }
 
-        if (view === 'lab' && labVisible) {
-            return <LabRoute setSubView={setSubView} setView={setView} isCloaked={settings.discreteMode} />;
-        }
 
         if (view === 'trends') {
             return <TrendsScreen setSubView={setSubView} setView={setView} isCloaked={settings.discreteMode} />;

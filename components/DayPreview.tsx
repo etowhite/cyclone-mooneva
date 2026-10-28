@@ -143,6 +143,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
             </div>
 
             {/* Content Body */}
+            {typeof log?.pain === 'number' && <p className="px-1 text-sm">{t('log.pain_title')}: {log.pain}/10</p>}
             <div className="space-y-2 px-1">
                 {/* Symptoms & Vitals */}
                 {(log?.symptoms?.length > 0 || log?.discharge || (!settings.kidMode && (log?.sexDrive || log?.sexType)) || log?.pillTakenAt || (log?.meds?.length ?? 0) > 0 || activePeriod?.isWithdrawalBleed || activePeriod?.ignoreForAverages) && (

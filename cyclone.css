@@ -176,3 +176,81 @@ body[data-cyclone] :is(.daily-log-panel,.day-preview-panel) { border:1px solid v
 
 body[data-cyclone] .daily-log-tab[aria-selected='true'] { background:var(--cyclone-container)!important; color:var(--cyclone-primary)!important; border-radius:20px; box-shadow:none!important; }
 body[data-cyclone] .daily-log-tab[aria-selected='false'] { background:transparent!important; color:var(--text-secondary)!important; }
+
+/* Control geometry is independent of a page's minimum button touch height. */
+body[data-cyclone] .cyclone-data-page button.cyclone-toggle { min-height:0; height:24px; width:40px; flex:none; }
+body[data-cyclone] .cyclone-data-page .cyclone-setting-title { min-height:0; }
+body[data-cyclone] .daily-log-panel :is(button[aria-pressed],.daily-log-action-circle) { min-height:44px; width:auto; height:auto; padding:10px 16px; flex:none; border:1px solid var(--border-soft)!important; border-radius:24px; background:var(--surface)!important; color:var(--text-secondary)!important; text-transform:none; letter-spacing:0; font-size:14px; line-height:1.2; box-shadow:none!important; }
+body[data-cyclone] .daily-log-panel button[aria-pressed='true'] { background:var(--cyclone-primary)!important; color:var(--cyclone-on-primary)!important; border-color:var(--cyclone-primary)!important; }
+body[data-cyclone] .daily-log-panel button[aria-pressed] :is(span,div) { color:inherit!important; text-transform:none; letter-spacing:0; font-size:14px; }
+body[data-cyclone] .daily-log-flow-circle>div>div { display:none; }
+body[data-cyclone] .cyclone-choice-dialog { border-radius:32px; border:1px solid var(--border-soft); background:var(--surface)!important; padding:24px; max-height:calc(100dvh - 48px); overflow-y:auto; }
+body[data-cyclone] .cyclone-choice-dialog button { min-height:48px; border-radius:24px; padding:12px 16px; text-transform:none; letter-spacing:0; font-size:14px; line-height:1.25; }
+body[data-cyclone] .cyclone-choice-dialog button:first-child { background:var(--cyclone-primary)!important; color:var(--cyclone-on-primary)!important; }
+body[data-cyclone] .cyclone-choice-dialog button:nth-child(2) { border:1px solid var(--border-soft); background:var(--cyclone-container)!important; color:var(--cyclone-primary)!important; }
+body[data-cyclone] .cyclone-choice-dialog button:last-child { background:transparent!important; color:var(--text-secondary)!important; }
+
+/* Shared pill shape for actions; calendar dates and switches retain their geometry. */
+body[data-cyclone] button:not(.calendar-day-cell):not(.cyclone-toggle):not(.cyclone-nav-item) { border-radius:24px; }
+body[data-cyclone] .cyclone-onboarding { background:radial-gradient(circle at 1px 1px,color-mix(in srgb,var(--cyclone-primary) 14%,transparent) 1px,transparent 1.5px),radial-gradient(ellipse at top left,var(--cyclone-container),transparent 70%),var(--app-bg)!important; background-size:20px 20px,100% 100%,auto; }
+body[data-cyclone] .cyclone-onboarding button { min-height:44px; border:1px solid var(--border-soft); box-shadow:none!important; text-transform:none; letter-spacing:0; font-size:14px; line-height:1.2; }
+body[data-cyclone] .cyclone-onboarding button[aria-pressed='false'] { background:var(--surface)!important; color:var(--text-secondary)!important; }
+body[data-cyclone] .cyclone-onboarding button[aria-pressed='true'] { background:var(--cyclone-primary)!important; color:var(--cyclone-on-primary)!important; border-color:var(--cyclone-primary); }
+body[data-cyclone] .cyclone-onboarding button[aria-pressed='true'] span { color:inherit!important; }
+body[data-cyclone] .cyclone-language-choices { width:100%; justify-content:center; }
+body[data-cyclone] .cyclone-language-choices button { min-width:112px; padding:12px 20px; }
+body[data-cyclone] .cyclone-goal-choice[aria-pressed='true'] { border:2px solid var(--cyclone-primary)!important; background:var(--cyclone-container)!important; color:var(--text-primary)!important; }
+body[data-cyclone] .cyclone-goal-choice { border:2px solid var(--border-soft)!important; }
+body[data-cyclone] .cyclone-onboarding h1 { font-size:16px; text-align:center; }
+
+/* App-wide action and option primitives, shared across forms, dialogs and Lab. */
+body[data-cyclone] button:is([class*="py-"],[class*="p-"],[aria-pressed]):not(.calendar-day-cell):not(.cyclone-toggle):not(.cyclone-nav-item):not(.cyclone-setting-row):not(.daily-log-close):not([class*="w-8"]):not([class*="w-9"]):not([class*="w-10"]):not([class*="w-12"]):not([class*="w-14"]):not([class*="w-16"]) {
+ border-radius:24px; min-height:44px; font-size:14px; font-weight:600; line-height:1.2; letter-spacing:0; text-transform:none; box-shadow:none!important;
+}
+body[data-cyclone] button[aria-pressed]:not(.calendar-day-cell) { border:1px solid var(--border-soft)!important; background:var(--surface)!important; color:var(--text-secondary)!important; }
+body[data-cyclone] button[aria-pressed='true']:not(.calendar-day-cell) { border-color:var(--cyclone-primary)!important; background:var(--cyclone-primary)!important; color:var(--cyclone-on-primary)!important; }
+body[data-cyclone] button[aria-pressed='true']:not(.calendar-day-cell) span { color:inherit!important; }
+body[data-cyclone] button[class*="text-white"]:not(.calendar-day-cell):not([class*="bg-red"]):not([class*="bg-rose"]) { background:var(--cyclone-primary)!important; color:var(--cyclone-on-primary)!important; border:1px solid var(--cyclone-primary); }
+body[data-cyclone] button:is([class*="bg-white"],[class*="bg-[#F0F2F5]"])[class*="py-"]:not(.calendar-day-cell):not(.cyclone-toggle):not(.cyclone-setting-row) { border:1px solid var(--border-soft); }
+body[data-cyclone] button:disabled { cursor:not-allowed; }
+body[data-cyclone] .cyclone-goal-choice[aria-pressed='true'] { border:2px solid var(--cyclone-primary)!important; background:var(--cyclone-container)!important; color:var(--text-primary)!important; }
+body[data-cyclone] .cyclone-data-page button.cyclone-toggle { min-height:0; height:24px; width:40px; }
+
+body[data-cyclone] .cyclone-data-page .space-y-8>:not([hidden])~:not([hidden]) { margin-top:0; }
+body[data-cyclone] .cyclone-onboarding[data-step='0']>div { background:transparent!important; }
+
+body[data-cyclone] .cyclone-onboarding button.cyclone-goal-choice[aria-pressed='true'] { border:2px solid var(--cyclone-primary)!important; background:var(--cyclone-container)!important; color:var(--text-primary)!important; }
+
+body[data-cyclone] :is(.cyclone-mood-phase-card,.cyclone-pain-chart,.cyclone-pain-scale) { border:1px solid var(--border-soft)!important; border-radius:32px; background:var(--surface)!important; box-shadow:none!important; padding:20px; }
+body[data-cyclone] .cyclone-pain-chart h2 { font-size:22px; font-weight:600; margin-bottom:12px; }
+body[data-cyclone] .cyclone-pain-caption { font-size:12px; color:var(--text-secondary); line-height:1.3; margin:6px 0 12px; }
+body[data-cyclone] .cyclone-pain-selected { display:flex; align-items:center; justify-content:space-between; gap:12px; border-radius:24px; background:var(--cyclone-container); padding:12px; margin-bottom:12px; }
+body[data-cyclone] .cyclone-pain-selected span { flex:1; min-width:0; font-size:14px; }
+body[data-cyclone] .cyclone-pain-selected strong { display:block; font-size:20px; margin-top:4px; }
+body[data-cyclone] .cyclone-pain-selected button { width:44px; height:44px; flex:none; color:var(--cyclone-primary); }
+body[data-cyclone] .cyclone-pain-chart svg { width:100%; overflow:visible; }
+body[data-cyclone] .cyclone-pain-chart svg circle { cursor:pointer; }
+body[data-cyclone] .cyclone-pain-scale input[type=range] { width:100%; margin:16px 0 8px; accent-color:var(--cyclone-primary); min-height:32px; background:transparent; }
+body[data-cyclone] .cyclone-pain-scale button { border:1px solid var(--border-soft); border-radius:24px; padding:10px 16px; min-height:44px; color:var(--cyclone-primary); }
+body[data-cyclone] .cyclone-pain-scale p { color:var(--text-secondary); margin-top:4px; }
+
+body[data-cyclone] .cyclone-pain-slider { height:56px; position:relative; margin:8px 0; }
+body[data-cyclone] .cyclone-pain-rail { position:absolute; height:16px; top:20px; left:8px; right:8px; background:var(--cyclone-container); border-radius:16px; }
+body[data-cyclone] .cyclone-pain-fill { position:absolute; height:100%; background:var(--cyclone-primary); border-radius:16px 0 0 16px; }
+body[data-cyclone] .cyclone-pain-rail>span { position:absolute; top:6px; width:4px; height:4px; border-radius:50%; background:var(--cyclone-primary); transform:translateX(-50%); }
+body[data-cyclone] .cyclone-pain-rail>span:first-of-type { transform:translateX(4px); }
+body[data-cyclone] .cyclone-pain-rail>span:last-of-type { transform:translateX(-8px); }
+body[data-cyclone] .cyclone-pain-rail>span.pain-tick-filled { background:var(--cyclone-on-primary); }
+body[data-cyclone] .cyclone-pain-thumb { position:absolute; top:50%; left:var(--pain-position); width:4px; height:44px; border-radius:4px; background:var(--cyclone-primary); transform:translate(-50%,-50%); box-shadow:0 0 0 6px var(--surface); }
+body[data-cyclone] .cyclone-pain-slider input[type=range] { position:absolute; inset:0; z-index:1; margin:0; width:100%; height:56px; min-height:56px; opacity:0; cursor:pointer; }
+body[data-cyclone] .cyclone-pain-slider:focus-within { outline:2px solid var(--cyclone-primary); outline-offset:2px; border-radius:16px; }
+
+body[data-cyclone] .cyclone-pain-scale { border:0!important; border-radius:0; padding:0; background:transparent!important; margin:4px 0; }
+body[data-cyclone] .cyclone-pain-heading { display:flex; align-items:center; gap:8px; }
+body[data-cyclone] .cyclone-pain-heading h3 { color:var(--cyclone-primary); font-size:12px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; }
+body[data-cyclone] .cyclone-pain-heading>span { width:24px; height:2px; border-radius:2px; background:var(--cyclone-primary); }
+body[data-cyclone] .cyclone-pain-scale strong { color:var(--cyclone-primary); }
+body[data-cyclone] .cyclone-pain-slider:focus-within { outline:none; }
+body[data-cyclone] .cyclone-pain-slider:has(input:focus-visible) .cyclone-pain-thumb { outline:2px solid var(--cyclone-primary); outline-offset:3px; }
+
+body[data-cyclone] .cyclone-goal-choice :is(.uppercase,.tracking-wider) { text-transform:none; letter-spacing:0; }

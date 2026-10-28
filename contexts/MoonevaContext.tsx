@@ -1,5 +1,5 @@
 import { useCycloneAppearance } from '../services/cycloneAppearance';
-import { dailySuggestions } from '../services/dailySuggestions';
+import { dailySuggestions, hasCycleForSuggestions } from '../services/dailySuggestions';
 import i18n from '../services/i18n';
 
 import React, { createContext, useContext, useCallback, useMemo, ReactNode } from 'react';
@@ -83,27 +83,8 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
         };
     }, [loading, settings, model.cycleModel]);
 
-    // Sync the Lab reminder (seam S6). Runs only while Lab is on, so Lab-off users never load
-    // Lab code. Discrete mode stays in the deps: turning it on makes the sync cancel the reminder.
-    const { labEnabled, discreteMode, discreetNotifications } = settings;
-    React.useEffect(() => {
-        if (loading || labEnabled !== true) return;
-
-        let cancelled = false;
-
-        import('../services/lab')
-            .then(({ syncLabReminderFromStore }) => {
-                if (cancelled) return;
-                return syncLabReminderFromStore(periods, logs, { labEnabled, discreteMode, discreetNotifications });
-            })
-            .catch(() => {
-                if (!cancelled) Logger.warn('Failed to sync Lab reminder');
-            });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [loading, labEnabled, discreteMode, discreetNotifications, periods, logs]);
+    // Remove reminders left by the discontinued experimental feature.
+    React.useEffect(() => { if (!loading) import('@capacitor/local-notifications').then(({LocalNotifications}) => LocalNotifications.cancel({notifications:[140,141,142,143].map(id=>({id}))})).catch(()=>{}); },[loading]);
 
     // Sync App Icon (Discrete Mode)
     React.useEffect(() => {
@@ -123,11 +104,11 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
         const snapshots = Array.from({length:70}, (_,offset) => {
             const date=addDays(today,offset), status=model.getDayStatus(date), meta=model.getDayMeta(date);
             const day=model.cycleModel.at(date);
-            const suggestions=dailySuggestions(date,status,i18n.language,settings.predictionsPaused || settings.isOnBirthControl || !!meta.isPregnancy);
+            const suggestions=hasCycleForSuggestions(status) ? dailySuggestions(date,status,i18n.language,settings.predictionsPaused || settings.isOnBirthControl || !!meta.isPregnancy) : [];
             const until=day.nextStart ? diffInDays(day.nextStart,date) : -1;
             return {date, title:clean(status.dayOfCycle ? (ru?'День ':'Day ')+status.dayOfCycle : status.title),
                 phase:clean(status.subtitle), forecast: clean(meta.isPregnancy ? status.title : meta.isBleeding ? (ru?'Месячные идут':'Period ongoing') : until>0 ? (ru?'Следующие месячные: через ':'Next period: ')+until+(ru?' дн.':' d') : status.title),
-                work:suggestions[0].text,sport:suggestions[1].text,mood:suggestions[2].text};
+                work:suggestions[0]?.text??'',sport:suggestions[1]?.text??'',mood:suggestions[2]?.text??''};
         });
         import('../services/widgetSync').then(({WidgetSync})=>WidgetSync.updateWidgetData({
             cycleDay:model.getDayMeta(today).dayOfCycle??-1,cycleLength:model.cycleModel.rules.cycleLength,
@@ -170,13 +151,12 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
             const pickerTime = Number(sessionStorage.getItem(PICKER_SESSION_KEY) || 0);
             if (pickerTime && Date.now() - pickerTime < PICKER_GRACE_PERIOD_MS) return;
 
-            Promise.all([import('../services/autoBackup'), import('../services/lab')])
-                .then(async ([{ runAutoBackup }, { loadLabForBackup }]) => runAutoBackup(live, {
+            Promise.all([import('../services/autoBackup')])
+                .then(async ([{ runAutoBackup }]) => runAutoBackup(live, {
                     data: liveLogs,
                     periods: livePeriods,
                     settings: live,
                     timestamp: new Date().toISOString(),
-                    lab: await loadLabForBackup(),
                 }))
                 .then(({ status, ...bookkeeping }) => {
                     // A skipped run changed nothing, so writing settings back would
@@ -200,17 +180,15 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
      */
     const runBackupNow = useCallback(async (): Promise<'written' | 'skipped' | 'failed'> => {
         const { settings: live, logs: liveLogs, periods: livePeriods, loaded } = backupState.current;
-        const [{ runAutoBackup }, { loadData, loadPeriods }, { loadLabForBackup }] = await Promise.all([
+        const [{ runAutoBackup }, { loadData, loadPeriods }] = await Promise.all([
             import('../services/autoBackup'),
             import('../services/logic/storage'),
-            import('../services/lab'),
         ]);
         const { status, ...bookkeeping } = await runAutoBackup(live, {
             data: loaded ? liveLogs : await loadData(),
             periods: loaded ? livePeriods : await loadPeriods(),
             settings: live,
             timestamp: new Date().toISOString(),
-            lab: await loadLabForBackup(),
         }, Date.now(), true);
 
         if (status !== 'skipped') {

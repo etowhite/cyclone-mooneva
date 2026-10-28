@@ -139,17 +139,18 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
           <div className="w-40 mb-5 mt-auto">
             <span className="cyclone-onboarding-wordmark">cyclone</span>
           </div>
-          <h1 className="text-xs text-slate-400 font-medium mb-6 tracking-wide">Choose your language</h1>
+          <h1 className="text-xs text-slate-400 font-medium mb-6 tracking-wide">{t('onboarding.choose_language')}</h1>
           <div
             className="w-full max-w-sm bg-[#F0F2F5] rounded-2xl p-4 mb-auto"
             style={{ boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.4), inset -4px -4px 8px rgba(255, 255, 255, 0.8)' }}
           >
-            <div className="grid grid-cols-3 gap-2">
+            <div className="cyclone-language-choices flex flex-wrap justify-center gap-2">
               {languages.map((lang) => {
                 const isSelected = i18n.language === lang.code;
                 return (
                   <button
                     key={lang.code}
+                    aria-pressed={isSelected}
                     onClick={() => i18n.changeLanguage(lang.code)}
                     className={`flex flex-col items-center justify-center py-3 px-2 rounded-xl transition-all ${isSelected
                       ? 'bg-[#7598a0] text-white scale-[0.98]'
@@ -177,6 +178,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
               return (
                 <button
                   key={day}
+                  aria-pressed={isSelected}
                   onClick={() => setFirstDayOfWeek(day)}
                   className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${isSelected
                     ? 'bg-[#7598a0] text-white'
@@ -371,8 +373,9 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
             return (
               <button
                 key={g.id}
+                aria-pressed={active}
                 onClick={() => selectGoal(g.id)}
-                className={`w-full p-4 rounded-2xl text-left rtl:text-right transition-all flex items-center gap-4 group relative overflow-hidden ${active ? 'text-[#7598a0]' : 'text-slate-600'}`}
+                className={`cyclone-goal-choice w-full p-4 rounded-2xl text-left rtl:text-right transition-all flex items-center gap-4 group relative overflow-hidden ${active ? 'text-[#7598a0]' : 'text-slate-600'}`}
                 style={active
                   ? { boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.4), inset -4px -4px 8px rgba(255, 255, 255, 0.8)', backgroundColor: '#F0F2F5' }
                   : { boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.3), -6px -6px 12px rgba(255, 255, 255, 0.7)', backgroundColor: '#F0F2F5' }
@@ -383,7 +386,6 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
                   <div className="text-sm font-black uppercase tracking-wider">{g.label}</div>
                   <div className="text-[10px] font-medium text-slate-400 mt-0.5">{g.sub}</div>
                 </div>
-                {active && <div className="absolute ltr:right-4 rtl:left-4 w-2 h-2 rounded-full bg-[#7598a0] shadow-[0_0_8px_#7598a0]" />}
               </button>
             );
           })}
@@ -505,7 +507,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
   );
 
   return (
-    <div className="fixed inset-0 bg-[#F0F2F5] z-[100] flex items-center justify-center p-4 selection:bg-[#7598a0]/20">
+    <div data-step={step} className="cyclone-onboarding fixed inset-0 bg-[#F0F2F5] z-[100] flex items-center justify-center p-4 selection:bg-[#7598a0]/20">
       <div
         className="w-full max-w-md bg-[#F0F2F5] rounded-[32px] overflow-hidden flex flex-col relative"
         style={{

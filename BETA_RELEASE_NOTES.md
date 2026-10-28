@@ -1,31 +1,33 @@
-# cyclone 3.0.0-beta.2 — test build / тестовая сборка
+# cyclone 3.0.0-beta.3 — test build / тестовая сборка
 
 ## Русский
-- Исправлены переключатели и обрезанный текст в управлении циклом, серые блоки в отметках беременности/статистики и переносы названий настроения.
-- Единый системный шрифт, как в прежнем cyclone. Управление данными и настройка/экран PIN приведены к общему оформлению.
-- Оставлены русский и английский; экспериментальная лаборатория переведена на русский.
-- Скрытый режим задач убран из интерфейса и вводного обучения; прежняя настройка отключается при загрузке. PIN остаётся.
-- Возвращён исходный знак cyclone в календаре и Android иконках. Название установки — cyclone. Палитра иконки следует приложению, яркость — устройству.
-- Убрано бесконечное переливание цветов кнопок календаря.
-- Подсказки работы, спорта и настроения без эмодзи для выбранного дня. 56 сочетаний на категорию, с осторожным учётом фазы. Подсказки не предсказывают ваше настроение или работоспособность.
-- Два виджета: компактный цикл и расширенный с подсказками. Общие данные расчёта и тексты с приложением, тема/язык синхронизируются. Снимки рассчитаны на 70 дней; затем виджет просит открыть приложение вместо показа устаревших значений. Изменения данных в приложении обновляют снимки.
+- Полностью удалена лаборатория: экраны, вкладка, настройки, таймеры и её экспорт. Старые уведомления отменяются. Основные записи из прежних резервных копий продолжают импортироваться.
+- Единый стиль кнопок и вариантов выбора по всему приложению: скругления, контуры, шрифт и цвет выбранного пункта.
+- Исправлены вытянутые переключатели резервных копий: компактная горизонтальная форма 40×24. Диалог контрацепции оформлен в выбранной теме без эмодзи.
+- Детский режим: описание раскрывается по нажатию на название/«Подробнее» и при переключении. Оно объясняет, какие поля скрываются и что прежние записи сохраняются.
+- Первый запуск переведён, выбор русского/английского центрирован, добавлен статичный фон с градиентом и точками. Цель выделяется обводкой вместо точки.
+- Подсказки в календаре и виджетах скрыты, пока нет данных о дне цикла.
+- Во вкладке «Тело» сразу после выделений появилась оценка боли 0–10. Шкала с точками, заполненной частью и вертикальным бегунком следует цветовой теме; оформлена обычным разделом без отдельной рамки. «Нет боли» сохраняет ноль, «Убрать оценку» удаляет только оценку.
+- В аналитике — интерактивный график боли: касание/перемещение по точкам, дата и значение, кнопки перехода между отметками, среднее за выбранные 30/90/180/365 дней. Дни без оценки не считаются нулём, будущие записи не входят в среднее, пропуски не соединяются линией.
+- Добавлена обводка блоку настроения по фазам, в том числе при отсутствии данных.
 
-Проверено: TypeScript, production web build, 8 тестов, мобильные настройки и редактор; Android сборка, отображение двух виджетов на API35, смена палитры/темы, отсутствие устаревших данных, открытие приложения по нажатию. Полная регрессия ещё продолжается.
+Проверки: TypeScript, production web/Android build, 15 тестов. Мобильный UI проверен на 360/412 px: первый запуск, контуры, переключатели, детский режим и диалог. Боль 6 сохраняется; на тестовых данных среднее за 90 дней — 4,5, за 30 дней — 7; выбор точки работает. Проверены сохранение нуля, границы периода и совместимость прежних резервных копий с сохранением PIN текущего устройства.
 
-Debug-подписанная тестовая beta, Android 7+. Можно обновить предыдущую beta этого форка. Старый native cyclone — отдельное приложение: импорт его JSON-бэкапа и перенос биометрии пока не готовы. Перед тестами сохраняйте резервную копию нужных данных.
+Тестовая debug-подписанная версия для Android 7+. Устанавливается поверх beta 1/2 этого форка. Старое native-приложение cyclone остаётся отдельным: перенос его JSON-бэкапов и биометрии ещё не завершён. Полная регрессия продолжается. Сохраняйте резервную копию нужных данных перед тестами.
 
 ## English
-- Fixed cycle settings switches and clipped hints, opaque labels in pregnancy/statistics controls and mood label wrapping.
-- Unified system sans-serif typography, matching the original cyclone; consistent data management and PIN setup/unlock styling.
-- English and Russian only; experimental Lab fully translated into Russian.
-- Removed the task-disguise setting and tutorial; saved disguise mode is disabled on load. PIN protection remains.
-- Restored the original cyclone mark in the calendar and Android launcher; installed name is cyclone. Icon palette follows the app, brightness follows the device.
-- Removed continuous colour cycling from calendar actions.
-- Emoji-free work, exercise and mood suggestions for the selected date, with 56 combinations per category and cautious phase context. They do not predict performance or feelings.
-- Compact and detailed Android widgets use the same model and suggestions as the app and follow its theme/language. Dated snapshots cover 70 days; an expired snapshot asks you to open the app rather than displaying stale numbers. App data edits refresh snapshots.
+- Removed Lab entirely: its screens, tab, settings, timers and exports. Pending legacy reminders are cancelled. Core data from older backups still imports.
+- Unified pill-style actions/options throughout the app, including theme-aware selection, borders, corners and typography.
+- Fixed stretched backup switches (40×24 horizontal controls). Contraception choices now use the selected theme without emoji.
+- Kid mode explains its effect when its title/details or switch is pressed; existing entries are preserved.
+- Localised first-run screen, centred English/Russian selection, static dotted gradient background and outlined goal selection instead of a dot.
+- Calendar/widget suggestions stay hidden until a cycle day is available.
+- Added optional daily pain 0–10 immediately below discharge in Body. The themed dotted track and vertical thumb match the reference, presented as an inline section. Zero and an absent rating remain distinct.
+- Interactive pain analytics: point selection/dragging, date/value, previous/next entries and an average for the selected 30/90/180/365 days. Missing ratings are not zero, future entries are excluded and gaps are not joined.
+- Added the missing mood-by-phase card outline, including its empty state.
 
-Validation: TypeScript, production web build, eight tests, mobile settings/editor checks; Android build, both widgets on API35, palette/light-dark changes, stale-data fallback and tap-to-open. Full regression is ongoing.
+Validation: TypeScript, production web/Android builds, 15 tests; mobile UI checks at 360/412 px. Pain 6 persists; fixture means are 4.5 over 90 days and 7 over 30 days, with interactive selection verified. Tests cover zero/missing ratings, date boundaries and legacy backup compatibility while preserving the device PIN policy.
 
-Debug-signed test beta for Android 7+. Updates the previous fork beta. The old native cyclone remains separate: its JSON backup migration and biometric integration are not ready yet. Keep a backup of data you need before testing.
+Debug-signed test build for Android 7+, updating fork beta 1/2. The original native cyclone remains separate; its JSON migration and biometric integration are not finished. Full regression is ongoing. Back up data you need before testing.
 
-GPL-3.0-or-later, based on Mooneva Cycle. Upstream attribution is preserved. Source archives correspond to this release tag. Bugs: https://github.com/etowhite/cyclone-mooneva/issues
+GPL-3.0-or-later; based on Mooneva Cycle, attribution preserved. Source archives match this release tag. Bugs: https://github.com/etowhite/cyclone-mooneva/issues

@@ -39,7 +39,7 @@ export const SettingCard = ({ children, title }: { children: React.ReactNode, ti
 );
 
 // 3. Neumorphic Row
-export const SettingRow = ({ label, desc, icon, children, last, mergeWithNext, onClick, tooltip, rightElement }: { label: string, desc?: React.ReactNode, icon?: React.ReactNode, children?: React.ReactNode, last?: boolean, mergeWithNext?: boolean, onClick?: () => void, tooltip?: string, rightElement?: React.ReactNode }) => {
+export const SettingRow = ({ label, desc, icon, children, last, mergeWithNext, onClick, onLabelClick, tooltip, rightElement }: { label: string, desc?: React.ReactNode, icon?: React.ReactNode, children?: React.ReactNode, last?: boolean, mergeWithNext?: boolean, onClick?: () => void, onLabelClick?: () => void, tooltip?: string, rightElement?: React.ReactNode }) => {
     const Root = onClick ? 'button' : 'div';
     return (
     <Root
@@ -58,7 +58,7 @@ export const SettingRow = ({ label, desc, icon, children, last, mergeWithNext, o
                     </div>
                 )}
                 <div className="flex flex-col min-w-0">
-                    <span className="text-[14px] font-semibold text-slate-700 cyclone-setting-title">{label}</span>
+                    {onLabelClick ? <button type="button" className="cyclone-setting-title text-start text-[14px] font-semibold" onClick={onLabelClick}>{label}</button> : <span className="text-[14px] font-semibold text-slate-700 cyclone-setting-title">{label}</span>}
                     {desc && <p className="text-[12px] text-slate-400 leading-snug mt-0.5 tracking-tight">{desc}</p>}
                 </div>
             </div>

@@ -404,6 +404,7 @@ import HeatmapSection from './trends/HeatmapSection';
 import CycleHistoryChart from './trends/CycleHistoryChart';
 import AverageFlowCurve from './trends/AverageFlowCurve';
 import MoodByPhase from './trends/MoodByPhase';
+import PainChart from './trends/PainChart';
 import type { CycleModel } from '../services/logic/cycleModel';
 
 interface TrendsViewProps {
@@ -440,7 +441,8 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
     medsHeatmap,
     customNamesInRange,
     filteredCycles,
-    filteredPeriods
+    filteredPeriods,
+    filteredLogs
   } = useTrendStats({
     logs,
     cycles,
@@ -559,6 +561,7 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
             {pregnancyOpen ? t('trends.pregnancy_note') : t('trends.completed_cycles_note')}
           </p>
           <TrendStatCards rangeAverages={rangeAverages} />
+          <PainChart logs={filteredLogs} days={range} />
 
           {(rangeAverages.isHistorical || averagedCycleCount > 0) && (
             <p className="px-2 text-center text-[11px] leading-relaxed text-slate-500">

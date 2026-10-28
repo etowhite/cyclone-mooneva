@@ -7,6 +7,7 @@ export const hasDailyLogContent = (log?: DailyLog | null): boolean => {
 
     return Boolean(
         log.flow ||
+        (typeof log.pain === 'number' && Number.isInteger(log.pain) && log.pain>=0 && log.pain<=10) ||
         log.pregnancyStart ||
         log.pregnancyEnd ||
         log.pillTakenAt ||

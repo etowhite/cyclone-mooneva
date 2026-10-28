@@ -24,7 +24,7 @@ const NumberSettingRow: React.FC<NumberSettingRowProps> = ({
     min,
     max,
     defaultValue,
-    suffix = 'days',
+    suffix,
     isLast = false,
     mergeWithPrevious = false
 }) => {
@@ -88,7 +88,7 @@ const NumberSettingRow: React.FC<NumberSettingRowProps> = ({
                         </button>
                     </div>
                 </div>
-                <span className="text-[11px] font-bold text-slate-400 min-w-[32px] lowercase">{suffix}</span>
+                <span className="text-[11px] font-bold text-slate-400 min-w-[32px] lowercase">{suffix ?? (t('common.days', 'days'))}</span>
             </div>
         </div>
     );

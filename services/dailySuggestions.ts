@@ -1,5 +1,7 @@
 import type { CycleStatusData } from './logic/status';
 
+export const hasCycleForSuggestions = (status: CycleStatusData) => Number.isFinite(status.dayOfCycle) && (status.dayOfCycle ?? 0) > 0;
+
 type Pair = readonly [string, string];
 const work: Pair[] = [
  ['Выбери одну главную задачу и начни с небольшого шага.','Choose one priority and start with a small step.'],

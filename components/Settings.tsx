@@ -15,7 +15,6 @@ import { PIN_MAX_LENGTH, isValidPin, normalizePinInput, hasPin, hashPin } from '
 import { FIRST_DAY_OPTIONS, resolveFirstDayOfWeek } from '../utils/weekStart';
 import { applySettingsInterlocks, getCycleVisibility } from '../services/logic/settingsInterlocks';
 import { findActivePeriod, settingBounds } from '../services/logic/cycle';
-import { LabPausedNote } from './lab';
 import { PregnancyPredictionsNote } from './settings/PregnancyPredictionsNote';
 
 import { SubViewType, ViewType, pushBackInterceptor } from '../hooks/useAppNavigation';
@@ -71,6 +70,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
   const [copiedCoupon, setCopiedCoupon] = useState(false);
   const [showPrivacyWarning, setShowPrivacyWarning] = useState(false);
   const [viewReport, setViewReport] = useState(false);
+  const [kidInfoOpen, setKidInfoOpen] = useState(false);
   const [showBirthControlDialog, setShowBirthControlDialog] = useState(false);
   const [showAdaptiveOffWarning, setShowAdaptiveOffWarning] = useState(false);
   const [pendingAction, setPendingAction] = useState<'bc' | 'pause' | null>(null);
@@ -351,9 +351,10 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
             </SettingCard>
 
             <SettingCard title={t('settings.kid_mode_section')}>
-              <SettingRow label={t('settings.kid_mode_label')} desc={t('settings.kid_mode_desc')} icon={<Icons.Eye />} last>
-                <Toggle label={t('settings.kid_mode_label')} active={!!settings.kidMode} onClick={() => onUpdate({ ...settings, kidMode: !settings.kidMode })} />
+              <SettingRow label={t('settings.kid_mode_label')} onLabelClick={() => setKidInfoOpen(v => !v)} desc={<button type="button" className="text-start" aria-expanded={kidInfoOpen} aria-controls="kid-mode-info" onClick={() => setKidInfoOpen(v => !v)}>{t('settings.kid_mode_desc')} · {t('common.learn_more')}</button>} icon={<Icons.Eye />} last>
+                <Toggle label={t('settings.kid_mode_label')} active={!!settings.kidMode} onClick={() => { setKidInfoOpen(true); onUpdate({ ...settings, kidMode: !settings.kidMode }); }} />
               </SettingRow>
+            {kidInfoOpen && <div id="kid-mode-info" className="cyclone-setting-note"><p>{t('settings.kid_mode_details')}</p></div>}
             </SettingCard>
 
           </div>
@@ -363,7 +364,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
         {showBirthControlDialog && periodForDialog && createPortal(
           <>
             <div className="fixed inset-0 bg-black/40 z-[301]" onClick={() => { setShowBirthControlDialog(false); setPeriodForDialog(null); }} />
-            <div role="dialog" aria-modal="true" aria-labelledby="bc-dialog-title" className="fixed left-4 right-4 top-1/2 -translate-y-1/2 z-[302] bg-[#F0F2F5] rounded-2xl p-5 max-w-sm mx-auto" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
+            <div role="dialog" aria-modal="true" aria-labelledby="bc-dialog-title" className="cyclone-choice-dialog fixed left-4 right-4 top-1/2 -translate-y-1/2 z-[302] bg-[#F0F2F5] rounded-2xl p-5 max-w-sm mx-auto" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
               <h3 id="bc-dialog-title" className="text-base font-bold text-slate-700 mb-1">{t('settings.birth_control_dialog_title', 'Current Period')}</h3>
               <p className="text-xs text-slate-500 mb-4">
                 {t('settings.birth_control_dialog_message', 'You have an active period. How should it be tagged?')}
@@ -378,7 +379,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   }}
                   className="py-3 rounded-xl font-semibold text-[11px] uppercase tracking-wide text-white bg-indigo-500"
                 >
-                  💊 {t('settings.birth_control_keep_withdrawal', 'Keep as Withdrawal Bleed')}
+                  {t('settings.birth_control_keep_withdrawal', 'Keep as Withdrawal Bleed')}
                 </button>
                 <button
                   onClick={() => {
@@ -389,7 +390,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   }}
                   className="py-3 rounded-xl font-semibold text-[11px] uppercase tracking-wide text-white bg-rose-400"
                 >
-                  ⭐ {t('settings.birth_control_tag_natural', 'Tag as Natural Period')}
+                  {t('settings.birth_control_tag_natural', 'Tag as Natural Period')}
                 </button>
                 <button
                   onClick={() => {
@@ -569,22 +570,6 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
               />
             </SettingCard>
           </section>
-
-          {/* 1.6 Lab (optional tab). Nothing Lab-related shows while discrete mode is on. */}
-          {!settings.discreteMode && (
-            <section>
-              <SettingCard title={t('lab.settings_section')}>
-                <SettingRow label={t('lab.toggle_label')} desc={t('lab.toggle_desc')} icon={<Icons.Flask />} last>
-                  <Toggle label={t('lab.toggle_label')} active={!!settings.labEnabled} onClick={() => {
-                    // Turning Lab off removes its pending reminder.
-                    if (settings.labEnabled) void import('../services/lab').then(m => m.cancelLabReminder());
-                    onUpdate({ ...settings, labEnabled: !settings.labEnabled });
-                  }} />
-                </SettingRow>
-                {settings.labEnabled && <LabPausedNote />}
-              </SettingCard>
-            </section>
-          )}
 
           {/* 2. Language */}
           {/* Clinical Export Button (standalone) */}

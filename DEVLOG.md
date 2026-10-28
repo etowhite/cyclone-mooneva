@@ -81,3 +81,45 @@ Own emulator5574 OFF,QA host удалён,forward9223 снят;5554не трон
 - ТОЧНЫЙ beta2 build HEAD4b8bda8 успешен:web17s/Android46s. APK aapt label=cyclone,package com.cyclone.mooneva.debug,version3.0.0-beta.2/code27/min24,apksignerV2VALID. Размер5930910, SHA2561aa0154d3b0f5ebe73cd1bef3b9c588fb944461b292198c739fb4a84e4c3745f. Оба CI4b8SUCCESS. QA host удалён, own5574OFF, forwarding снят,5554не тронут. Публикуем GitHub prerelease с exact source4b8.
 
 - Публикация beta2 подтверждена API: prerelease=true,APK+SHA256SUMS uploaded,digest совпал. PR1 описание обновлено под весь финальный scope. Текущий запрос завершён.
+
+- Beta3 запросы: исправить вытянутый vertical toggle backup (CSS data-page button min-height44 растягивает small24); применить mood-chip дизайн к flow/body/discharge/libido/sex choices сtheme selected; themed BC dialog без emoji/ярких несвязанных цветов; описание kidMode по нажатию сточным объяснением скрываемых полей. Проверить360/412 light/dark, высотуsmall24, текст/selectedstate; GitHub/APK обновить.
+
+- Причина backup овала подтверждена:min-height44 на всех data-page button перезаписывает h24small. Зафиксировали h24/w40/minheight0 на .cyclone-toggle; остальная touch area по родительскойстроке. Выборы editor преобразованы в theme pills с44minheight иnormalcase, BCdialog theme buttons безemoji. Добавили click label/info для kidMode, проверяем реальное раскрытие (первый insertion не совпализ-заCRLF, не считать готовым доQA).
+
+- Новые запросы в beta3: скрывать calendar/widget подсказки без отметок/дня цикла; onboarding goal выделять контуром вместо точки; первый экран fully localized, языки по центру, статичный градиент+точки на фоне. Не терять текущие backup/body/BCdialog/kidinfo изменения. Добавить регрессию отсутствия tips до первой записи и появления после.
+
+- Уточнение единого стиля: pill24/outline/normalcase для всех смысловых кнопок и choice, с сохранением геометрии switch/calendarcell/iconbuttons. Onboarding first screen делаем центрированным с theme radial gradient+dots; goal aria-pressed+2px outline вместо marker. hasCycleForSuggestions central predicate dayOfCycle>0, использовать вcalendar иwidget, тестировать отсутствующие0/negative. QA BC: при включении adaptive off dialog нужно подтвердить прежде следующего switch, исправить порядок QA.
+
+- Уточнение пользователя: единый mood-pill стиль абсолютно всех однотипных CTA/choice по приложению, не только onboarding/editor. Пройти button classes и дать единые theme primary/outline/normalcase/shapes, сохраняя специализированные switch/calendar/date/icon/nav геометрию и смысл destructive actions. Ответить сannotation1. Также CRLF prevented aria-pressed insertion; исправить доQA.
+
+- Пользователь отменил Lab: полностью убрать лабораторию из приложения. Это заменяет прежний перевод/доработку Lab, остальные beta3 запросы остаются. Удалить вкладку/settings/routes/trends/notifications/backup export Lab, dependency imports. Старые backup файлы должны продолжать импортироваться без потери core данных; не стирать пользовательские данные на устройстве без нужды. Изучить все refs прежде удаления файлов, проверить typecheck+backup import.
+
+- Lab UI/runtime/store/domain удалены38файлов после проверки путей; legacy backup полеunknown оставляем только для совместимого чтения. Удаленыroutes/nav/settings/autobackupLab,старые140-143уведомления отменяются при запуске. Новыеexportsне должны переносить labEnabled; добавитьsanitize+тест совместимости/core+devicePIN. Текущие расчёты не менять.
+
+- Beta3 QA Settings PASS: kidinfo раскрывается, BCdialog theme безemoji, backup toggles40×24 на360/412,JSerrors0. Lab удалён; добавляем meaningful backup regression (старый optionalLab/core и сохранение devicePIN), плюс newcycle suggestiongating/onboarding QA. QAскрины scriptсоздал вignored fork/verification/, учесть путь.
+
+- 11 тестов PASS включая legacybackup/core иdevicePIN. QAскрин data выявил двойнойgap grid16+globalmargin16: fix data-gridmargin0 для ровно16. Также NumberSettingRow имел hardcoded days, локализовать единицу. Далее onboarding/emptytips/bodypill QA перед релизом.
+
+- QA emptytips: отсутствие подтверждено; добавление записи черезпрямой storage seed было перезаписано unloadflush текущего Reactstate[] (QA race, не UI действие). Ждём окончания1s debounce до второй fixturewrite. Onboarding QA button называется Начать отслеживание,первый locatorНачатьбылнеточным;исправить. Не менять appрасчёты иззаfixtureгонки.
+
+- QA PASS: flowpill44/radius24, no-data tips hidden puis firstcycle tips visible, Lab nav/settings absent,JSerrors0. Onboarding обнаружилконфликт sharedselector:border1px перекрылgoal2px. Усиливаемgoal selector внутриonboarding,повторяем толькоэтоQA. Выборязыкапереведён/центрирован; no pointmarker(divs1).
+
+- Пользователь спросил статус. Сейчас beta3: Labудалён, единыеpillCTA, kidinfo, backup40x24, themedBCdialog, no-cycle-tipsgating проверены. Последняя проверка goaloutline2px после CSSконфликта и финальныеtsc/tests/build/capsync вsession11108; ещёне опубликовано. Ответить кратко статусом, затем продолжить сборку/GitHub.
+
+- Продолжаем после пользовательских прерываний. Проверить session11108 и текущие web/QA логи,не запускатьпараллельнуюсборкудо выяснения. Затем beta3 Android,commit/pushCI,prereleaseAPK. Lab долженостатьсяудалённым,новыеUIзапросы сохраняются.
+
+- Новыеbeta3задачи: MoodByPhase card border каксоседние. Pain0..10 nullable сразу после discharge вBody; сохранитьDailyLog/restorevalidation/exportreportпоуместности, interactiveanalyticsсselectedrange исредним по фактически отмеченным болям(отсутствие≠0). Обновить journal/prompt; текущую сборку не выпускать без pain. Изучитьdatamodel/autosave/filter API.
+
+- Pain implemented nullableDailyLog,0 preservedhasContent/autosave/dateflush/reset. Body scale immediatelyafterdischarge. Summary exactNcalendar days inclusive today, ignores future/missing/invalid,meanonlyratings; SVGpointer/keyboard selection+prevnext,doesnotconnectunloggedgaps. Backupvalidatespain0..10. Need regression boundary/zero/backup/dateedit andrangeUI. Moodempty-statecardborderadded.
+
+- Pain tests15PASS:0 vsmissing,exact30/90window incltoday,futureexcluded,invalidrange,rejectbackup11,preserve0 anddevicePIN. UI painQA не стартовал: devserver5174 завершился при прерывании,ERR_CONNECTION_REFUSED. Перезапустить толькоVite, не менять appпоошибкеокружения.
+
+- PainUIQA прочитал диск ровно1.6s, вapp дваdebounce600ms+1000ms, чтение на границе преждевременное. Даём2500ms/проверяемподписанноеvalue6; appкодне менять безподтверждённого дефекта. Основные15тестовPASS.
+
+- Пользователь явно запросил pain slider дизайн reference: толстаяpilltrack,11точек,filledleft,разрыв вокругвертикальногоthumb. Реализуем декоративнуюtrack+transparentnative range overlay (доступность/keyboard/nativegestureсохраняются), theme vars, nullable score unchanged. Chartnote нужно уточнить,чтобы не утверждатьвсеpainданныетолькозавершённыхциклов.
+
+- PainUIуточнение: убрать отдельнуюобводкувBody, оформлять sectionheading какВыделения сцветнойлинией. Самаpilltrack/points/verticalthumb остаётсяreference. Keyboardfocus отметитьнаthumb,непрямоугольникомвсегоrange. Сохранение/analyticsне меняются.
+
+- Финальный painreference QA PASS: сохранение6, mean90=4.5/30=7, интерактивнаяследующаяточка,errors0; painбезouterрамки и headingline. Готовим единыйbeta3release сpain иудалениемLab. Последняяstyleправка:normalcase внутриgoalchoice,чтобыchilduppercaseнеобходилобщийстиль. Далееcommit/pushCI и точныйAndroidartifact.
+
+- Проверен финальный screenshot pain: inlineheadingline,track11dots,filledleft,verticalthumb/gap,безouterborder. Последние15tests+UImean/range/pointsPASS. Releaseweb14sSUCCESS,Androidсборкаидёт. Фиксируем весьbeta3source (Lab removal+pain+UI) иpushPR1дляCI.
