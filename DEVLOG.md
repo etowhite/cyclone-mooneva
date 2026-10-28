@@ -1,5 +1,5 @@
 # 1. Текущая цель
-Подготовить первую тестовую beta APK отдельного форка cyclone на базе Mooneva и опубликовать исходники и prerelease на GitHub.
+Beta 2 отдельного форка cyclone опубликована. Следующая цель — дальнейшая регрессия и доработка по отзывам, интеграция миграции данных и биометрии.
 
 # 2. Выполненные шаги
 - Отдельный fork: https://github.com/etowhite/cyclone-mooneva, cyclone/design, PR #1. GPL-3.0-or-later и авторство сохранены. Старый ../cyclone отдельно.
@@ -10,15 +10,17 @@
 - tsc, web production build и 6 контрактных тестов расчётов прошли. Services/logic не изменялись; это не полная проверка всей медицинской логики.
 
 # 3. Текущий статус и проблемы
-Собирается 3.0.0-beta.1, versionCode 26, debug-подпись, package com.cyclone.mooneva.debug. Это отдельная тестовая установка. Полного переноса функций старого native cyclone ещё нет: миграция бэкапа, виджеты и биометрия ожидают интеграции. Не обещать готовность этих функций.
-JDK21/SDK36/Gradle8.14.3 в ../.toolchain. На 8GB машине не запускать Gradle и эмулятор одновременно. Использовать только собственный 5574, никогда 5554.
+Готово: https://github.com/etowhite/cyclone-mooneva/releases/tag/v3.0.0-beta.2 . APK3.0.0-beta.2/code27,debug package com.cyclone.mooneva.debug,имя cyclone; source4b8bda8. Web/Android build,8tests и оба CI этого head успешны. SHA2561aa0154d3b0f5ebe73cd1bef3b9c588fb944461b292198c739fb4a84e4c3745f совпадает с GitHub asset digest.
+Реализованы все текущие UI запросы: en/ru,перевод Lab,единый sans,исходный logo,убран discrete,карточки/PIN/data,перенос mood,цвет active tab,статичные CTA,подсказки и два виджета. gap16/radius32 проверены численно. APK обновляет beta1. Полный медицинский/функциональный regression ещё не завершён; nativecycloneJSONmigration и биометрия не готовы.
+Own emulator5574 OFF,QA host удалён,forward9223 снят;5554не тронут. JDK21/SDK36/Gradle8.14.3 в ../.toolchain;не запускать Gradle и эмулятор одновременно на8GBhost.
 
 # 4. Следующие шаги
-1. Дождаться Android сборки, проверить подпись, package/version и запуск APK.
-2. Зафиксировать текущие изменения, push в PR #1 и проверить CI именно нового commit.
-3. Опубликовать GitHub prerelease с APK, SHA256, RU/EN описанием и точными исходниками по тегу.
-4. Обновить этот журнал и CONTINUE_PROMPT.md результатами и ссылками.
-5. Дальше issues #2 (mobile QA) и #3 (native интеграция/миграция). Перед изменениями читать и обновлять DEVLOG; отчёты о журнале в чат не нужны. Держать CONTINUE_PROMPT готовым до любого лимита. Не коммитить ключи, SDK, dist, node_modules и личные данные.
+1. Продолжать issues #2 mobile QA и #3 миграция/биометрия. Не утверждать,что все функции старого native cyclone перенесены.
+2. Активно вести GitHub через tested commits/PR. Main protected:PR,webCI strict,admins enforced,no force/delete; approvals0.
+3. Читать/обновлять DEVLOG перед изменениями; без отчётов о журнале в чате. Держать CONTINUE_PROMPT актуальным до любого лимита.
+4. Не коммитить SDK/keys/личные данные/QA outputs. Старый ../cyclone остаётся отдельным.
+
+## История проверок
 
 - Beta Android BUILD SUCCESSFUL 1m15s; aapt подтвердил com.cyclone.mooneva.debug / 3.0.0-beta.1 / code26 / min24, apksigner v2 VALID. Собственный Gradle daemon остановлен перед проверкой запуска на 5574. Удаляем лишнюю пустую строку build.gradle перед commit.
 
@@ -73,3 +75,9 @@ JDK21/SDK36/Gradle8.14.3 в ../.toolchain. На 8GB машине не запус
 - Пользователь повторил старый screenshot наложения и добавил active tab цвет: текущий QA уже измерил gap16/radius32 и исправленный border, нужно показать свежий снимок и добавить aria-selected theme container+primary, как BottomNav. Не путать старую screenshot с финальной beta2. Проверить таб настроение выделен цветом и gap не потерян.
 
 - Текущий layout/color QA PASS: gap16, radius32, theme border; выбранный tab теперь theme container/primary, фон проверен. Подсказки следуют29числу, transparent advanced labels,normal moodwrap,errors0. Переходим к commit/push PR1 сейчас, не откладывая GitHub до ответа. Финальная сборка после последнего CSS ещё будет обновлена перед prerelease.
+
+- GitHub code commit4b8bda8 опубликован PR1. Последний screenshot подтверждает самостоятельную rounded32 карточку и colored selected Настроение (bg86/61/102,text213/183/232), gap16. Собираем точный HEAD4b8bda8 после всех последних CSS, ранее native tests остаются действительны (widget/native код не менялся).
+
+- ТОЧНЫЙ beta2 build HEAD4b8bda8 успешен:web17s/Android46s. APK aapt label=cyclone,package com.cyclone.mooneva.debug,version3.0.0-beta.2/code27/min24,apksignerV2VALID. Размер5930910, SHA2561aa0154d3b0f5ebe73cd1bef3b9c588fb944461b292198c739fb4a84e4c3745f. Оба CI4b8SUCCESS. QA host удалён, own5574OFF, forwarding снят,5554не тронут. Публикуем GitHub prerelease с exact source4b8.
+
+- Публикация beta2 подтверждена API: prerelease=true,APK+SHA256SUMS uploaded,digest совпал. PR1 описание обновлено под весь финальный scope. Текущий запрос завершён.
