@@ -1073,5 +1073,10 @@
         "reset_title": "Reset Lab data?",
         "reset_body": "This deletes all Lab entries, devices and Lab settings on this phone. Your calendar and other data stay.",
         "paused_pregnancy": "Lab is paused during a pregnancy. Your Lab data is kept."
+    },
+    "cyclone": {
+        "appearance": "Appearance",
+        "appearance_description": "Theme, colour palette and language",
+        "settings_subtitle": "Your space, your preferences."
     }
 }

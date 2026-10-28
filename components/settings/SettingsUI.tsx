@@ -58,7 +58,7 @@ export const SettingRow = ({ label, desc, icon, children, last, mergeWithNext, o
                     </div>
                 )}
                 <div className="flex flex-col min-w-0">
-                    <span className="text-[14px] font-semibold text-slate-700 truncate">{label}</span>
+                    <span className="text-[14px] font-semibold text-slate-700 cyclone-setting-title">{label}</span>
                     {desc && <p className="text-[12px] text-slate-400 leading-snug mt-0.5 tracking-tight">{desc}</p>}
                 </div>
             </div>

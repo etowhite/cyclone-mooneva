@@ -451,6 +451,85 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
     );
   }
 
+  if (subView === 'appearance') {
+    return <div className="cyclone-settings-page flex flex-col h-full bg-[#F0F2F5]">
+      <header className="cyclone-subheader">
+        <button type="button" onClick={() => onSubViewChange('main')} aria-label={t('common.back')}>←</button>
+        <h1>{t('cyclone.appearance', 'Appearance')}</h1>
+      </header>
+      <div className="flex-1 overflow-y-auto px-4 pb-32 space-y-5">
+        <CycloneAppearance />
+          <section>
+            <SettingCard title={t('settings.language')}>
+              <SettingRow label={t('settings.language')} icon={<Icons.Globe />} mergeWithNext>
+                <select
+                  aria-label={t('settings.language')}
+                  value={i18n.language}
+                  onChange={(e) => {
+                    const lang = e.target.value;
+                    i18n.changeLanguage(lang);
+                    document.dir = i18n.dir(lang);
+                  }}
+                  className="bg-slate-100 border-none text-text-secondary text-sm font-medium rounded-lg px-3 py-2 pr-8 focus:ring-2 focus:ring-accent/20 outline-none"
+                >
+                  {[
+                    { code: 'en', label: 'English' },
+                    { code: 'zh', label: '中文' },
+                    { code: 'es', label: 'Español' },
+                    { code: 'sv', label: 'Svenska' },
+                    { code: 'fa', label: 'فارسی' },
+                    { code: 'ar', label: 'العربية' },
+                    { code: 'tr', label: 'Türkçe' },
+                    { code: 'de', label: 'Deutsch' },
+                    { code: 'fr', label: 'Français' },
+                    { code: 'uk', label: 'Українська' },
+                    { code: 'it', label: 'Italiano' },
+                    { code: 'hu', label: 'Magyar' },
+                    { code: 'ru', label: 'Русский' },
+                    { code: 'pt', label: 'Português' }
+                  ].map(lang => (
+                    <option key={lang.code} value={lang.code}>{lang.label}</option>
+                  ))}
+                </select>
+              </SettingRow>
+              <SettingRow
+                label={t('settings.first_day_of_week')}
+                desc={t('settings.first_day_of_week_desc')}
+                icon={<Icons.Calendar />}
+                last
+              >
+                <div className="flex flex-col items-end gap-1">
+                  <select
+                    aria-label={t('settings.first_day_of_week')}
+                    value={effectiveFirstDayOfWeek}
+                    onChange={(e) => onUpdate({
+                      ...settings,
+                      firstDayOfWeek: e.target.value as FirstDayOfWeek
+                    })}
+                    className="bg-slate-100 border-none text-text-secondary text-sm font-medium rounded-lg px-3 py-2 pr-8 focus:ring-2 focus:ring-accent/20 outline-none"
+                  >
+                    {FIRST_DAY_OPTIONS.map(day => (
+                      <option key={day} value={day}>{t(`settings.week_start_${day}`)}</option>
+                    ))}
+                  </select>
+                  {settings.firstDayOfWeek && (
+                    <button
+                      type="button"
+                      onClick={() => onUpdate({ ...settings, firstDayOfWeek: undefined })}
+                      className="text-[9px] font-bold uppercase tracking-wider text-[#7598a0] hover:text-[#5d7f87] transition-colors"
+                    >
+                      {t('settings.use_language_default')}
+                    </button>
+                  )}
+                </div>
+              </SettingRow>
+            </SettingCard>
+          </section>
+
+      </div>
+    </div>;
+  }
+
   if (subView === 'data_management') {
     return <DataManagementView settings={settings} onUpdate={onUpdate} onBack={() => onSubViewChange('main')} runBackupNow={runBackupNow} />;
   }
@@ -458,28 +537,20 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
   return (
     <div className="flex flex-col h-full bg-[#F0F2F5] animate-slide-up relative">
       <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
-        {/* PREMIUM SPA BRANDING */}
-        {/* PREMIUM BRANDING HEADER - COMPACT & NEUMORPHIC */}
-        <div className="flex flex-col items-center pt-8 pb-4 px-8 text-center relative overflow-hidden">
-          <div className="w-48 mb-2 relative filter drop-shadow-sm">
-            <img
-              src="/bitmap.png"
-              alt={t('branding.logo_alt')}
-              className="w-full h-auto opacity-90"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.parentElement!.innerHTML = '<h1 class="text-3xl font-black text-slate-700 tracking-tighter mb-1">Mooneva</h1>';
-              }}
-            />
-          </div>
-          <div className="space-y-0.5 relative z-10">
-            <h2 className="text-xs font-bold text-slate-400 tracking-[0.2em] uppercase opacity-80">
-              {t('branding.subtitle', 'Private Period Tracker')}
-            </h2>
-          </div>
-        </div>
-
+        <header className="cyclone-settings-heading">
+          <span className="cyclone-wordmark">cyclone</span>
+          <h1>{t('common.settings')}</h1>
+          <p>{t('cyclone.settings_subtitle', 'Your space, your preferences.')}</p>
+        </header>
         <div className="px-4 space-y-6 max-w-lg mx-auto">
+          <section>
+            <SettingCard title={t('cyclone.appearance', 'Appearance')}>
+              <SettingRow label={t('cyclone.appearance', 'Appearance')}
+                desc={t('cyclone.appearance_description', 'Theme, colour palette and language')}
+                icon={<Icons.Moon />} last onClick={() => onSubViewChange('appearance')}
+                rightElement={<span aria-hidden>→</span>} />
+            </SettingCard>
+          </section>
           {/* 0. About & Support (Consolidated & Neumorphic) */}
           <section>
             <div
@@ -597,73 +668,6 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
           )}
 
           {/* 2. Language */}
-          <section>
-            <SettingCard title={t('settings.language')}>
-              <SettingRow label={t('settings.language')} icon={<Icons.Globe />} mergeWithNext>
-                <select
-                  aria-label={t('settings.language')}
-                  value={i18n.language}
-                  onChange={(e) => {
-                    const lang = e.target.value;
-                    i18n.changeLanguage(lang);
-                    document.dir = i18n.dir(lang);
-                  }}
-                  className="bg-slate-100 border-none text-text-secondary text-sm font-medium rounded-lg px-3 py-2 pr-8 focus:ring-2 focus:ring-accent/20 outline-none"
-                >
-                  {[
-                    { code: 'en', label: 'English' },
-                    { code: 'zh', label: '中文' },
-                    { code: 'es', label: 'Español' },
-                    { code: 'sv', label: 'Svenska' },
-                    { code: 'fa', label: 'فارسی' },
-                    { code: 'ar', label: 'العربية' },
-                    { code: 'tr', label: 'Türkçe' },
-                    { code: 'de', label: 'Deutsch' },
-                    { code: 'fr', label: 'Français' },
-                    { code: 'uk', label: 'Українська' },
-                    { code: 'it', label: 'Italiano' },
-                    { code: 'hu', label: 'Magyar' },
-                    { code: 'ru', label: 'Русский' },
-                    { code: 'pt', label: 'Português' }
-                  ].map(lang => (
-                    <option key={lang.code} value={lang.code}>{lang.label}</option>
-                  ))}
-                </select>
-              </SettingRow>
-              <SettingRow
-                label={t('settings.first_day_of_week')}
-                desc={t('settings.first_day_of_week_desc')}
-                icon={<Icons.Calendar />}
-                last
-              >
-                <div className="flex flex-col items-end gap-1">
-                  <select
-                    aria-label={t('settings.first_day_of_week')}
-                    value={effectiveFirstDayOfWeek}
-                    onChange={(e) => onUpdate({
-                      ...settings,
-                      firstDayOfWeek: e.target.value as FirstDayOfWeek
-                    })}
-                    className="bg-slate-100 border-none text-text-secondary text-sm font-medium rounded-lg px-3 py-2 pr-8 focus:ring-2 focus:ring-accent/20 outline-none"
-                  >
-                    {FIRST_DAY_OPTIONS.map(day => (
-                      <option key={day} value={day}>{t(`settings.week_start_${day}`)}</option>
-                    ))}
-                  </select>
-                  {settings.firstDayOfWeek && (
-                    <button
-                      type="button"
-                      onClick={() => onUpdate({ ...settings, firstDayOfWeek: undefined })}
-                      className="text-[9px] font-bold uppercase tracking-wider text-[#7598a0] hover:text-[#5d7f87] transition-colors"
-                    >
-                      {t('settings.use_language_default')}
-                    </button>
-                  )}
-                </div>
-              </SettingRow>
-            </SettingCard>
-          </section>
-
           {/* Clinical Export Button (standalone) */}
           <button
             onClick={() => setShowPrivacyWarning(true)}
@@ -686,7 +690,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
             </div>
           </button>
 
-          <CycloneAppearance />
+
 
           {/* 3.5 Privacy — Discrete Mode */}
           <section>

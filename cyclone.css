@@ -58,3 +58,20 @@ body[data-cyclone] button[role="switch"] > div { background:var(--text-secondary
 body[data-cyclone] button[role="switch"][aria-checked="true"] > div { background:var(--cyclone-on-primary)!important; }
 body[data-cyclone][data-theme] :is([class~="bg-white/50"],[class~="bg-white/70"],[class~="bg-slate-100"],[class~="bg-slate-200"],[class*="bg-[#E8EAED]"],[class*="bg-[#E0E5EC]"]) { background-color:var(--surface-alt)!important; }
 body[data-cyclone] .setting-row-merge-next + * { background-color:var(--surface)!important; }
+
+body[data-cyclone] .cyclone-nav-item { flex:1; min-width:0; height:56px; gap:4px; }
+body[data-cyclone] .cyclone-nav-label { font-size:11px; line-height:14px; font-weight:600; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+body[data-cyclone] .cyclone-setting-title { white-space:normal; overflow-wrap:anywhere; line-height:1.2; }
+body[data-cyclone] .cyclone-settings-heading { padding:28px 24px 24px; }
+body[data-cyclone] .cyclone-settings-heading h1 { font-size:32px; font-weight:600; margin:12px 0 6px; }
+body[data-cyclone] .cyclone-wordmark { color:var(--cyclone-primary); font-size:14px; font-weight:600; }
+body[data-cyclone] .cyclone-settings-heading p { color:var(--text-secondary); font-size:14px; }
+body[data-cyclone] .cyclone-subheader { display:flex; align-items:center; gap:16px; padding:20px 16px; }
+body[data-cyclone] .cyclone-subheader button { width:44px; height:44px; border-radius:50%; font-size:24px; color:var(--cyclone-primary); }
+body[data-cyclone] .cyclone-subheader h1 { font-size:24px; font-weight:600; }
+
+body[data-cyclone] :is(h1,h2,h3,h4) { color:var(--text-primary); }
+body[data-cyclone] .mooneva-bottom-nav { background:var(--surface)!important; color:var(--text-secondary); }
+body[data-cyclone] .mooneva-bottom-nav button { color:var(--text-secondary)!important; }
+body[data-cyclone] .mooneva-bottom-nav button[aria-current="page"] { color:var(--cyclone-primary)!important; }
+body[data-cyclone] .cyclone-onboarding-wordmark { display:block; text-align:center; font-size:36px; font-weight:600; color:var(--cyclone-primary); letter-spacing:-1px; }

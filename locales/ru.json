@@ -1081,5 +1081,10 @@
         "reset_title": "Reset Lab data?",
         "reset_body": "This deletes all Lab entries, devices and Lab settings on this phone. Your calendar and other data stay.",
         "paused_pregnancy": "Во время беременности Lab приостановлен. Ваши данные Lab сохранены."
+    },
+    "cyclone": {
+        "appearance": "Оформление",
+        "appearance_description": "Тема, цветовая палитра и язык",
+        "settings_subtitle": "Твоё пространство — твои правила."
     }
 }

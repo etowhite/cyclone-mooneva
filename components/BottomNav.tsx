@@ -18,11 +18,6 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, onViewChange, onSett
     const today = getTodayStr();
     const labVisible = useMemo(() => isLabVisible(settings, logs, periods, today), [settings, logs, periods, today]);
 
-    // Every tab marks the open page with the same dot under its icon.
-    const activeDot = (view: BottomNavProps['currentView']) => currentView === view && (
-        <span className={`mooneva-nav-dot absolute -bottom-1 w-1 h-1 rounded-full ${isCloaked ? 'bg-white' : 'bg-gray-800'}`} aria-hidden />
-    );
-
     const navWrapperClass = 'mooneva-bottom-nav-wrap fixed bottom-0 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50 pointer-events-auto';
 
     return (
@@ -38,7 +33,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, onViewChange, onSett
                 {/* Trends */}
                 <button
                     onClick={() => onViewChange('trends')}
-                    className={`relative h-11 w-11 flex items-center justify-center rounded-xl transition-all ${currentView === 'trends'
+                    className={`relative cyclone-nav-item flex flex-col items-center justify-center rounded-xl transition-all ${currentView === 'trends'
                         ? (isCloaked ? 'text-white' : 'text-slate-700')
                         : (isCloaked ? 'text-white/40' : 'text-slate-400 hover:text-slate-600')
                         }`}
@@ -59,13 +54,13 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, onViewChange, onSett
                         <path d="M3 3v18h18" />
                         <path d="m19 9-5 5-4-4-3 3" />
                     </svg>
-                    {activeDot('trends')}
+                    <span className="cyclone-nav-label">{t('trends.header')}</span>
                 </button>
 
                 {/* Calendar */}
                 <button
                     onClick={() => onViewChange('calendar')}
-                    className={`relative h-11 w-11 flex items-center justify-center rounded-xl transition-all ${currentView === 'calendar'
+                    className={`relative cyclone-nav-item flex flex-col items-center justify-center rounded-xl transition-all ${currentView === 'calendar'
                         ? (isCloaked ? 'text-white' : 'text-slate-700')
                         : (isCloaked ? 'text-white/40' : 'text-slate-400 hover:text-slate-600')
                         }`}
@@ -88,14 +83,14 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, onViewChange, onSett
                         <path d="M16 2v4" />
                         <path d="M3 10h18" />
                     </svg>
-                    {activeDot('calendar')}
+                    <span className="cyclone-nav-label">{t('common.calendar')}</span>
                 </button>
 
                 {/* Lab (only when switched on in Settings) */}
                 {labVisible && (
                     <button
                         onClick={() => onViewChange('lab')}
-                        className={`relative h-11 w-11 flex items-center justify-center rounded-xl transition-all ${currentView === 'lab'
+                        className={`relative cyclone-nav-item flex flex-col items-center justify-center rounded-xl transition-all ${currentView === 'lab'
                             ? (isCloaked ? 'text-white' : 'text-slate-700')
                             : (isCloaked ? 'text-white/40' : 'text-slate-400 hover:text-slate-600')
                             }`}
@@ -117,14 +112,14 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, onViewChange, onSett
                             <path d="M6.453 15h11.094" />
                             <path d="M8.5 2h7" />
                         </svg>
-                        {activeDot('lab')}
+                        <span className="cyclone-nav-label">{t('lab.nav')}</span>
                     </button>
                 )}
 
                 {/* Settings */}
                 <button
                     onClick={onSettingsClick}
-                    className={`relative h-11 w-11 flex items-center justify-center rounded-xl transition-all ${currentView === 'settings'
+                    className={`relative cyclone-nav-item flex flex-col items-center justify-center rounded-xl transition-all ${currentView === 'settings'
                         ? (isCloaked ? 'text-white' : 'text-slate-700')
                         : (isCloaked ? 'text-white/40' : 'text-slate-400 hover:text-slate-600')
                         }`}
@@ -145,7 +140,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, onViewChange, onSett
                         <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
                         <circle cx="12" cy="12" r="3" />
                     </svg>
-                    {activeDot('settings')}
+                    <span className="cyclone-nav-label">{t('common.settings')}</span>
                 </button>
             </nav>
         </div>

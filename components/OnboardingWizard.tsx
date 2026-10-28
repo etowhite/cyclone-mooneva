@@ -186,14 +186,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
       <div className="flex flex-col h-full min-h-0">
         <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col items-center py-4 px-2">
           <div className="w-40 mb-5 mt-auto">
-            <img
-              src="/bitmap.png"
-              alt="Mooneva"
-              className="w-full h-auto object-contain drop-shadow-lg"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
+            <span className="cyclone-onboarding-wordmark">cyclone</span>
           </div>
           <h1 className="text-xs text-slate-400 font-medium mb-6 tracking-wide">Choose your language</h1>
           <div
@@ -267,16 +260,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
     <div className="flex flex-col h-full min-h-0">
       <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col items-center justify-center text-center gap-6 px-4 py-4">
         <div className="w-40 max-w-[40vw] relative">
-          <img
-            src="/bitmap.png"
-            alt="Mooneva"
-            className="w-full h-auto object-contain drop-shadow-xl animate-fade-in"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-              const parent = e.currentTarget.parentElement;
-              if (parent) parent.innerHTML = '<div class="w-full h-full rounded-full bg-[#7598a0] flex items-center justify-center text-white text-4xl font-black">M</div>';
-            }}
-          />
+          <span className="cyclone-onboarding-wordmark">cyclone</span>
         </div>
         <div className="space-y-4">
           <h1 className="text-3xl font-black text-slate-800 tracking-tight leading-tight">

@@ -1,3 +1,13 @@
+# Current checkpoint: mobile design stage2
+
+Read DEVLOG.md before edits and update it before code/responses; no chat reports about updating it. Keep this prompt current before any limit. Separate GitHub fork etowhite/cyclone-mooneva, branchcyclone/design,PR1. Native ../cyclone remains separate.
+
+Stage2: visible bottom-nav labels, theme-safe active pill, separate Appearance subview containing theme/palette/language/week-start, readable wrapping settings titles, cyclone settings header and onboarding wordmark. Android app name/package_name/custom_url_scheme updated to cyclone/com.cyclone.mooneva while Java namespace stays com.mooneva.app. This is intentional but Android has NOT been built/verified. SDK36/Gradle8.14.3 required by upstream, current old workspace has SDK35/Gradle8.9; prepare dependencies rather than silently downgrade.
+
+Verified: tsc,productionwebbuild,6cyclecontracttests; mobileChrome412x915 walkthrough language→welcome→cycle→goal→setup→discrete tutorial(skip)→Getstarted→What'sNew(Close)→Settings→Appearance. Sage/light switch and contrast screenshotchecked. Upstreamstartuprelease-notes dialog is still English and mentionsMooneva; visiblebranding/localisationremainingwork. All5paletteslight/darkfade/shadowfixesfrompriorcommitchecked. Calculations/services/logicUNCHANGED. Header/navcolorsmustuseCSSvariables,notinheritintermediateanimationcolors.
+
+Next: pushstage2withCI,continueissue2(fullcalendar/trends/mobilevisualbranding),thenissue3(Androididentity/aliases/plugins/biometrics/widgetsandnativecyclonebackupmigration). No APK ready. Originalstorage/protocolkeysretained,nevermassrename. GPL/upstreamcreditsmustremain. GitHubActionsmustpassbeforemerging; PRcurrentlyopen. Developmentserver127.0.0.1:5174whenrunning. pnpm11.25.0,Node22+,usepnpm-lockfrozen. Upstreampublictestsabsent;ours6contractsarenotfullupstreamcoverage.
+
 # Continue cyclone Mooneva fork
 
 Read DEVLOG.md, FORK.md and ROADMAP.md before edits. Update DEVLOG before changes/responses without chat reports. Keep this prompt ready before either usage limit. Work in this separate cyclone-mooneva repository; original ../cyclone stays separate.
