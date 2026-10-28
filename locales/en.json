@@ -1077,6 +1077,12 @@
     "cyclone": {
         "appearance": "Appearance",
         "appearance_description": "Theme, colour palette and language",
-        "settings_subtitle": "Your space, your preferences."
+        "settings_subtitle": "Your space, your preferences.",
+        "about_title": "About this fork",
+        "about_body": "cyclone is a separate Mooneva-based project. Your health data stays on this device.",
+        "feedback": "Report a cyclone issue",
+        "attribution": "Based on Mooneva Cycle. Original authors and GPL-3.0-or-later license retained.",
+        "repo_title": "cyclone on GitHub",
+        "repo_body": "Source, development tasks and progress of this fork."
     }
 }

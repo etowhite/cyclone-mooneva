@@ -1,10 +1,23 @@
 # 1. Текущая цель
-Отдельный forkMooneva с оформлением cyclone; сохранять исходные расчёты и развивать GitHubрепозиторий через PR/CI.
+Подготовить первую тестовую beta APK отдельного форка cyclone на базе Mooneva и опубликовать исходники и prerelease на GitHub.
+
 # 2. Выполненные шаги
-GitHubetowhite/cyclone-mooneva,веткаcyclone/design,PR1. Пятьпалитр/auto-light-dark,контурыкарточек,навигациясподписями,ОформлениеотдельносЯзыком/неделей,исправленысветлыеполосы/тени,скруглённыеселектысchevron.
-NativeJDK21/SDK36/Gradle8.14.3средаподготовлена,первыйdebugAPKсобран(com.cyclone.mooneva.debug). Десятьиконок5палитр×day/night,цветотпалитрыcyclone,яркостьотdeviceuiModeнезависимоотapppreviewmode. LauncherEntryзащищаетMainActivityотзакрытия,API33атомарныесмены,старыеenablefirst. Runtimeconfigurationreceiver+boot/Mainlifecycle,drawable-nightобеспечиваетресурснуюсменуиприбезпроцесса. Todoмаскировкасохранена.
-Проверки:6cycleконтрактов,webtypecheck/build;nativebuildуспешен10m27s,инкрементальныйbackgroundfix1m56s. РеальныйAPI35эмулятораудит:10вариантов/1launcher/Maincontinuity/Todooverride/backgroundthemePASS. cmd overlay lookupподтвердилnight/defaultресурсы. Собственный5574восстановленsystemauto/sync/выключен,5554нетронут.
+- Отдельный fork: https://github.com/etowhite/cyclone-mooneva, cyclone/design, PR #1. GPL-3.0-or-later и авторство сохранены. Старый ../cyclone отдельно.
+- Пять палитр, auto/light/dark, контуры карточек, отдельное оформление с языком и началом недели, навигация с подписями. Исправлены белые полосы, тени и селекты.
+- Десять Android иконок: палитра приложения и светлый/тёмный режим устройства. API35 аудит подтвердил одну иконку, смену в фоне и Todo override. Опубликовано в 40df682.
+- Следующий UI этап: заголовки cyclone/Аналитика, карточка о форке вместо ваучера, собственные issues, RU/EN release notes, контуры и выбранный диапазон аналитики.
+- Исправлена нечитаемость при переходе: opacity остаётся 1 на 0/100/750 ms; текст rgb(240,230,244) на фоне rgb(23,18,25). JS ошибок нет. Mobile Chrome 412×915: синтетическая история 28/30/32 дала среднее 30, месячные 5, три цикла и heatmap.
+- tsc, web production build и 6 контрактных тестов расчётов прошли. Services/logic не изменялись; это не полная проверка всей медицинской логики.
+
 # 3. Текущий статус и проблемы
-Icon/selectправкиготовятсявcommit/pushPR1. NativeAPKdebug—проверкаэтогофункционала,неполноценныйрелизфорка. На8GBhostпервыйзапускпараллельнодаемонусборкивызвалSYSTEMserverперезапуск;послестопадаемонаиbootпроверкипрошли. Сборкуиэмуляторлучшеразделять. Оставшиесязадачи:полныйmobilecalendar/trendsбрендинг,переносданныхnativecyclone,биометрия/виджеты/Androidreleaseподпись. Services/logicнетронуты,старыйnativeпроектотдельно.
+Собирается 3.0.0-beta.1, versionCode 26, debug-подпись, package com.cyclone.mooneva.debug. Это отдельная тестовая установка. Полного переноса функций старого native cyclone ещё нет: миграция бэкапа, виджеты и биометрия ожидают интеграции. Не обещать готовность этих функций.
+JDK21/SDK36/Gradle8.14.3 в ../.toolchain. На 8GB машине не запускать Gradle и эмулятор одновременно. Использовать только собственный 5574, никогда 5554.
+
 # 4. Следующие шаги
-Pushicon/selectкоммита,проверитьCI;дальшеissue2mobileредизайн,issue3nativeинтеграция/миграция. Передправкамичитать/вестиэтотфайл,отчётвчатобэтомне нужен. ПоддерживатьCONTINUE_PROMPTдолюбоголимита. GPL/авторствосохранять,storage/protocolключинемассовопереименовывать.
+1. Дождаться Android сборки, проверить подпись, package/version и запуск APK.
+2. Зафиксировать текущие изменения, push в PR #1 и проверить CI именно нового commit.
+3. Опубликовать GitHub prerelease с APK, SHA256, RU/EN описанием и точными исходниками по тегу.
+4. Обновить этот журнал и CONTINUE_PROMPT.md результатами и ссылками.
+5. Дальше issues #2 (mobile QA) и #3 (native интеграция/миграция). Перед изменениями читать и обновлять DEVLOG; отчёты о журнале в чат не нужны. Держать CONTINUE_PROMPT готовым до любого лимита. Не коммитить ключи, SDK, dist, node_modules и личные данные.
+
+- Beta Android BUILD SUCCESSFUL 1m15s; aapt подтвердил com.cyclone.mooneva.debug / 3.0.0-beta.1 / code26 / min24, apksigner v2 VALID. Собственный Gradle daemon остановлен перед проверкой запуска на 5574. Удаляем лишнюю пустую строку build.gradle перед commit.

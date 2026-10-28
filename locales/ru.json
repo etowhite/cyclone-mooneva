@@ -1085,6 +1085,12 @@
     "cyclone": {
         "appearance": "Оформление",
         "appearance_description": "Тема, цветовая палитра и язык",
-        "settings_subtitle": "Твоё пространство — твои правила."
+        "settings_subtitle": "Твоё пространство — твои правила.",
+        "about_title": "О приложении",
+        "about_body": "cyclone — отдельный проект на основе Mooneva. Данные о здоровье хранятся на устройстве.",
+        "feedback": "Сообщить о проблеме cyclone",
+        "attribution": "Основано на Mooneva Cycle. Авторство и лицензия GPL-3.0-or-later сохранены.",
+        "repo_title": "cyclone на GitHub",
+        "repo_body": "Исходники, задачи и ход разработки форка."
     }
 }

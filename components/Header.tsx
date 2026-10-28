@@ -32,7 +32,7 @@ const Header: React.FC<HeaderProps> = ({ isCloaked, cycleStatus, taskCount = 0, 
         {!isCloaked ? (
           <>
             <div className="flex items-center flex-shrink-0">
-              <img src="/bitmap.png" alt="Mooneva" className="h-8 w-auto object-contain drop-shadow-xl" />
+              <span className="cyclone-header-wordmark">cyclone</span>
             </div>
             <div className="flex-1 min-w-0 flex justify-end items-center gap-2">
               {onBackupClick && (

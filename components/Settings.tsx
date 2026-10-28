@@ -551,80 +551,14 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                 rightElement={<span aria-hidden>→</span>} />
             </SettingCard>
           </section>
-          {/* 0. About & Support (Consolidated & Neumorphic) */}
-          <section>
-            <div
-              className="rounded-2xl p-4 bg-[#F0F2F5] space-y-4"
-              style={{ boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.3), inset -4px -4px 8px rgba(255, 255, 255, 0.7)' }}
-            >
-              <div className="text-center space-y-1.5 pt-1">
-                <h3 className="text-base font-black tracking-tight">
-                  <span style={{ color: '#005293' }}>{t('common.free', 'Free')}.</span>{' '}
-                  <span style={{ color: '#ddca00' }}>{t('common.private', 'Private')}.</span>{' '}
-                  <span style={{ color: '#005293' }}>{t('common.forever', 'Forever')}.</span>{' '}🇸🇪
-                </h3>
-                <p className="text-[11px] font-medium text-slate-500 leading-relaxed max-w-xs mx-auto">
-                  {t('branding.passion_not_ads')}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => setShowGiftModal(true)}
-                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-[#F0F2F5] text-slate-600 transition-all active:scale-[0.98] group cursor-pointer"
-                  style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
-                >
-                  <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shadow-inner group-hover:scale-110 transition-transform duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wide group-hover:text-emerald-600 transition-colors">
-                    {t('branding.voucher_button', '25% Voucher')}
-                  </span>
-                </button>
-
-                <button
-                  onClick={async () => {
-                    try {
-                      await Share.share({
-                        title: 'Mooneva',
-                        text: t('share_message.text'),
-                        url: 'https://mooneva.se/pages/mooneva_cycle',
-                        dialogTitle: t('common.share')
-                      });
-                    } catch (error) {
-                      Logger.error('Error sharing:', error);
-                    }
-                  }}
-                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-[#F0F2F5] text-slate-600 transition-all active:scale-[0.98] group cursor-pointer"
-                  style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
-                >
-                  <div className="w-8 h-8 rounded-full bg-[#e0f2fe] flex items-center justify-center text-sky-500 shadow-inner group-hover:scale-110 transition-transform duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wide group-hover:text-sky-500 transition-colors">{t('common.share')}</span>
-                </button>
-              </div>
-
-              <div className="flex justify-center gap-6 pt-1 opacity-60 hover:opacity-100 transition-opacity">
-                <a href="https://mooneva.se" target="_blank" rel="noopener noreferrer" className="text-[9px] font-bold uppercase tracking-widest text-slate-400 hover:text-[#7598a0] transition-colors">
-                  {t('common.website')}
-                </a>
-                <button onClick={() => setShowAbout(!showAbout)} className="text-[9px] font-bold uppercase tracking-widest text-slate-400 hover:text-[#7598a0] transition-colors">
-                  {t('branding.story_title')}
-                </button>
-              </div>
-
-              {showAbout && (
-                <div className="animate-fade-in pt-3 border-t border-slate-200/50">
-                  <p className="text-[10px] text-slate-500 leading-relaxed text-justify relative">
-                    <span className="text-2xl absolute -top-2 -left-1 opacity-20">❝</span>
-                    {t('branding.story_body')}
-                  </p>
-                </div>
-              )}
-            </div>
+          <section className="cyclone-about-card">
+            <h2>{t('cyclone.about_title', 'About this fork')}</h2>
+            <p>{t('cyclone.about_body', 'cyclone is a separate Mooneva-based project. Your health data stays on this device.')}</p>
+            <a href="https://github.com/etowhite/cyclone-mooneva/issues" target="_blank" rel="noopener noreferrer">
+              {t('cyclone.feedback', 'Report a cyclone issue')} ↗
+            </a>
+            <p className="cyclone-attribution">{t('cyclone.attribution', 'Based on Mooneva Cycle. Original authors and GPL-3.0-or-later license retained.')}</p>
           </section>
-
           {/* 1. Prediction Settings (grouped) */}
           <section>
             <SettingCard title={t('settings.predictions')}>
@@ -869,7 +803,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                 </p>
 
                 <a
-                  href="mailto:app@mooneva.se?subject=Mooneva App Feedback"
+                  href="https://github.com/etowhite/cyclone-mooneva/issues" target="_blank" rel="noopener noreferrer"
                   className="block w-full text-center bg-white text-[#5b7a82] py-3 rounded-xl font-bold text-sm shadow-sm active:scale-[0.98] transition-all hover:bg-slate-50"
                 >
                   {t('settings.feedback_button')}
@@ -893,9 +827,9 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                 </svg>
               </div>
 
-              <h3 className="text-sm font-bold text-slate-700 mb-1">{t('settings.star_repo_title', 'Star Mooneva on GitHub')}</h3>
+              <h3 className="text-sm font-bold text-slate-700 mb-1">{t('cyclone.repo_title', 'cyclone on GitHub')}</h3>
               <p className="text-xs text-slate-400 leading-relaxed mb-4">
-                {t('settings.star_repo_desc', 'Mooneva is open source. A star costs you nothing and helps other people find a tracker that keeps their data on their own phone.')}
+                {t('cyclone.repo_body', 'Source, development tasks and progress of this fork.')}
               </p>
 
               <button
@@ -903,7 +837,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                 onClick={() => {
                   // '_system' hands the URL to the OS browser, the same route the store link
                   // uses. The app itself holds no INTERNET permission and makes no request.
-                  window.open('https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker', '_system');
+                  window.open('https://github.com/etowhite/cyclone-mooneva', '_system');
                 }}
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#24292f] text-white font-bold text-xs active:scale-[0.98] transition-transform"
               >

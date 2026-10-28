@@ -492,6 +492,7 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
 
       <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar px-[max(24px,calc((100%_-_32rem)/2))] pt-4 pb-32 space-y-6 relative z-10">
 
+        <header className="cyclone-trends-heading"><h1>{t('trends.header')}</h1></header>
         {/* Range selector + stat cards grouped with tight spacing */}
         <div className="space-y-3">
           <div
@@ -501,8 +502,9 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
             {[30, 90, 180, 365].map((days) => (
               <button
                 key={days}
+                aria-pressed={range === days}
                 onClick={() => setRange(days as 30 | 90 | 180 | 365)}
-                className={`flex-1 py-2.5 rounded-[1.5rem] text-[10px] font-extrabold uppercase tracking-[0.15em] transition-all duration-300 ${range === days
+                className={`cyclone-range-button flex-1 py-2.5 rounded-[1.5rem] text-[10px] font-extrabold uppercase tracking-[0.15em] transition-all duration-300 ${range === days
                   ? 'text-white'
                   : 'text-slate-500 hover:text-slate-700'
                   }`}
@@ -606,7 +608,7 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
             rows={[
               ...MOOD_OPTIONS.map((opt, idx) => ({
                 id: opt.id,
-                label: `${opt.emoji} ${t(opt.labelKey)}`,
+                label: t(opt.labelKey),
                 data: moodHeatmap[opt.id],
                 config: {
                   color: opt.color,

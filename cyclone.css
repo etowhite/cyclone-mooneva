@@ -92,3 +92,28 @@ body[data-cyclone][data-theme] select.cyclone-select {
 html[dir="rtl"] body[data-cyclone] select.cyclone-select {
  padding-left:38px; padding-right:14px; background-position:left 12px center;
 }
+
+body[data-cyclone] .cyclone-header-wordmark { font-size:24px; font-weight:600; letter-spacing:-1px; color:var(--cyclone-primary); }
+body[data-cyclone] .cyclone-about-card { padding:20px; border:1px solid var(--border-soft); border-radius:28px; background:var(--surface); display:grid; gap:12px; }
+body[data-cyclone] .cyclone-about-card h2 { font-size:18px; font-weight:600; }
+body[data-cyclone] .cyclone-about-card p { font-size:14px; line-height:1.35; color:var(--text-secondary); }
+body[data-cyclone] .cyclone-about-card a { color:var(--cyclone-primary); font-size:14px; min-height:44px; display:flex; align-items:center; }
+body[data-cyclone] .cyclone-about-card .cyclone-attribution { font-size:12px; }
+
+body[data-cyclone] .cyclone-setting-card { border:1px solid var(--border-soft); background:var(--surface); }
+body[data-cyclone] .cyclone-trends-heading h1 { font-size:32px; font-weight:600; margin:6px 0 12px; }
+body[data-cyclone] button.cyclone-range-button[aria-pressed="true"] { background:var(--cyclone-primary)!important; color:var(--cyclone-on-primary)!important; }
+body[data-cyclone] button.cyclone-range-button[aria-pressed="false"] { color:var(--text-secondary)!important; }
+
+/* Route content must remain readable during transitions, including the first frame. */
+@keyframes cyclone-screen-enter {
+ from { transform:translateY(8px); }
+ to { transform:translateY(0); }
+}
+body[data-cyclone] .animate-slide-up {
+ animation:cyclone-screen-enter 180ms ease-out both;
+ opacity:1;
+}
+@media(prefers-reduced-motion:reduce) {
+ body[data-cyclone] .animate-slide-up { animation:none; transform:none; }
+}

@@ -30,7 +30,7 @@ export const Toggle = ({ active, onClick, disabled, small = false, label }: { ac
 export const SettingCard = ({ children, title }: { children: React.ReactNode, title?: string }) => (
     <div className="space-y-3" role="group" aria-label={title}>
         <div
-            className="bg-[#F0F2F5] rounded-[24px] overflow-hidden"
+            className="cyclone-setting-card bg-[#F0F2F5] rounded-[24px] overflow-hidden"
             style={{ boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)' }}
         >
             {children}

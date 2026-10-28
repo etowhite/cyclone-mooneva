@@ -36,7 +36,7 @@ android {
         // (debug-key) APK never conflicts with a release-signed copy and has its own data.
         debug {
             applicationIdSuffix ".debug"
-            versionNameSuffix "-debug"
+            versionNameSuffix "-beta.1"
         }
         release {
             minifyEnabled false

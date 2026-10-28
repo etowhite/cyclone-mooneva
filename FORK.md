@@ -1,14 +1,15 @@
 # cyclone — Mooneva fork
 
-Separate React/Capacitor project based on aradar46/Mooneva-Cycle-Private-Period-Tracker, commit827e36a2bd863efa24faae608ca826bb1d56eab1. GPL-3.0-or-later and upstream credits retained. Branchcyclone/design, upstream remote points to the public project; no personal GitHub repository has been created or pushed.
+Separate React/Capacitor fork of aradar46/Mooneva-Cycle-Private-Period-Tracker, based on 827e36a2bd863efa24faae608ca826bb1d56eab1. GPL-3.0-or-later and upstream attribution are retained.
 
-The native ../cyclone project remains separate. Presentation overrides are in cyclone.css, services/cycloneAppearance.ts and components/settings/CycloneAppearance.tsx. Health calculations/storage remain upstream. Five palettes and auto/light/dark are visual preferences only. Android applicationId com.cyclone.mooneva separates the fork from both existing apps; native plugin/package compatibility still needs verification before an APK is distributed.
+Repository: https://github.com/etowhite/cyclone-mooneva. Development branch: cyclone/design; PR #1. The original native ../cyclone project remains separate.
 
-Next: validate baseline and styled web app, visual review, finish cyclone branding and navigation, adapt Android identity/icons/biometry/widgets, provide a confirmed cyclone backup importer before migrating real data. This first scaffold is not a completed Android release.
-## Launcher icons (in progress)
+Presentation overrides live in cyclone.css, services/cycloneAppearance.ts and components/settings/CycloneAppearance.tsx. Health calculations and storage remain upstream. Five palettes, auto/light/dark, outlined cards, labelled navigation, dedicated appearance/language settings and mobile analytics styling are implemented.
 
-Ten native cyclone vector icons: Rose/Lavender/Sage/Ocean/Amber, each light and dark. Palette follows the app preference; brightness follows Android system uiMode even when the app appearance is forced. LauncherAppearance persists palette and discrete mode; configuration/boot events and Activity configuration changes reconcile aliases. A permanent MainActivity is opened through LauncherEntryActivity so disabling an icon alias does not disable the app entry point. API33+ alias updates are atomic; older Android enables the replacement first. Discrete Todo mode wins over palette selection until disabled.
+Android icons follow the selected palette and device light/dark setting independently of forced app appearance. Ten variants, one enabled launcher, background changes and discrete Todo override passed an API35 emulator audit. Runtime configuration registration and drawable-night resources cover system changes.
 
-Native implementation is pending emulator verification. First build requires JDK21, AndroidSDK36 and upstream Gradle8.14.3. The old native cyclone toolchain JDK17/SDK35 is not sufficient. Do not distribute this as a tested APK until palette/system-mode/discrete/single-launcher behaviour has passed on device.
+The first test build is 3.0.0-beta.1, debug signed, package com.cyclone.mooneva.debug. It installs separately from the original native cyclone. Existing native cyclone JSON migration, native widgets and biometric integration are not yet implemented in this fork. Do not assume that all original cyclone features have been transferred.
 
-Launcher verification update: Android debug build and API35 emulator audit passed for all ten palette/mode variants, one launcher, Activity continuity, discrete override and system-theme changes in the background. Runtime configuration registration and drawable-night resources replace the initial manifest-only approach. Android resource lookup verified dark/default selection. This verifies launcher behaviour, not the entire fork's Android release readiness.
+Build: Node22+, pnpm11.25.0, JDK21, Android SDK36, Gradle8.14.3. Run pnpm install --frozen-lockfile, pnpm exec tsc --noEmit, pnpm test, pnpm build, pnpm exec cap sync android, then android/gradlew assembleDebug. Output: android/app/build/outputs/apk/debug/app-debug.apk. Debug signing uses the local Android debug keystore; do not commit keys.
+
+See DEVLOG.md, ROADMAP.md and CONTINUE_PROMPT.md for verified scope and remaining work.
