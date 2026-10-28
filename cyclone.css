@@ -40,7 +40,7 @@ body[data-cyclone] :focus-visible { outline:3px solid var(--cyclone-primary); ou
 @media(prefers-reduced-motion:reduce) { body[data-cyclone] * { scroll-behavior:auto!important; transition-duration:.01ms!important; animation-duration:.01ms!important; } }
 /* Flat Material-like controls, overriding upstream inline neumorphic shadows. */
 body[data-cyclone] [style*="box-shadow"] { box-shadow:none!important; }
-body[data-cyclone] :is(button[class*="bg-[#7598a0]"],button[role="switch"][aria-checked="true"]) { background:var(--cyclone-primary)!important; color:var(--cyclone-on-primary)!important; }
+body[data-cyclone] :is(button[class*="bg-[#7598a0]"],button.cyclone-toggle[role="switch"][aria-checked="true"]) { background:var(--cyclone-primary)!important; color:var(--cyclone-on-primary)!important; }
 body[data-cyclone] button[role="switch"] { border:1px solid var(--border-soft); box-shadow:none!important; }
 body[data-cyclone] [class*="text-[#7598a0]"] { color:var(--cyclone-primary)!important; }
 body[data-cyclone] :is([class*="border-slate"],[class*="border-gray"]) { border-color:var(--border-soft)!important; }
@@ -54,8 +54,8 @@ body[data-cyclone][data-theme] [style*="inset"],
 body[data-cyclone][data-theme] :is(.shadow-sm,.shadow-md,.shadow-lg,.shadow-xl,.shadow-2xl) { box-shadow:none!important; }
 body[data-cyclone] :is(input,textarea,select) { background-color:var(--surface-alt); color:var(--text-primary); border-color:var(--border-soft); }
 body[data-cyclone] button[role="switch"][aria-checked="false"] { background:var(--surface-alt)!important; }
-body[data-cyclone] button[role="switch"] > div { background:var(--text-secondary)!important; box-shadow:none!important; }
-body[data-cyclone] button[role="switch"][aria-checked="true"] > div { background:var(--cyclone-on-primary)!important; }
+body[data-cyclone] button.cyclone-toggle[role="switch"] > div { background:var(--text-secondary)!important; box-shadow:none!important; }
+body[data-cyclone] button.cyclone-toggle[role="switch"][aria-checked="true"] > div { background:var(--cyclone-on-primary)!important; }
 body[data-cyclone][data-theme] :is([class~="bg-white/50"],[class~="bg-white/70"],[class~="bg-slate-100"],[class~="bg-slate-200"],[class*="bg-[#E8EAED]"],[class*="bg-[#E0E5EC]"]) { background-color:var(--surface-alt)!important; }
 body[data-cyclone] .setting-row-merge-next + * { background-color:var(--surface)!important; }
 
@@ -117,3 +117,62 @@ body[data-cyclone] .animate-slide-up {
 @media(prefers-reduced-motion:reduce) {
  body[data-cyclone] .animate-slide-up { animation:none; transform:none; }
 }
+
+/* Shared cyclone typography and compact settings surfaces. */
+body[data-cyclone], body[data-cyclone] * { font-family:Roboto,Arial,sans-serif!important; }
+body[data-cyclone] :is(h1,h2,h3,h4,.font-black,.font-extrabold) { font-weight:600; }
+body[data-cyclone] .cyclone-toggle { flex:none; min-width:40px; overflow:hidden; }
+body[data-cyclone] .cyclone-setting-note { padding:0 20px 16px; }
+body[data-cyclone] .cyclone-setting-card:has(>.cyclone-setting-note)>.cyclone-setting-row { border-bottom:0; }
+body[data-cyclone] .cyclone-setting-note p { font-size:12px; line-height:1.25; font-style:normal; }
+body[data-cyclone] .cyclone-data-card { border:1px solid var(--border-soft); border-radius:28px; background:var(--surface); }
+body[data-cyclone] .cyclone-data-card>.p-6 { padding:20px; }
+body[data-cyclone] .cyclone-data-page>.overflow-y-auto { padding:12px 16px 100px; }
+body[data-cyclone] .cyclone-data-page .space-y-8 { gap:16px; display:grid; }
+body[data-cyclone] .cyclone-data-page .space-y-8>* { margin-top:0; }
+body[data-cyclone] .cyclone-data-page :is(input,button) { min-height:44px; }
+body[data-cyclone] .cyclone-data-page :is(input[type=checkbox],input[type=radio]) { min-height:0; }
+body[data-cyclone] .pin-setup-panel { padding:16px 20px 20px; }
+body[data-cyclone] .pin-setup-panel input { min-height:48px; border-radius:16px; }
+body[data-cyclone] .cyclone-pin-lock { background:var(--app-bg); }
+body[data-cyclone] .cyclone-pin-lock>div { width:100%; max-width:360px; }
+body[data-cyclone] .cyclone-pin-lock h2 { text-transform:none; letter-spacing:0; font-size:26px; }
+body[data-cyclone] :is(.animate-period-button,.animate-guide-button,.cycle-insight-moon-spin) { animation:none!important; color:var(--cyclone-primary)!important; }
+
+body[data-cyclone] .calendar-month-title { white-space:nowrap; letter-spacing:0; font-size:14px; text-transform:none; }
+body[data-cyclone] .cyclone-day-tips { padding:20px; margin-top:16px; border:1px solid var(--border-soft); border-radius:28px; background:var(--surface); }
+body[data-cyclone] .cyclone-day-tips h2 { font-size:22px; font-weight:600; }
+body[data-cyclone] .cyclone-day-tips header p { font-size:12px; line-height:1.25; color:var(--text-secondary); margin-top:6px; }
+body[data-cyclone] .cyclone-day-tips article { margin-top:16px; }
+body[data-cyclone] .cyclone-day-tips h3 { color:var(--cyclone-primary); font-size:14px; font-weight:600; margin-bottom:4px; }
+body[data-cyclone] .cyclone-day-tips article p { font-size:14px; line-height:1.25; }
+
+body[data-cyclone] .cyclone-data-page :is(p,.text-xs) { font-size:14px; line-height:1.25; }
+body[data-cyclone] .cyclone-data-page h3 { font-size:16px; }
+
+body[data-cyclone] .daily-log-panel button[role="switch"] { background:var(--surface)!important; color:var(--text-primary)!important; border:1px solid var(--border-soft); border-radius:20px; }
+body[data-cyclone] .daily-log-panel button[role="switch"]>div:first-child { background:transparent!important; min-width:0; }
+body[data-cyclone] .daily-log-panel button[role="switch"]>div:last-child { flex:none; border:1px solid var(--border-soft); background:var(--surface-alt)!important; color:transparent; }
+body[data-cyclone] .daily-log-panel button[role="switch"][aria-checked="true"]>div:last-child { background:var(--cyclone-primary)!important; color:var(--cyclone-on-primary); border-color:var(--cyclone-primary); }
+body[data-cyclone] .daily-log-panel button[role="switch"] span { font-size:14px; line-height:1.25; }
+body[data-cyclone] .daily-log-panel button[role="switch"] p { font-size:12px; line-height:1.25; }
+body[data-cyclone] .cyclone-mood-options { display:flex; flex-wrap:wrap; gap:10px; max-width:100%; padding:8px 0; }
+body[data-cyclone] .daily-log-mood-circle { width:auto; height:auto; min-height:44px; padding:10px 16px; border-radius:24px; border:1px solid var(--border-soft)!important; box-shadow:none!important; }
+body[data-cyclone] .daily-log-mood-circle span { font-size:14px; line-height:1.2; text-transform:none; letter-spacing:0; overflow-wrap:normal; word-break:normal; white-space:normal; }
+body[data-cyclone] .daily-log-mood-circle[aria-pressed="true"] { background:var(--cyclone-primary)!important; color:var(--cyclone-on-primary)!important; }
+
+/* Panels are separate cards; no negative overlap with calendar or suggestions. */
+body[data-cyclone] { --cyclone-block-gap:16px; }
+body[data-cyclone] :is(.daily-log-panel,.day-preview-panel) { width:100%; max-width:100%; margin:0; border-radius:32px; border:1px solid var(--border-soft); padding:20px; background:var(--surface); }
+body[data-cyclone] .day-preview-panel>div:first-child { margin-top:0; }
+body[data-cyclone] .cyclone-calendar-details { margin-top:var(--cyclone-block-gap); }
+body[data-cyclone] .cyclone-day-tips { margin-top:var(--cyclone-block-gap); border-radius:32px; }
+body[data-cyclone] .calendar-swipe-surface { margin-top:var(--cyclone-block-gap); }
+body[data-cyclone] .space-y-8>:not([hidden])~:not([hidden]),
+body[data-cyclone] .space-y-6>:not([hidden])~:not([hidden]) { margin-top:var(--cyclone-block-gap); }
+body[data-cyclone] .daily-log-panel .daily-log-tab { text-transform:none; letter-spacing:0; }
+
+body[data-cyclone] :is(.daily-log-panel,.day-preview-panel) { border:1px solid var(--border-soft)!important; background:var(--surface)!important; box-shadow:none!important; }
+
+body[data-cyclone] .daily-log-tab[aria-selected='true'] { background:var(--cyclone-container)!important; color:var(--cyclone-primary)!important; border-radius:20px; box-shadow:none!important; }
+body[data-cyclone] .daily-log-tab[aria-selected='false'] { background:transparent!important; color:var(--text-secondary)!important; }

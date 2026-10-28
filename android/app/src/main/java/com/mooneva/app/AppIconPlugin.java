@@ -6,7 +6,7 @@ public class AppIconPlugin extends Plugin {
  @PluginMethod public void setIcon(PluginCall call) {
   String name=call.getString("name");
   if(!"Todo".equals(name)&&!"Default".equals(name)) { call.reject("Unknown icon"); return; }
-  try { LauncherAppearance.discrete(getContext(),"Todo".equals(name)); call.resolve(); }
+  try { LauncherAppearance.discrete(getContext(),false); call.resolve(); }
   catch(Exception error) { call.reject("Cannot switch launcher icon",error); }
  }
  @PluginMethod public void setAppearance(PluginCall call) {

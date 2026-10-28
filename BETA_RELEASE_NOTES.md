@@ -1,23 +1,31 @@
-# cyclone 3.0.0-beta.1 — test build / тестовая сборка
+# cyclone 3.0.0-beta.2 — test build / тестовая сборка
 
 ## Русский
-Первая тестовая сборка отдельного форка Mooneva с оформлением cyclone.
-- Пять цветовых палитр; светлая, тёмная и системная тема.
-- Отдельный раздел оформления, язык и начало недели; навигация с подписями.
-- Календарь, история циклов, прогнозы, графики и тепловые карты на исходной архитектуре Mooneva.
-- Иконка Android меняет палитру вслед за приложением, а яркость — вслед за темой устройства.
-- Исправлены контраст и прозрачность текста при переходе на экран настроек.
+- Исправлены переключатели и обрезанный текст в управлении циклом, серые блоки в отметках беременности/статистики и переносы названий настроения.
+- Единый системный шрифт, как в прежнем cyclone. Управление данными и настройка/экран PIN приведены к общему оформлению.
+- Оставлены русский и английский; экспериментальная лаборатория переведена на русский.
+- Скрытый режим задач убран из интерфейса и вводного обучения; прежняя настройка отключается при загрузке. PIN остаётся.
+- Возвращён исходный знак cyclone в календаре и Android иконках. Название установки — cyclone. Палитра иконки следует приложению, яркость — устройству.
+- Убрано бесконечное переливание цветов кнопок календаря.
+- Подсказки работы, спорта и настроения без эмодзи для выбранного дня. 56 сочетаний на категорию, с осторожным учётом фазы. Подсказки не предсказывают ваше настроение или работоспособность.
+- Два виджета: компактный цикл и расширенный с подсказками. Общие данные расчёта и тексты с приложением, тема/язык синхронизируются. Снимки рассчитаны на 70 дней; затем виджет просит открыть приложение вместо показа устаревших значений. Изменения данных в приложении обновляют снимки.
 
-Установка: скачайте APK и разрешите установку из выбранного источника. Это debug-подписанная beta с отдельным идентификатором com.cyclone.mooneva.debug. Прежний native cyclone остаётся отдельным приложением. Импорт его JSON-бэкапов, перенос его виджетов и биометрии ещё не реализованы в этом форке. Часть исходного интерфейса пока на английском. Проверены 6 контрактных тестов расчётов, TypeScript, web/Android сборка и отдельные сценарии; полная регрессия ещё впереди.
+Проверено: TypeScript, production web build, 8 тестов, мобильные настройки и редактор; Android сборка, отображение двух виджетов на API35, смена палитры/темы, отсутствие устаревших данных, открытие приложения по нажатию. Полная регрессия ещё продолжается.
+
+Debug-подписанная тестовая beta, Android 7+. Можно обновить предыдущую beta этого форка. Старый native cyclone — отдельное приложение: импорт его JSON-бэкапа и перенос биометрии пока не готовы. Перед тестами сохраняйте резервную копию нужных данных.
 
 ## English
-First test build of the separate Mooneva fork with cyclone styling.
-- Five palettes; light, dark and system appearance.
-- Dedicated appearance, language and week-start settings; labelled navigation.
-- Calendar, cycle history, predictions, charts and heatmaps using the upstream Mooneva architecture.
-- Android icon palette follows the app; icon brightness follows the device theme.
-- Fixed text contrast and opacity during settings transitions.
+- Fixed cycle settings switches and clipped hints, opaque labels in pregnancy/statistics controls and mood label wrapping.
+- Unified system sans-serif typography, matching the original cyclone; consistent data management and PIN setup/unlock styling.
+- English and Russian only; experimental Lab fully translated into Russian.
+- Removed the task-disguise setting and tutorial; saved disguise mode is disabled on load. PIN protection remains.
+- Restored the original cyclone mark in the calendar and Android launcher; installed name is cyclone. Icon palette follows the app, brightness follows the device.
+- Removed continuous colour cycling from calendar actions.
+- Emoji-free work, exercise and mood suggestions for the selected date, with 56 combinations per category and cautious phase context. They do not predict performance or feelings.
+- Compact and detailed Android widgets use the same model and suggestions as the app and follow its theme/language. Dated snapshots cover 70 days; an expired snapshot asks you to open the app rather than displaying stale numbers. App data edits refresh snapshots.
 
-Install the APK and allow installation from your chosen source. This beta uses debug signing and the separate application ID com.cyclone.mooneva.debug. The original native cyclone remains separate. Its JSON backup migration, widgets and biometric integration have not yet been ported. Some upstream screens remain English-only. Six calculation contract tests, TypeScript, web/Android builds and selected scenarios are checked; full regression testing is still pending.
+Validation: TypeScript, production web build, eight tests, mobile settings/editor checks; Android build, both widgets on API35, palette/light-dark changes, stale-data fallback and tap-to-open. Full regression is ongoing.
 
-GPL-3.0-or-later. Based on Mooneva Cycle by its upstream contributors. Exact corresponding project source is available through this release tag and GitHub source archives. Report bugs: https://github.com/etowhite/cyclone-mooneva/issues
+Debug-signed test beta for Android 7+. Updates the previous fork beta. The old native cyclone remains separate: its JSON backup migration and biometric integration are not ready yet. Keep a backup of data you need before testing.
+
+GPL-3.0-or-later, based on Mooneva Cycle. Upstream attribution is preserved. Source archives correspond to this release tag. Bugs: https://github.com/etowhite/cyclone-mooneva/issues

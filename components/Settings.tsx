@@ -314,7 +314,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   }}
                 />
               </SettingRow>
-              <div className="pl-[64px] pr-4 pb-3 -mt-2">
+              <div className="cyclone-setting-note">
                 {settings.isOnBirthControl ? (
                   <p className="text-xs text-amber-600 font-medium">{t('settings.bc_protected_msg')}</p>
                 ) : (
@@ -472,22 +472,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   }}
                   className="cyclone-select"
                 >
-                  {[
-                    { code: 'en', label: 'English' },
-                    { code: 'zh', label: '中文' },
-                    { code: 'es', label: 'Español' },
-                    { code: 'sv', label: 'Svenska' },
-                    { code: 'fa', label: 'فارسی' },
-                    { code: 'ar', label: 'العربية' },
-                    { code: 'tr', label: 'Türkçe' },
-                    { code: 'de', label: 'Deutsch' },
-                    { code: 'fr', label: 'Français' },
-                    { code: 'uk', label: 'Українська' },
-                    { code: 'it', label: 'Italiano' },
-                    { code: 'hu', label: 'Magyar' },
-                    { code: 'ru', label: 'Русский' },
-                    { code: 'pt', label: 'Português' }
-                  ].map(lang => (
+                  {[{code:'en',label:'English'}, {code:'ru',label:'Русский'}].map(lang => (
                     <option key={lang.code} value={lang.code}>{lang.label}</option>
                   ))}
                 </select>
@@ -625,20 +610,6 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
           </button>
 
 
-
-          {/* 3.5 Privacy — Discrete Mode */}
-          <section>
-            <SettingCard title="Privacy & Security">
-              <SettingRow
-                label={t('settings.discrete_mode')}
-                desc={t('settings.discrete_mode_full_desc')}
-                icon={<Icons.Eye />}
-                last
-              >
-                <Toggle label={t('settings.discrete_mode')} active={settings.discreteMode} onClick={() => onUpdate({ ...settings, discreteMode: !settings.discreteMode })} />
-              </SettingRow>
-            </SettingCard>
-          </section>
 
           {/* 4. PIN Lock */}
           <section>

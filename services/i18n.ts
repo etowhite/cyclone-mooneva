@@ -12,7 +12,7 @@ import en from '../locales/en.json';
 
 // Vite turns this into a code-split loader per file WITHOUT reading any of them,
 // so the language list stays derived from locales/ instead of hand-maintained.
-const localeLoaders = import.meta.glob<{ default: Record<string, unknown> }>('../locales/*.json');
+const localeLoaders = import.meta.glob<{ default: Record<string, unknown> }>(['../locales/en.json', '../locales/ru.json']);
 
 const codeFromPath = (path: string) => path.slice(path.lastIndexOf('/') + 1, -'.json'.length);
 

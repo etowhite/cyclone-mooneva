@@ -634,7 +634,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
 
                         {activeTab === 'mood' && (
                             <section className="flex flex-col gap-3">
-                                <div className="flex flex-wrap gap-x-4 gap-y-3 py-4 items-center justify-center max-w-[280px] mx-auto">
+                                <div className="cyclone-mood-options">
                                     {MOOD_OPTIONS.map(opt => (
                                         <MoodCircle
                                             key={opt.id}

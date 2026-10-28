@@ -9,7 +9,7 @@ export const Toggle = ({ active, onClick, disabled, small = false, label }: { ac
         aria-label={label}
         onClick={disabled ? undefined : onClick}
         disabled={disabled}
-        className={`${small ? 'w-10 h-6' : 'w-14 h-8'} rounded-full relative transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7598a0] focus-visible:ring-offset-2 ${active ? 'bg-[#7598a0]' : 'bg-[#E8EAED]'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`cyclone-toggle shrink-0 ${small ? 'w-10 h-6' : 'w-14 h-8'} rounded-full relative transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7598a0] focus-visible:ring-offset-2 ${active ? 'bg-[#7598a0]' : 'bg-[#E8EAED]'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         style={{
             boxShadow: active
                 ? 'inset 2px 2px 4px rgba(0,0,0,0.1), 0 0 8px rgba(117, 152, 160, 0.3)'
@@ -45,7 +45,7 @@ export const SettingRow = ({ label, desc, icon, children, last, mergeWithNext, o
     <Root
         {...(onClick ? { type: 'button' as const, onClick } : {})}
         title={tooltip}
-        className={`py-3 px-4 ${!last ? 'border-b border-slate-200/50' : ''} ${mergeWithNext ? 'setting-row-merge-next' : ''} ${onClick ? 'block w-full text-start cursor-pointer active:bg-slate-100/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#7598a0]' : ''}`}
+        className={`cyclone-setting-row py-3 px-4 ${!last ? 'border-b border-slate-200/50' : ''} ${mergeWithNext ? 'setting-row-merge-next' : ''} ${onClick ? 'block w-full text-start cursor-pointer active:bg-slate-100/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#7598a0]' : ''}`}
     >
         <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 flex-1 min-w-0">

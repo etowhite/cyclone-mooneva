@@ -10,6 +10,10 @@ export interface WidgetSyncData {
     daysUntilOvulation: number;
     currentPhase: 'period' | 'fertile' | 'ovulation' | 'luteal' | 'follicular' | 'pms';
     discreteMode: boolean;
+    snapshots: string;
+    palette: string;
+    mode: string;
+    language: string;
 }
 
 export interface WidgetSyncResult {

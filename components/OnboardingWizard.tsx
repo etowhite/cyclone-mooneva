@@ -39,11 +39,6 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
     predictionsPaused: false
   });
 
-  // Spycraft / Discrete
-  const [discreteUnlocked, setDiscreteUnlocked] = useState(false);
-  const [pressing, setPressing] = useState(false);
-  const pressTimer = useRef<NodeJS.Timeout | null>(null);
-  const [progress, setProgress] = useState(0);
 
 
   // --- Helpers ---
@@ -102,7 +97,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
 
   // --- Navigation Helpers ---
   const nextStep = () => {
-    if (step === 4 && (goal === 'pregnancy' || goal === 'birthControl')) {
+    if (step === 4) {
       setStep(6); // skip spycraft, go to get started
     } else if (step === 5) {
       setStep(6); // spycraft → get started
@@ -114,7 +109,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
   };
 
   const prevStep = () => {
-    if (step === 6 && (goal === 'pregnancy' || goal === 'birthControl')) {
+    if (step === 6) {
       setStep(4);
     } else if (step === 6) {
       setStep(5);
@@ -122,35 +117,6 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
       setStep(s => Math.max(0, s - 1));
     }
   };
-
-  // --- Interaction Handlers ---
-  const handlePressStart = React.useCallback(() => {
-    if (discreteUnlocked) return;
-    setPressing(true);
-    setProgress(0);
-    const startTime = Date.now();
-    const duration = 2000; // 2 seconds
-
-    if (pressTimer.current) clearInterval(pressTimer.current);
-    pressTimer.current = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const p = Math.min(100, (elapsed / duration) * 100);
-      setProgress(p);
-
-      if (p >= 100) {
-        if (pressTimer.current) clearInterval(pressTimer.current);
-        setDiscreteUnlocked(true);
-        setPressing(false);
-      }
-    }, 50);
-  }, [discreteUnlocked]);
-
-  const handlePressEnd = React.useCallback(() => {
-    if (discreteUnlocked) return;
-    setPressing(false);
-    setProgress(0);
-    if (pressTimer.current) clearInterval(pressTimer.current);
-  }, [discreteUnlocked]);
 
   const dateStripRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -165,22 +131,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
 
   // --- Render Steps ---
   const renderLanguage = () => {
-    const languages = [
-      { code: 'en', native: 'English' },
-      { code: 'de', native: 'Deutsch' },
-      { code: 'es', native: 'Español' },
-      { code: 'sv', native: 'Svenska' },
-      { code: 'zh', native: '中文' },
-      { code: 'fa', native: 'فارسی' },
-      { code: 'ar', native: 'العربية' },
-      { code: 'tr', native: 'Türkçe' },
-      { code: 'fr', native: 'Français' },
-      { code: 'uk', native: 'Українська' },
-      { code: 'it', native: 'Italiano' },
-      { code: 'hu', native: 'Magyar' },
-      { code: 'ru', native: 'Русский' },
-      { code: 'pt', native: 'Português' },
-    ];
+    const languages = [{code:'en',native:'English'}, {code:'ru',native:'Русский'}];
 
     return (
       <div className="flex flex-col h-full min-h-0">
@@ -473,103 +424,6 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
     );
   };
 
-  const renderSpycraft = () => {
-    return (
-      <div className="flex flex-col h-full min-h-0 py-2 px-2">
-        <h2 className="flex-shrink-0 text-2xl font-black text-slate-800 tracking-tight text-center mb-1">{t('onboarding.discrete.title')}</h2>
-        <p className="flex-shrink-0 text-xs text-slate-400 text-center mb-3 font-medium max-w-xs mx-auto leading-relaxed">{t('onboarding.discrete.desc')}</p>
-        <div className="flex-1 min-h-0 relative mb-3">
-          <div className="absolute inset-0 bg-slate-900 rounded-[2rem] border-4 border-slate-800 shadow-2xl overflow-hidden flex flex-col">
-            <div className="bg-slate-50 flex-1 p-4 flex flex-col relative overflow-hidden">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-slate-800">{t('onboarding.discrete.task_header')}</h3>
-                <div className="text-slate-400 p-2">
-                  <div className="w-5 h-5 border-2 border-slate-300 rounded" />
-                </div>
-              </div>
-              <div className="space-y-3">
-                {[24, 32, 16].map((w, idx) => (
-                  <div key={idx} className="flex items-center gap-3 p-3 bg-white rounded-xl shadow-sm border border-slate-100 opacity-50">
-                    <div className="w-5 h-5 rounded-full border-2 border-slate-200" />
-                    <div className={`h-2 bg-slate-200 rounded-full`} style={{ width: `${w}px` }} />
-                  </div>
-                ))}
-              </div>
-              {!discreteUnlocked && !pressing && (
-                <div className="absolute bottom-[80px] right-[40px] z-40 animate-bounce pointer-events-none">
-                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-[#7598a0]">
-                    <path d="M10 10L30 30M30 30V15M30 30H15" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-              )}
-              <div className="absolute bottom-6 right-6 z-30">
-                <button
-                  onMouseDown={handlePressStart}
-                  onMouseUp={handlePressEnd}
-                  onMouseLeave={handlePressEnd}
-                  onTouchStart={(e) => { e.preventDefault(); handlePressStart(); }}
-                  onTouchEnd={(e) => { e.preventDefault(); handlePressEnd(); }}
-                  onTouchCancel={handlePressEnd}
-                  onContextMenu={(e) => e.preventDefault()}
-                  className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all active:scale-95 relative touch-none select-none ${discreteUnlocked ? 'bg-green-500' : 'bg-[#7598a0]'} ${!discreteUnlocked && !pressing ? 'ring-4 ring-[#7598a0]/30 animate-pulse' : ''}`}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    {discreteUnlocked ? <path d="M20 6L9 17l-5-5" /> : <path d="M12 5v14M5 12h14" />}
-                  </svg>
-                  {pressing && !discreteUnlocked && (
-                    <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 100 100">
-                      <circle cx="50" cy="50" r="46" fill="none" stroke="white" strokeWidth="8" strokeOpacity="0.3" />
-                      <circle
-                        cx="50" cy="50" r="46" fill="none" stroke="white" strokeWidth="8"
-                        strokeDasharray="289.026"
-                        strokeDashoffset={289.026 * (1 - progress / 100)}
-                        style={{ transition: 'stroke-dashoffset 50ms linear' }}
-                      />
-                    </svg>
-                  )}
-                </button>
-              </div>
-              {!discreteUnlocked && !pressing && (
-                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center p-6 text-center animate-fade-in z-20 pointer-events-none">
-                  <div className="bg-white p-4 rounded-xl shadow-lg">
-                    <p className="text-xs font-bold text-slate-800">{t('onboarding.discrete.tutorial_overlay_title')}</p>
-                    <p className="text-xs text-slate-500 mt-1">{t('onboarding.discrete.tutorial_overlay_desc')}</p>
-                    <div className="mt-3 text-[10px] text-[#7598a0] font-black uppercase tracking-wider">{t('onboarding.discrete.tutorial_overlay_hint')}</div>
-                  </div>
-                </div>
-              )}
-              {discreteUnlocked && (
-                <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center animate-fade-in text-center p-4 z-40">
-                  <div className="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mb-2 shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
-                  </div>
-                  <h3 className="text-lg font-black text-slate-800">{t('onboarding.discrete.success_title')}</h3>
-                  <p className="text-xs text-slate-500 mt-1">{t('onboarding.discrete.success_desc')}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="flex-shrink-0 space-y-3">
-          <button
-            onClick={nextStep}
-            disabled={!discreteUnlocked}
-            className={`w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all ${discreteUnlocked
-              ? 'text-white bg-[#7598a0] active:scale-[0.98]'
-              : 'text-slate-300 bg-[#F0F2F5] cursor-not-allowed grayscale opacity-50'}`}
-            style={discreteUnlocked ? { boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)' } : {}}
-          >
-            {discreteUnlocked ? t('common.continue') : t('onboarding.discrete.complete_tutorial')}
-          </button>
-          <div className="flex justify-between px-2">
-            <button onClick={prevStep} className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('common.back')}</button>
-            <button onClick={nextStep} className="text-[10px] font-bold uppercase tracking-widest text-[#7598a0]">{t('onboarding.discrete.skip_tutorial')}</button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   const renderGetStarted = () => (
     <div className="flex flex-col h-full min-h-0 py-2 px-2">
       <h2 className="flex-shrink-0 text-2xl font-black text-slate-800 tracking-tight text-center mb-4">
@@ -662,8 +516,8 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
       >
         {step > 0 && (
           <div className="absolute top-4 left-0 right-0 flex justify-center gap-2 z-20">
-            {[1, 2, 3, 4, 5, 6, 7].map(i => (
-              <div key={i} className={`w-2 h-2 rounded-full transition-all duration-500 ${step + 1 >= i ? 'bg-[#7598a0]' : 'bg-slate-300'}`} />
+            {[0, 1, 2, 3, 4, 6].map(i => (
+              <div key={i} className={`w-2 h-2 rounded-full transition-all duration-500 ${step >= i ? 'bg-[#7598a0]' : 'bg-slate-300'}`} />
             ))}
           </div>
         )}
@@ -673,7 +527,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
           {step === 2 && renderCalibration()}
           {step === 3 && renderGoal()}
           {step === 4 && renderCycleSetup()}
-          {step === 5 && renderSpycraft()}
+
           {step === 6 && renderGetStarted()}
         </div>
       </div>

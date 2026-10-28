@@ -128,7 +128,7 @@ const PinLock: React.FC<PinLockProps> = (props) => {
   const isLockedOut = lockoutRemaining > 0;
 
   return (
-    <div className="fixed inset-0 z-[5000] bg-[#F0F2F5] flex flex-col items-center justify-center p-6 animate-fade-in font-sans">
+    <div className="cyclone-pin-lock fixed inset-0 z-[5000] bg-[#F0F2F5] flex flex-col items-center justify-center p-6 animate-fade-in font-sans">
 
       {/* Header Area */}
       <div className="flex flex-col items-center mb-10">

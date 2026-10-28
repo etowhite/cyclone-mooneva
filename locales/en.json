@@ -138,7 +138,7 @@
         "history": "History"
     },
     "branding": {
-        "title": "Mooneva",
+        "title": "cyclone",
         "subtitle": "Private Period Tracker",
         "tagline": "Total Comfort. Zero Compromise.",
         "visit_website": "visit Mooneva.se",
@@ -662,7 +662,7 @@
         "auto_backup_subtitle": "Encrypted, to a folder you choose. Runs at most once a day.",
         "auto_backup_enable": "Back up automatically",
         "auto_backup_password_warning": "Choose a password and keep it somewhere safe. This is not your PIN. Automatic backups are encrypted with it, and without it your data cannot be recovered. There is no way to reset it.",
-        "auto_backup_sync_tip": "Tip: pick a folder another app keeps in sync (Drive, Dropbox, Nextcloud, iCloud, Syncthing) and your backups survive a lost or broken phone. Mooneva Cycle has no internet access of its own, and the file is encrypted before it is written, so nobody can open it without your password, not even whoever stores it.",
+        "auto_backup_sync_tip": "Tip: pick a folder another app keeps in sync (Drive, Dropbox, Nextcloud, iCloud, Syncthing) and your backups survive a lost or broken phone. cyclone has no internet access of its own, and the file is encrypted before it is written, so nobody can open it without your password, not even whoever stores it.",
         "auto_backup_choose_folder": "Choose folder",
         "auto_backup_destination": "Folder",
         "auto_backup_last_run": "Last backup",
@@ -882,7 +882,7 @@
         "reminder_overdue_body": "It was due {{hours}} h ago. Empty or change it now.",
         "settings_section": "Lab",
         "toggle_label": "Lab",
-        "toggle_desc": "Super experimental, English only for now. Adds a Mooneva Lab tab with a device timer and a blood estimate for cups, discs, pads and tampons.",
+        "toggle_desc": "Experimental tools: a replacement timer and a blood-loss estimate for cups, discs, pads and tampons.",
         "home": {
             "log": "Log",
             "history": "History",

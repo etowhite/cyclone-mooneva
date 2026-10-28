@@ -185,7 +185,7 @@ const CycleSetupStep: React.FC<CycleSetupStepProps> = ({ values, onChange }) => 
                                 }}
                             />
                         </SettingRow>
-                        <div className="pl-[64px] pr-4 pb-3 -mt-2">
+                        <div className="cyclone-setting-note">
                             {values.isOnBirthControl ? (
                                 <p className="text-xs text-amber-600 font-medium">{t('settings.bc_protected_msg')}</p>
                             ) : (

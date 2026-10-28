@@ -1,3 +1,4 @@
+import { DailySuggestions } from '../calendar/DailySuggestions';
 
 import React, { useState } from 'react';
 import { ScreenWrapper } from '../ScreenWrapper';
@@ -253,9 +254,9 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                 )}
 
                 {!isCloaked && (
-                    <div className="-mt-10 relative z-0">
+                    <div className="cyclone-calendar-details relative z-0 mt-4">
                         {editDate ? (
-                            <div className="pt-6">
+                            <div className="">
                                 <DailyLogPanel
                                     date={editDate}
                                     onClose={clearSelection}
@@ -266,7 +267,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                                 />
                             </div>
                         ) : previewDate ? (
-                            <div className="pt-6">
+                            <div className="">
                                 <DayPreview
                                     date={previewDate}
                                     onClose={() => setPreviewDate(null)}
@@ -277,7 +278,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                                 />
                             </div>
                         ) : (
-                            <div className="pt-14">
+                            <div className="">
                                 <TimelineView
                                     cycles={pastCycles}
                                     showFertile={getCycleVisibility(settings).fertile}
@@ -288,6 +289,8 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                         )}
                     </div>
                 )}
+
+                {!isCloaked && <DailySuggestions date={shownDate} status={cycleStatus} general={settings.predictionsPaused || settings.isOnBirthControl || !!getDayMeta(shownDate).isPregnancy} />}
 
                 {isCloaked && (
                     <div className="space-y-3 pb-8">

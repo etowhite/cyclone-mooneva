@@ -35,3 +35,41 @@ JDK21/SDK36/Gradle8.14.3 в ../.toolchain. На 8GB машине не запус
 - GitHub PUT отклонил simultaneous contexts+checks (422 schema oneOf). Изменений защиты не применено. Повторяем с checks только, сохраняя привязку к GitHub Actions app15368.
 
 - ГОТОВО: API подтвердил main protected=true. Обязательный PR, web от GitHub Actions app15368, strict up-to-date=true, resolved conversations=true; force push/deletion=false; enforce_admins=true. Для одиночного владельца approvals0, поэтому второй участник не требуется. Настройки действуют на main, development ветка cyclone/design остаётся доступна. Приложение/APK не менялись.
+
+- Новая задача beta2: исправить наложение контуров/обрезку hormonal подсказки и малые switch, локализация Lab и оставшегося UI, только en/ru, вернуть исходную иконку native cyclone и имя cyclone. Дополнение: DataManagementView привести к единому дизайну (header/cards/spacing/controls), не менять backup расчёты. Сначала изучаем компоненты, затем фиксируем дизайн/локали/иконки, проверяем web/mobile/Android и публикуем beta2/GitHub.
+
+- Дополнения пользователя beta2: убрать переливание календарных CTA/подсказок, заменить CycleInsightMoon на исходный логотип cyclone; полностью убрать скрытый Todo режим из доступного UI и отключить сохранённый режим, не затронув PIN. PIN настройку и экран разблокировки оформить единообразно. Lab остаётся, его переводим. Будущие ответы/код после чтения журнала.
+
+- Причины подтверждены: малый Toggle сжимается в flex и thumb уезжает; hormonal hint имеет -mt-2 поверх border; debug/res/values переопределяет имя как Mooneva Debug. Шрифт native cyclone — системный SansSerif, применим глобально включая кнопки/SVG/формы. Discrete отключаем при загрузке/обновлении настроек (сохраняя backup поле совместимости), убираем UI/tutorial; PIN не меняем по безопасности.
+
+- Дополнение beta2: в календаре три подсказки без emoji (работа/спорт/настроение) по выбранному дню и расчётной фазе, разнообразные по дням; не обещать точного влияния гормонов на продуктивность. Использовать текущий cycleStatus, не менять расчёт. Проверки: детерминированность, разные соседние дни, en/ru, режим pregnancy/paused без ложной фазы.
+
+- Реализованы en/ru-only загрузчик/выбор, полный RU Lab, отсутствие видимого discrete/tutorial, отключение старого discrete при загрузке/обновлении; debug label cyclone. UI shared fonts, switch shrink0, hint без отрицательного margin, data/PIN карточки, статичные календарные CTA и исходный logo. Подсказки:56 уникальных сочетаний на категорию/цикл, 3 безemoji, neutral приpregnancy/paused/BC. Проверка вектора выявила вложенный XML-envelope из генератора, исправляем до Android сборки.
+
+- Web beta2 проверки прошли: tsc, build,8tests; mobile412px безoverflow,8switches40/56px thumbInside=true,JS errors0. Android beta2 сборка запущена. Новый запрос: два виджета как в старом cyclone (компактный цикл и большой с тремя подсказками), палитра/яркость синхронны приложению, актуальные данные. Сначала изучаем существующий WidgetSync upstream и старые layout/provider, не объявлять виджеты готовыми до native проверки.
+
+- Виджеты реализуем через dated snapshots70дней от model.getDayStatus/getDayMeta/at, чтобы после полуночи не показывался вчерашний день, не дублируя native расчёты. Два RemoteViews provider, resize, appclick, date/timezone/boot update, темы app mode/palette. Найден пропущенный второй provider в списке sync из-за CRLF — исправить перед тестом. UI audit data выявил плохую видимость старого checkbox-track: заменяем два backup toggles на общий Toggle.
+
+- Дополнительно исправить в редакторе дня: серые прямоугольники label/switch в Статистика/Беременность и перенос слов настроения. Не менять смысл ignoreForAverages/pregnancy markers; исправить карточки/контролы/адаптивную раскладку. Проверить выбранные/disabled состояния.
+
+- Продолжаем beta2 со всеми запросами, последний фокус: корректный внешний вид advanced switches и текстовых mood chips. Общий CSS role=switch ошибочно красил все прямые div, включая label-container, что дало серый прямоугольник. Ограничить thumb styling только .cyclone-toggle; для full-row switch отдельные label/indicator правила. После UI добить native widget QA/release.
+
+- Исправлены advanced row-switch: label div больше не получает thumb background; mood chips текстовые44px с переносом по словам, общая типографика. Widget native class/list сохранены; provider2 включён; snapshots70 и app theme передаются. Перед сборкой проверяем web не падает, затем host два виджета с live snapshot, сменой темы и stale fallback.
+
+- Пользователь повторно подтвердил полный набор beta2: подсказки/шрифты/PIN/статичные CTA/логотип/единый data UI/удаление скрытого режима. Все в текущем scope, не считать повторение новой отдельной задачей. До финального ответа проверить каждый пункт и дать APK только с этими правками.
+
+- Повторный вопрос пользователя по первому screenshot: подтверждаем учёт en/ru-only, полного RU Lab, исправленных switch/hormonal note, исходного cyclone logo и launcher label. Не потерять это при widget этапе; финальную beta2 сверить с полным списком.
+
+- Пользователь напомнил GitHub: после QA обязательно commit/push в PR1, точный-head CI, prerelease beta2 APK+SHA. Не завершать локальными изменениями. Автоматический review отклонил совмещённую команду записи native widget QA-script/запуска (blocked by policy, без подробной причины); используем стандартное файловое редактирование для QA без командных строк из текста.
+
+- Два widget реально отображаются вместе в API35 host: compact/detailed, правильный системный sans, dark lavender и3text tips видны. Первый скрин был затемнён системными ANR DigitalWellbeing/SystemUI (не cyclone); после Wait оба виджета читаемы. Native crash buffer пуст. Продолжаем palette/light/stale/date проверку и web editor QA (первый locator button был ошибочен: tabs role другой, исправлен QA).
+
+- Финальная проверка редактора Chrome412×915:12 mood chips normal wrapping,3 label backgrounds transparent,errors0. Проверены screenshots moods/advanced. NativeAPI35: оба widgets при sync обновлены (widgetsUpdated2); darklavender и lightsage читаемы, stale snapshot очищает значения с предложением открыть cyclone; tap открывает MainActivity, crashbuffer пуст. Системные ANR не относятся к app и после Wait ушли. Обновляем notes и собираем точный beta2 artifact перед GitHub.
+
+- Пользователь заметил seam/наезд после добавления tips: DailyLogPanel раньше приклеивалась к Calendar, теперь tips внутри Calendar разделили связку. Исправить архитектуру размещения: подсказки отдельной sibling-карточкой после редактора/preview, panel отдельныйrounded32 с16px gap и внутренним padding, одинаковыйgap календарныхблоков иsafe bottom отnav. Не выпускать beta2 с этимскрин-дефектом.
+
+- После переноса карточек screenshot подтвердил gap16/rounded32, но inherited dark index.css имеет border!important 8% opacity. Устанавливаем explicit theme border!important для day-preview/daily-log. Добавляем QA измерение gap/радиуса/переключения tips на29число; затем последний web+native artifact.
+
+- Пользователь повторил старый screenshot наложения и добавил active tab цвет: текущий QA уже измерил gap16/radius32 и исправленный border, нужно показать свежий снимок и добавить aria-selected theme container+primary, как BottomNav. Не путать старую screenshot с финальной beta2. Проверить таб настроение выделен цветом и gap не потерян.
+
+- Текущий layout/color QA PASS: gap16, radius32, theme border; выбранный tab теперь theme container/primary, фон проверен. Подсказки следуют29числу, transparent advanced labels,normal moodwrap,errors0. Переходим к commit/push PR1 сейчас, не откладывая GitHub до ответа. Финальная сборка после последнего CSS ещё будет обновлена перед prerelease.

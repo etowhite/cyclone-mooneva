@@ -4,7 +4,8 @@
     <string name="title_activity_main">cyclone</string>
     <string name="package_name">com.cyclone.mooneva</string>
     <string name="custom_url_scheme">com.cyclone.mooneva</string>
-    <string name="widget_name">Cycle Tracker</string>
+    <string name="widget_name">cyclone · Cycle</string>
     <string name="widget_ring_name">Cycle Ring</string>
     <string name="widget_ring_desc">Circular arc showing your cycle progress</string>
+<string name="widget_tips_name">cyclone · Daily suggestions</string>
 </resources>

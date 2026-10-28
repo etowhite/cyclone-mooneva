@@ -24,11 +24,12 @@ public final class LauncherAppearance {
   context.getSharedPreferences(PREFS,0).edit().putBoolean("discrete",enabled).apply(); apply(context);
  }
  public static synchronized void apply(Context context) {
+  com.mooneva.app.widget.CycleBarWidgetProvider.refreshAll(context);
   boolean dark=(context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)==Configuration.UI_MODE_NIGHT_YES;
   android.content.SharedPreferences prefs=context.getSharedPreferences(PREFS,0);
   String palette=prefs.getString("palette","rose");
   if (!Arrays.asList(PALETTES).contains(palette)) palette="rose";
-  String chosen=prefs.getBoolean("discrete",false)?"LauncherTodo":"Launcher"+palette+(dark?"Dark":"Light");
+  String chosen="Launcher"+palette+(dark?"Dark":"Light");
   List<String> aliases=new ArrayList<>(Arrays.asList("LauncherDefault","LauncherTodo"));
   for(String name:PALETTES) { aliases.add("Launcher"+name+"Light"); aliases.add("Launcher"+name+"Dark"); }
   PackageManager pm=context.getPackageManager();
