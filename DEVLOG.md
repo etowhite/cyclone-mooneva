@@ -21,3 +21,7 @@ JDK21/SDK36/Gradle8.14.3 в ../.toolchain. На 8GB машине не запус
 5. Дальше issues #2 (mobile QA) и #3 (native интеграция/миграция). Перед изменениями читать и обновлять DEVLOG; отчёты о журнале в чат не нужны. Держать CONTINUE_PROMPT готовым до любого лимита. Не коммитить ключи, SDK, dist, node_modules и личные данные.
 
 - Beta Android BUILD SUCCESSFUL 1m15s; aapt подтвердил com.cyclone.mooneva.debug / 3.0.0-beta.1 / code26 / min24, apksigner v2 VALID. Собственный Gradle daemon остановлен перед проверкой запуска на 5574. Удаляем лишнюю пустую строку build.gradle перед commit.
+
+- Commit 0633c1f опубликован в PR #1; оба GitHub web CI SUCCESS. Emulator первый запуск: AVD не найден без ANDROID_AVD_HOME, перезапущен с правильным .toolchain/avd. Установка до окончания загрузки дала системный PackageManagerInternal null, ждём boot_completed перед повтором. Это ещё не результат проверки приложения.
+
+- Beta установлена на собственный API35 emulator5574: install Success, MainActivity запущена, процесс жив, native crash buffer пуст. WebView CDP подтвердил document.readyState=complete и отображаемый onboarding со всеми языками и кнопкой Continue. Первый ранний скрин был до загрузки JS, повторный проверяется. Предыдущий UI аудит Chrome покрывает настройки/календарь/аналитику. CI0633c1f оба SUCCESS.
