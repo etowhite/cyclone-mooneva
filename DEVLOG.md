@@ -6,3 +6,5 @@
 Первый этап готовится к push/PR. Это веб-прототип, не готовый Android APK. Остались длинные подписи upstream, полная навигация/брендинг, Android identity/aliases/plugins, импорт nativecyclone, виджеты/биометрия. CI workflow добавлен, фактический запуск после push ещё не подтверждён. В public upstream отсутствовали tests, поэтому его suite нельзя считать пройденным.
 # 4. Следующие шаги
 Push ветки, создать PR и GitHub-задачи; проверить CI. Дальше последовательно делать мобильный редизайн и Android-адаптацию через отдельные PR. Читать/вести этот журнал до правок/ответов, не отчитываться об обновлении в чат. Поддерживать CONTINUE_PROMPT заранее до любого лимита. Оригинальный ../cyclone не заменять.
+
+- Опубликованcommit2b1a7c0,PRhttps://github.com/etowhite/cyclone-mooneva/pull/1. GitHubActions40692180158SUCCESS(typecheck,6tests,build). Issues#2mobileдизайн/#3Android+миграция. Первыйэтапостаётсявfeaturebranch,невыданкакAndroidrelease. Следующаяработавissue#2,затем#3.
