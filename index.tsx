@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import './cyclone.css';
 import { i18nReady } from './services/i18n';
 import App from './App';
 

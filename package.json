@@ -1,5 +1,5 @@
 {
-  "name": "mooneva-private-period-tracker",
+  "name": "cyclone-mooneva",
   "private": true,
   "version": "3.0.0",
   "type": "module",
@@ -14,7 +14,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "NODE_OPTIONS=--no-experimental-webstorage vitest run",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0"
   },

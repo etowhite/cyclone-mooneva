@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useCycloneAppearance } from '../services/cycloneAppearance';
 import { useTranslation } from 'react-i18next';
 
 interface UseAppThemeOptions {
@@ -7,8 +8,10 @@ interface UseAppThemeOptions {
     darkNeumorphism?: boolean;
 }
 
-export const useAppTheme = ({ view, discreteMode, darkNeumorphism = false }: UseAppThemeOptions) => {
+export const useAppTheme = ({ view, discreteMode }: UseAppThemeOptions) => {
     const { t } = useTranslation();
+    const { appearance, isDark } = useCycloneAppearance();
+    const darkNeumorphism = isDark;
 
     useEffect(() => {
         const favicon = document.getElementById('favicon') as HTMLLinkElement;
@@ -18,6 +21,8 @@ export const useAppTheme = ({ view, discreteMode, darkNeumorphism = false }: Use
         // Reset all classes first
         body.className = 'transition-colors duration-500 ease-in-out';
         body.removeAttribute('data-theme');
+        if (discreteMode) { delete body.dataset.cyclone; delete body.dataset.cyclonePalette; }
+        else { body.dataset.cyclone = 'true'; body.dataset.cyclonePalette = appearance.palette; }
 
         if (discreteMode) {
             body.classList.add('bg-gray-100', 'text-gray-900', 'antialiased');
@@ -42,18 +47,11 @@ export const useAppTheme = ({ view, discreteMode, darkNeumorphism = false }: Use
             }
             body.classList.add('antialiased');
 
-            // Title switching
-            const titles: Record<string, string> = {
-                calendar: 'Mooneva',
-                timeline: 'Timeline',
-                trends: 'Cycle Trends',
-                settings: 'Settings'
-            };
-            document.title = titles[view] || 'Mooneva';
+            document.title = 'cyclone';
 
-            const iconUrl = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌙</text></svg>';
+            const iconUrl = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="18" fill="#eee0f5"/><path d="M44 19a18 18 0 1 0 4 24M43 27a10 10 0 1 0 0 14" fill="none" stroke="#76578c" stroke-width="6" stroke-linecap="round"/></svg>');
             if (favicon) favicon.href = iconUrl;
             if (appleIcon) appleIcon.href = iconUrl;
         }
-    }, [view, discreteMode, darkNeumorphism, t]);
+    }, [view, discreteMode, darkNeumorphism, t, appearance.palette]);
 };

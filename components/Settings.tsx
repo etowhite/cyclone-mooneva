@@ -1,3 +1,4 @@
+import CycloneAppearance from './settings/CycloneAppearance';
 import { Share } from '@capacitor/share';
 import { version } from '../package.json';
 import Logger from '../services/logger';
@@ -685,19 +686,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
             </div>
           </button>
 
-          {/* 3. Appearance */}
-          <section>
-            <SettingCard title="Privacy & Security">
-              <SettingRow
-                label={t('settings.dark_neumorphism')}
-                desc={t('settings.dark_neumorphism_desc')}
-                icon={<Icons.Moon />}
-                last
-              >
-                <Toggle label={t('settings.dark_neumorphism')} active={!!settings.darkNeumorphism} onClick={() => onUpdate({ ...settings, darkNeumorphism: !settings.darkNeumorphism })} />
-              </SettingRow>
-            </SettingCard>
-          </section>
+          <CycloneAppearance />
 
           {/* 3.5 Privacy — Discrete Mode */}
           <section>
