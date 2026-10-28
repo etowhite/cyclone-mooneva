@@ -470,7 +470,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                     i18n.changeLanguage(lang);
                     document.dir = i18n.dir(lang);
                   }}
-                  className="bg-slate-100 border-none text-text-secondary text-sm font-medium rounded-lg px-3 py-2 pr-8 focus:ring-2 focus:ring-accent/20 outline-none"
+                  className="cyclone-select"
                 >
                   {[
                     { code: 'en', label: 'English' },
@@ -506,7 +506,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                       ...settings,
                       firstDayOfWeek: e.target.value as FirstDayOfWeek
                     })}
-                    className="bg-slate-100 border-none text-text-secondary text-sm font-medium rounded-lg px-3 py-2 pr-8 focus:ring-2 focus:ring-accent/20 outline-none"
+                    className="cyclone-select"
                   >
                     {FIRST_DAY_OPTIONS.map(day => (
                       <option key={day} value={day}>{t(`settings.week_start_${day}`)}</option>

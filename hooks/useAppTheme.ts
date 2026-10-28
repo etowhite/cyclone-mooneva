@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+import AppIcon from '../services/appIcon';
 import { useEffect } from 'react';
 import { useCycloneAppearance } from '../services/cycloneAppearance';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +14,13 @@ export const useAppTheme = ({ view, discreteMode }: UseAppThemeOptions) => {
     const { t } = useTranslation();
     const { appearance, isDark } = useCycloneAppearance();
     const darkNeumorphism = isDark;
+
+
+    useEffect(() => {
+        if (Capacitor.getPlatform()==='android') {
+            void AppIcon.setAppearance({palette:appearance.palette}).catch(error => console.warn('Launcher appearance update failed',error));
+        }
+    }, [appearance.palette]);
 
     useEffect(() => {
         const favicon = document.getElementById('favicon') as HTMLLinkElement;

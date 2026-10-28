@@ -75,3 +75,20 @@ body[data-cyclone] .mooneva-bottom-nav { background:var(--surface)!important; co
 body[data-cyclone] .mooneva-bottom-nav button { color:var(--text-secondary)!important; }
 body[data-cyclone] .mooneva-bottom-nav button[aria-current="page"] { color:var(--cyclone-primary)!important; }
 body[data-cyclone] .cyclone-onboarding-wordmark { display:block; text-align:center; font-size:36px; font-weight:600; color:var(--cyclone-primary); letter-spacing:-1px; }
+
+/* Consistent select shape and disclosure icon; keep the platform option picker. */
+body[data-cyclone] select.cyclone-select {
+ appearance:none; -webkit-appearance:none;
+ min-height:44px; max-width:100%; min-width:140px;
+ border:1px solid var(--border-soft); border-radius:18px;
+ padding:10px 38px 10px 14px; line-height:20px; font-size:14px;
+ background-color:var(--surface-alt); color:var(--text-primary);
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23697662' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+ background-repeat:no-repeat; background-position:right 12px center; background-size:18px;
+}
+body[data-cyclone][data-theme] select.cyclone-select {
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23c8bacf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+}
+html[dir="rtl"] body[data-cyclone] select.cyclone-select {
+ padding-left:38px; padding-right:14px; background-position:left 12px center;
+}
