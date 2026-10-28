@@ -123,3 +123,15 @@ Own emulator5574 OFF,QA host удалён,forward9223 снят;5554не трон
 - Финальный painreference QA PASS: сохранение6, mean90=4.5/30=7, интерактивнаяследующаяточка,errors0; painбезouterрамки и headingline. Готовим единыйbeta3release сpain иудалениемLab. Последняяstyleправка:normalcase внутриgoalchoice,чтобыchilduppercaseнеобходилобщийстиль. Далееcommit/pushCI и точныйAndroidartifact.
 
 - Проверен финальный screenshot pain: inlineheadingline,track11dots,filledleft,verticalthumb/gap,безouterborder. Последние15tests+UImean/range/pointsPASS. Releaseweb14sSUCCESS,Androidсборкаидёт. Фиксируем весьbeta3source (Lab removal+pain+UI) иpushPR1дляCI.
+
+- Code15abbf4 pushPR1,оба exact-headCI SUCCESS. Androidbeta3 BUILD SUCCESSFUL1m11s,apksignerV2VALID,aapt:cyclone/com.cyclone.mooneva.debug/3.0.0-beta.3/code28/min24. APK5587939bytes,SHA256fa8e7297303718ef0f61790640f69d1a2cb1bb8219941567b7ed53010eba171b. Публикуемprereleaseсexactsource15abbf4; docsPR1обновленыподpain/Labremoval. Не заявлятьполнуюнативнуюрегрессию:вэтойbetaпровереныwebUI+nativebuild,widgetAPI35изbeta2.
+
+- Beta3 опубликована и assets/digest подтверждены: https://github.com/etowhite/cyclone-mooneva/releases/tag/v3.0.0-beta.3 source15abbf4. Новый запрос: взять исходнуюpainшкалу из native ../cyclone и заменить самодельную. Изучить оригинальныйcomposable/размеры/цвета/поведение и точно перенести вReact/WebView,сохраняяnullablevalue/autosave/analytics. Это новая правка послеbeta3,не утверждатьчтоужеопубликована.
+
+- Оригинал найден SymptomScreen.kt: штатный Compose Material3Slider1.3.0,0..10,steps9,roundToInt; old typography. Проверены токены установленного исходногоM3artifact: track16,thumb4×44,pressed/focuswidth2,gap6,innercorner2,stop4. Создаём отдельный Reactпорт этих параметров вместоCSSимитации/nativeinputoverlay; точнаяpixelgeometry/pointer/keyboard,0tapреальносохраняется. Безотдельнойрамки какпопросилипредыдущимсообщением. Palette secondaryContainer берём изoriginalCyclonePalettes.kt,синхронизацияthemeсохраняется.
+
+- OriginalPainSlider Reactport добавлен: SVGреальные16pxtrack/4×44thumb(2pxfocus/press),6pxgap,2pxinnercorners,4pxticks; nativepalette5×2 взятаизCyclonePalettes.kt. Заменёнinputoverlay,лишниекнопкиНетболи/Очиститьубраныкаквoriginal;0можноtapвначало,nullableuntouchedсохраняется. Проверитьpointer0/10/keyboard+analytics,удалитьнеиспользуемыйCSSстаройшкалы,minorbeta4послеbeta3.
+
+- Originalsliderport tsc+15testsPASS;UI сохраняет6,analyticsmeans90=4.5/30=7,pointselectionPASS. Дополнительно проверяемtap0/drag10/keyboard6 чтобызамена nativeinputнаroleslider непотеряланулевыеоценки. Затем beta4sourceCI/APK. Beta3 уже опубликована; journal/continuation обновитьпослеэтойдельты.
+
+- Originalslider QA PASS: pointer0 реальносохранён,drag10сохранён,keyboard6сохранён,mean90=4.5/30=7 иchartselectionне изменились,JSerrors0. Финальнаяbeta4сборка/публикацияразрешенаврамкахтекущегообновления. Остальнаяbeta3функциональностьсохраняется.

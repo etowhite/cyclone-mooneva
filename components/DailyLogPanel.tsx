@@ -1,3 +1,4 @@
+import {OriginalPainSlider} from './calendar/OriginalPainSlider';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -754,12 +755,8 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                 <div className="cyclone-pain-scale">
                                     <div className="flex items-center justify-between gap-3"><div className="cyclone-pain-heading"><h3>{t('log.pain_title')}</h3><span aria-hidden="true" /></div><strong>{pain===null?t('log.pain_unrated'):pain+' / 10'}</strong></div>
                                     <p>{pain===null?t('log.pain_unrated'):pain===0?t('log.pain_none'):pain<=3?t('log.pain_mild'):pain<=6?t('log.pain_moderate'):t('log.pain_severe')}</p>
-                                    <div className="cyclone-pain-slider" style={{'--pain-position':((pain??0)*10)+'%'} as React.CSSProperties}>
-                                        <div className="cyclone-pain-rail" aria-hidden="true"><div className="cyclone-pain-fill" style={{width:((pain??0)*10)+'%'}} />{Array.from({length:11},(_,n)=><span key={n} className={n<=(pain??0)?'pain-tick-filled':''} style={{left:(n*10)+'%'}} />)}<i className="cyclone-pain-thumb" /></div>
-                                        <input type="range" min="0" max="10" step="1" value={pain??0} aria-label={t('log.pain_title')} aria-valuetext={pain===null?t('log.pain_unrated'):pain+' / 10'} onChange={e=>setPain(Number(e.target.value))}/>
-                                    </div>
+                                    <OriginalPainSlider value={pain} onChange={setPain} />
                                     <div className="flex justify-between"><span>0</span><span>10</span></div>
-                                    <div className="flex gap-2 mt-3"><button type="button" onClick={()=>setPain(0)}>{t('log.pain_none')}</button>{pain!==null&&<button type="button" onClick={()=>setPain(null)}>{t('log.pain_clear')}</button>}</div>
                                 </div>
 
                                 {!settings.kidMode && (

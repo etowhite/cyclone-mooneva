@@ -1,0 +1,7 @@
+/* Same 48dp interaction height and 16dp track as native cyclone's Material3 Slider. */
+body[data-cyclone] .cyclone-original-pain-slider { width:100%; height:48px; min-height:48px; position:relative; touch-action:pan-y; cursor:pointer; outline:none!important; user-select:none; -webkit-tap-highlight-color:transparent; }
+body[data-cyclone] .cyclone-original-pain-slider svg { display:block; pointer-events:none; overflow:visible; }
+body[data-cyclone] .cyclone-pain-scale>p { font-size:12px; line-height:15px; }
+body[data-cyclone] .cyclone-pain-scale>div:has(>span:first-child) { font-size:10px; line-height:12px; color:var(--text-secondary); }
+
+body[data-cyclone] .cyclone-pain-scale strong { font-size:14px; line-height:16px; }
