@@ -1,24 +1,24 @@
 # 1. Текущая цель
-Beta 2 отдельного форка cyclone опубликована. Следующая цель — дальнейшая регрессия и доработка по отзывам, интеграция миграции данных и биометрии.
+Текущие запросы завершены: опубликована beta4 отдельного форка cyclone. Продолжать развитие по новым отзывам и оставшимся задачам миграции/регрессии.
 
 # 2. Выполненные шаги
-- Отдельный fork: https://github.com/etowhite/cyclone-mooneva, cyclone/design, PR #1. GPL-3.0-or-later и авторство сохранены. Старый ../cyclone отдельно.
-- Пять палитр, auto/light/dark, контуры карточек, отдельное оформление с языком и началом недели, навигация с подписями. Исправлены белые полосы, тени и селекты.
-- Десять Android иконок: палитра приложения и светлый/тёмный режим устройства. API35 аудит подтвердил одну иконку, смену в фоне и Todo override. Опубликовано в 40df682.
-- Следующий UI этап: заголовки cyclone/Аналитика, карточка о форке вместо ваучера, собственные issues, RU/EN release notes, контуры и выбранный диапазон аналитики.
-- Исправлена нечитаемость при переходе: opacity остаётся 1 на 0/100/750 ms; текст rgb(240,230,244) на фоне rgb(23,18,25). JS ошибок нет. Mobile Chrome 412×915: синтетическая история 28/30/32 дала среднее 30, месячные 5, три цикла и heatmap.
-- tsc, web production build и 6 контрактных тестов расчётов прошли. Services/logic не изменялись; это не полная проверка всей медицинской логики.
+- Отдельный GitHub fork etowhite/cyclone-mooneva, ветка cyclone/design, PR #1. GPL-3.0-or-later и атрибуция Mooneva сохранены; старый ../cyclone не менялся.
+- Пять палитр, темы, иконки по палитре/системной яркости, en/ru, единые кнопки/шрифты/карточки, PIN/data UI, детские пояснения и обновлённый первый запуск.
+- Лаборатория полностью убрана из приложения. Основные записи старых бэкапов читаются, локальный PIN не перезаписывается.
+- Три ежедневные подсказки и два виджета, отсутствие подсказок без дня цикла. Виджеты используют общий Mooneva-модельный snapshot, не дублируют расчёт нативно.
+- Оценка боли 0–10 с сохранением нуля, интерактивный график, точные выбранные периоды и средние только по отмеченным дням.
+- Beta4 заменяет прежний slider отдельным React-переносом параметров оригинального Material3 Slider1.3.0 из native SymptomScreen.kt: 16px track,4×44thumb(2press/focus),6gap,4ticks,0..10/steps9, цвета исходных палитр. Inline-секция без отдельной рамки сохранена.
+- Проверены TypeScript,15тестов, мобильные UI360/412, tap0/drag10/keyboard6, сохранение и аналитика90mean4.5/30mean7,JSerrors0. Web/Android builds и exact-head CI успешны.
 
 # 3. Текущий статус и проблемы
-Готово: https://github.com/etowhite/cyclone-mooneva/releases/tag/v3.0.0-beta.2 . APK3.0.0-beta.2/code27,debug package com.cyclone.mooneva.debug,имя cyclone; source4b8bda8. Web/Android build,8tests и оба CI этого head успешны. SHA2561aa0154d3b0f5ebe73cd1bef3b9c588fb944461b292198c739fb4a84e4c3745f совпадает с GitHub asset digest.
-Реализованы все текущие UI запросы: en/ru,перевод Lab,единый sans,исходный logo,убран discrete,карточки/PIN/data,перенос mood,цвет active tab,статичные CTA,подсказки и два виджета. gap16/radius32 проверены численно. APK обновляет beta1. Полный медицинский/функциональный regression ещё не завершён; nativecycloneJSONmigration и биометрия не готовы.
-Own emulator5574 OFF,QA host удалён,forward9223 снят;5554не тронут. JDK21/SDK36/Gradle8.14.3 в ../.toolchain;не запускать Gradle и эмулятор одновременно на8GBhost.
+Опубликована https://github.com/etowhite/cyclone-mooneva/releases/tag/v3.0.0-beta.4 . Source74358b34f08e065e9c3cb0080729e4af648fe47f,обаCI SUCCESS. APK3.0.0-beta.4/code29,com.cyclone.mooneva.debug,labelcyclone,V2подпись,5588567bytes. SHA2562c1680322184314012574c4951fcd519c60470a66363d6b4e258fcccf6541feb совпадает с GitHub asset digest. Обновляет предыдущие beta этого форка.
+Own emulator5574 OFF,5554не трогали,QAhostудалён,9223forwardснят. Последние beta3/4 UI проверялись в Chrome mobile; не заявлять полной Android/медицинской регрессии. Native cyclone JSON migration/биометрия/production signing ещё не готовы.
 
 # 4. Следующие шаги
-1. Продолжать issues #2 mobile QA и #3 миграция/биометрия. Не утверждать,что все функции старого native cyclone перенесены.
-2. Активно вести GitHub через tested commits/PR. Main protected:PR,webCI strict,admins enforced,no force/delete; approvals0.
-3. Читать/обновлять DEVLOG перед изменениями; без отчётов о журнале в чате. Держать CONTINUE_PROMPT актуальным до любого лимита.
-4. Не коммитить SDK/keys/личные данные/QA outputs. Старый ../cyclone остаётся отдельным.
+1. Новые отзывы и issues #2 mobile QA/#3 native integration. Не восстанавливать удалённую Lab.
+2. Активно вести GitHub через PR/CI. Main protected: PR,webCI strict,admins enforced,no force/delete,approvals0.
+3. Читать и обновлять DEVLOG перед изменениями/ответами; отчёты о журнале в чат не нужны. CONTINUE_PROMPT держать готовым до любого лимита.
+4. Не коммитить ключи,SDK,dist,node_modules,личные данные/QA outputs. JDK21/SDK36/Gradle8.14.3 в ../.toolchain; на8GBhost не совмещать Gradle и эмулятор.
 
 ## История проверок
 
@@ -135,3 +135,7 @@ Own emulator5574 OFF,QA host удалён,forward9223 снят;5554не трон
 - Originalsliderport tsc+15testsPASS;UI сохраняет6,analyticsmeans90=4.5/30=7,pointselectionPASS. Дополнительно проверяемtap0/drag10/keyboard6 чтобызамена nativeinputнаroleslider непотеряланулевыеоценки. Затем beta4sourceCI/APK. Beta3 уже опубликована; journal/continuation обновитьпослеэтойдельты.
 
 - Originalslider QA PASS: pointer0 реальносохранён,drag10сохранён,keyboard6сохранён,mean90=4.5/30=7 иchartselectionне изменились,JSerrors0. Финальнаяbeta4сборка/публикацияразрешенаврамкахтекущегообновления. Остальнаяbeta3функциональностьсохраняется.
+
+- Beta4source74358b34f08e065e9c3cb0080729e4af648fe47f опубликован,обаGitHubCI SUCCESS. Buildweb16s/Android1m1sSUCCESS,aaptlabelcyclone/version3.0.0-beta.4/code29,V2signatureVALID. APK5588567bytes,SHA2562c1680322184314012574c4951fcd519c60470a66363d6b4e258fcccf6541feb. MobiletouchauditPASS0/drag10/keyboard6,analyticsunchanged,errors0. Публикуемprerelease exactsource74358b3.
+
+- Beta4 release API confirmed prerelease=true,APK+SHA256SUMS uploaded,digest matches. Current request complete.
