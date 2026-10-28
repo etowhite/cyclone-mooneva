@@ -217,7 +217,7 @@ const CycleSetupStep: React.FC<CycleSetupStepProps> = ({ values, onChange }) => 
                     </div>
                 </div>
                 {hasMoreBelow && (
-                    <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[#F0F2F5] to-transparent flex items-end justify-center pb-1">
+                    <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 cyclone-scroll-fade flex items-end justify-center pb-1">
                         <svg className="w-4 h-4 text-[#7598a0] animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
                             <path d="m6 9 6 6 6-6" />
                         </svg>

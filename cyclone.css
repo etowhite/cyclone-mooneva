@@ -44,3 +44,17 @@ body[data-cyclone] :is(button[class*="bg-[#7598a0]"],button[role="switch"][aria-
 body[data-cyclone] button[role="switch"] { border:1px solid var(--border-soft); box-shadow:none!important; }
 body[data-cyclone] [class*="text-[#7598a0]"] { color:var(--cyclone-primary)!important; }
 body[data-cyclone] :is([class*="border-slate"],[class*="border-gray"]) { border-color:var(--border-soft)!important; }
+
+/* Upstream fades used a fixed near-white colour, creating bright bands in dark mode. */
+body[data-cyclone] { color-scheme:light; --shadow-raised:none; --shadow-raised-sm:none; --shadow-raised-xs:none; --shadow-inset:none; --shadow-inset-xs:none; }
+body[data-cyclone][data-theme] { color-scheme:dark; }
+body[data-cyclone] .cyclone-scroll-fade { background:linear-gradient(to top,var(--surface),transparent); }
+body[data-cyclone][data-theme] [style*="box-shadow"],
+body[data-cyclone][data-theme] [style*="inset"],
+body[data-cyclone][data-theme] :is(.shadow-sm,.shadow-md,.shadow-lg,.shadow-xl,.shadow-2xl) { box-shadow:none!important; }
+body[data-cyclone] :is(input,textarea,select) { background-color:var(--surface-alt); color:var(--text-primary); border-color:var(--border-soft); }
+body[data-cyclone] button[role="switch"][aria-checked="false"] { background:var(--surface-alt)!important; }
+body[data-cyclone] button[role="switch"] > div { background:var(--text-secondary)!important; box-shadow:none!important; }
+body[data-cyclone] button[role="switch"][aria-checked="true"] > div { background:var(--cyclone-on-primary)!important; }
+body[data-cyclone][data-theme] :is([class~="bg-white/50"],[class~="bg-white/70"],[class~="bg-slate-100"],[class~="bg-slate-200"],[class*="bg-[#E8EAED]"],[class*="bg-[#E0E5EC]"]) { background-color:var(--surface-alt)!important; }
+body[data-cyclone] .setting-row-merge-next + * { background-color:var(--surface)!important; }
