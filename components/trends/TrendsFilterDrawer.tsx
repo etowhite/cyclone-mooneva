@@ -111,7 +111,7 @@ const TrendsFilterDrawer: React.FC<TrendsFilterDrawerProps> = ({
                                     color: mood.dark
                                 }}
                             >
-                                <span className="text-2xl drop-shadow-sm filter">{mood.emoji}</span>
+
                             </button>
                         ))}
                     </div>

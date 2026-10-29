@@ -38,6 +38,7 @@ export interface DailyLog {
   symptoms: string[];
   notes: string;
   mood?: string[]; // MOOD_OPTIONS ids; legacy single-string logs are migrated on load
+  pain?: number | null; // Optional daily rating 0..10; absent is not zero
   discharge?: DischargeType;
   sexDrive?: SexDriveType;
   sexType?: SexType;
@@ -103,7 +104,7 @@ export type ContraceptionReminder =
     };
 
 export interface AppSettings {
-  labEnabled?: boolean; // Shows the Lab tab; off by default
+  labEnabled?: boolean; // Legacy import compatibility; feature has been removed
   // Security Feature: Disguises app as Task Manager
   discreteMode: boolean;
   // Neutral reminder texts and the private channel, without hiding the app. Absent = off.
@@ -211,7 +212,7 @@ export interface BackupData {
   settings: AppSettings;
   timestamp: string;
   periods?: PeriodRecord[];
-  lab?: unknown; // Lab data, present only when the Lab key exists on disk
+  lab?: unknown; // Ignored legacy extension in older backup files
 }
 
 export interface DayMeta {

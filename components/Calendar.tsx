@@ -546,6 +546,7 @@ const Calendar: React.FC<CalendarProps> = ({
         </div>
       </div>
 
+
       {/* Guide popup (legend content in modal) */}
       {showLegend && (
         <>

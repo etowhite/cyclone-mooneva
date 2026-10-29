@@ -1,3 +1,6 @@
+import { useCycloneAppearance } from '../services/cycloneAppearance';
+import { dailySuggestions, hasCycleForSuggestions } from '../services/dailySuggestions';
+import i18n from '../services/i18n';
 
 import React, { createContext, useContext, useCallback, useMemo, ReactNode } from 'react';
 import { App } from '@capacitor/app';
@@ -7,7 +10,7 @@ import type { MoonevaModel } from '../hooks/useMoonevaModel';
 import { DailyLog, AppSettings, PeriodRecord } from '../types';
 import Logger from '../services/logger';
 import { getCycleVisibility } from '../services/logic/settingsInterlocks';
-import { toLocalISOString, diffInDays } from '../utils/dateUtils';
+import { toLocalISOString, diffInDays, addDays } from '../utils/dateUtils';
 import { PICKER_SESSION_KEY, PICKER_GRACE_PERIOD_MS } from '../utils/pickerSession';
 
 // Define the shape of our global context
@@ -80,27 +83,8 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
         };
     }, [loading, settings, model.cycleModel]);
 
-    // Sync the Lab reminder (seam S6). Runs only while Lab is on, so Lab-off users never load
-    // Lab code. Discrete mode stays in the deps: turning it on makes the sync cancel the reminder.
-    const { labEnabled, discreteMode, discreetNotifications } = settings;
-    React.useEffect(() => {
-        if (loading || labEnabled !== true) return;
-
-        let cancelled = false;
-
-        import('../services/lab')
-            .then(({ syncLabReminderFromStore }) => {
-                if (cancelled) return;
-                return syncLabReminderFromStore(periods, logs, { labEnabled, discreteMode, discreetNotifications });
-            })
-            .catch(() => {
-                if (!cancelled) Logger.warn('Failed to sync Lab reminder');
-            });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [loading, labEnabled, discreteMode, discreetNotifications, periods, logs]);
+    // Remove reminders left by the discontinued experimental feature.
+    React.useEffect(() => { if (!loading) import('@capacitor/local-notifications').then(({LocalNotifications}) => LocalNotifications.cancel({notifications:[140,141,142,143].map(id=>({id}))})).catch(()=>{}); },[loading]);
 
     // Sync App Icon (Discrete Mode)
     React.useEffect(() => {
@@ -110,54 +94,28 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
         });
     }, [settings.discreteMode]);
 
-    // Sync Android Widget Data
+    // Dated snapshots use the same model and suggestions as the calendar.
+    const { appearance } = useCycloneAppearance();
     React.useEffect(() => {
-        // Before the data has loaded (or after a failed load) every value would be "--".
         if (loading || loadError) return;
-        import('../services/widgetSync').then(({ WidgetSync }) => {
-            const today = toLocalISOString(new Date());
-            const todayMeta = model.getDayMeta(today);
-            const vis = getCycleVisibility(settings);
-
-            // -1 = no cycle day today (stale, paused, no data): the widget shows "Day --".
-            const cycleDay = todayMeta.dayOfCycle ?? -1;
-            // The length the forecast really uses (adaptive and clamps applied), not the setting.
-            const cycleLength = model.cycleModel.rules.cycleLength;
-
-            // Days until the forecast period. 0 = due today or overdue, -1 = no forecast
-            // (stale, paused, no data): the widget shows "P: --" (CycleBarWidgetProvider).
-            const { nextPeriod, ovulationNext } = model.cycleModel;
-            const daysUntilPeriod = nextPeriod ? Math.max(0, diffInDays(nextPeriod.start, today)) : -1;
-
-            // Determine current phase
-            let currentPhase: 'period' | 'fertile' | 'ovulation' | 'luteal' | 'follicular' | 'pms' = 'follicular';
-            if (todayMeta.isPeriod) {
-                currentPhase = 'period';
-            } else if (todayMeta.isOvulation) {
-                currentPhase = 'ovulation';
-            } else if (todayMeta.isFertile) {
-                currentPhase = 'fertile';
-            } else if (todayMeta.isPMS) {
-                currentPhase = 'pms';
-            }
-
-            WidgetSync.updateWidgetData({
-                cycleDay,
-                cycleLength,
-                daysUntilPeriod,
-                currentPhase,
-                // -1 = hidden or unknown: the widget shows "O: --" (CycleBarWidgetProvider).
-                daysUntilOvulation: vis.ovulation && ovulationNext ? diffInDays(ovulationNext, today) : -1,
-                discreteMode: settings.discreteMode ?? false
-            }).catch(err => Logger.warn('Failed to sync widget data:', err));
-        }).catch(() => {
-            // Plugin not available (e.g., web platform) - silently ignore
+        const today = toLocalISOString(new Date());
+        const ru = i18n.language.startsWith('ru');
+        const clean = (text: string) => text.replace(/\p{Extended_Pictographic}/gu, '').trim();
+        const snapshots = Array.from({length:70}, (_,offset) => {
+            const date=addDays(today,offset), status=model.getDayStatus(date), meta=model.getDayMeta(date);
+            const day=model.cycleModel.at(date);
+            const suggestions=hasCycleForSuggestions(status) ? dailySuggestions(date,status,i18n.language,settings.predictionsPaused || settings.isOnBirthControl || !!meta.isPregnancy) : [];
+            const until=day.nextStart ? diffInDays(day.nextStart,date) : -1;
+            return {date, title:clean(status.dayOfCycle ? (ru?'День ':'Day ')+status.dayOfCycle : status.title),
+                phase:clean(status.subtitle), forecast: clean(meta.isPregnancy ? status.title : meta.isBleeding ? (ru?'Месячные идут':'Period ongoing') : until>0 ? (ru?'Следующие месячные: через ':'Next period: ')+until+(ru?' дн.':' d') : status.title),
+                work:suggestions[0]?.text??'',sport:suggestions[1]?.text??'',mood:suggestions[2]?.text??''};
         });
-        // ponytail: depends on the cycle model/settings, not getDayMeta's identity (which
-        // changes on every log edit, including notes unrelated to the widget's phase
-        // display) - getDayMeta is still called fresh above, so this only narrows how
-        // often the sync runs, not what it computes when it does.
-    }, [loading, loadError, settings, model.cycleModel]);
+        import('../services/widgetSync').then(({WidgetSync})=>WidgetSync.updateWidgetData({
+            cycleDay:model.getDayMeta(today).dayOfCycle??-1,cycleLength:model.cycleModel.rules.cycleLength,
+            daysUntilPeriod:-1,daysUntilOvulation:-1,currentPhase:'follicular',discreteMode:false,
+            snapshots:JSON.stringify(snapshots),palette:appearance.palette,mode:appearance.mode,language:ru?'ru':'en'
+        })).catch(err=>Logger.warn('Widget sync unavailable:',err));
+    }, [loading,loadError,settings,model,appearance.palette,appearance.mode]);
 
     // Automatic Encrypted Backup to the user's chosen folder
     // Backgrounding is the trigger because it is the last reliable moment before
@@ -193,13 +151,12 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
             const pickerTime = Number(sessionStorage.getItem(PICKER_SESSION_KEY) || 0);
             if (pickerTime && Date.now() - pickerTime < PICKER_GRACE_PERIOD_MS) return;
 
-            Promise.all([import('../services/autoBackup'), import('../services/lab')])
-                .then(async ([{ runAutoBackup }, { loadLabForBackup }]) => runAutoBackup(live, {
+            Promise.all([import('../services/autoBackup')])
+                .then(async ([{ runAutoBackup }]) => runAutoBackup(live, {
                     data: liveLogs,
                     periods: livePeriods,
                     settings: live,
                     timestamp: new Date().toISOString(),
-                    lab: await loadLabForBackup(),
                 }))
                 .then(({ status, ...bookkeeping }) => {
                     // A skipped run changed nothing, so writing settings back would
@@ -223,17 +180,15 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
      */
     const runBackupNow = useCallback(async (): Promise<'written' | 'skipped' | 'failed'> => {
         const { settings: live, logs: liveLogs, periods: livePeriods, loaded } = backupState.current;
-        const [{ runAutoBackup }, { loadData, loadPeriods }, { loadLabForBackup }] = await Promise.all([
+        const [{ runAutoBackup }, { loadData, loadPeriods }] = await Promise.all([
             import('../services/autoBackup'),
             import('../services/logic/storage'),
-            import('../services/lab'),
         ]);
         const { status, ...bookkeeping } = await runAutoBackup(live, {
             data: loaded ? liveLogs : await loadData(),
             periods: loaded ? livePeriods : await loadPeriods(),
             settings: live,
             timestamp: new Date().toISOString(),
-            lab: await loadLabForBackup(),
         }, Date.now(), true);
 
         if (status !== 'skipped') {

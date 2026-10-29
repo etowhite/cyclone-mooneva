@@ -167,7 +167,7 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles, cycleModel }) =
 
     if (cycles.length === 0) {
         return (
-            <div className="bg-[#F0F2F5] rounded-[40px] p-8" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
+            <div className="cyclone-mood-phase-card bg-[#F0F2F5] rounded-[40px] p-8" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
                 <h3 className="text-sm font-extrabold tracking-[0.15em] text-slate-800 uppercase">{t('trends.mood_by_phase')}</h3>
                 <p className="text-slate-400 text-sm text-center py-8">{t('trends.need_data_mood')}</p>
             </div>
@@ -175,7 +175,7 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles, cycleModel }) =
     }
 
     return (
-        <div className="bg-[#F0F2F5] rounded-[32px] p-6" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
+        <div className="cyclone-mood-phase-card bg-[#F0F2F5] rounded-[32px] p-6" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
             {/* Header - stacked for better mobile alignment */}
             <div className="flex flex-col gap-1 mb-6">
                 <h2 className="text-sm font-extrabold tracking-[0.15em] text-slate-800 uppercase">

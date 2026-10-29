@@ -138,7 +138,7 @@ export const usePersistence = (): UsePersistenceResult => {
                     }
                 }
 
-                setSettings(loadedSettings);
+                setSettings({ ...loadedSettings, discreteMode: false, labEnabled: false });
             } catch (error) {
                 Logger.error("Failed to load settings", error);
                 settingsLoadFailed = true;
@@ -344,6 +344,7 @@ export const usePersistence = (): UsePersistenceResult => {
     }, [logs, settings.periodLength, settings.isOnBirthControl]);
 
     const updateSettingsWrapper = useCallback((newSettings: AppSettings) => {
+        newSettings = { ...newSettings, discreteMode: false, labEnabled: false };
         setSettings(newSettings);
         persistSettings(newSettings).catch(err => Logger.error('Failed to persist settings:', err));
     }, [persistSettings]);

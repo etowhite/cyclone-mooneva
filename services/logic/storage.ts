@@ -13,6 +13,7 @@ import type {
     PeriodRecord,
 } from '../../types';
 import Logger from '../logger';
+import {isPainScore} from '../painStats';
 
 import { Capacitor } from '@capacitor/core';
 import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
@@ -618,6 +619,7 @@ export const __resetDeviceMasterKeyCacheForTests = (): void => {
  */
 export const sanitizeSettingsForBackup = (settings: AppSettings): AppSettings => {
     const safeSettings = { ...settings };
+    delete safeSettings.labEnabled;
     for (const key of DEVICE_LOCAL_SETTING_KEYS) {
         delete safeSettings[key];
     }
@@ -641,10 +643,8 @@ export const mergeRestoredSettings = (
         }
     }
 
-    // A backup from before Lab has no labEnabled: keep this device's choice.
-    if (!Object.hasOwn(restoredSettings, 'labEnabled') && Object.hasOwn(currentSettings, 'labEnabled')) {
-        safeSettings.labEnabled = currentSettings.labEnabled;
-    }
+    // The discontinued experimental feature cannot be re-enabled by a backup.
+    safeSettings.labEnabled = false;
 
     return safeSettings;
 };
@@ -768,7 +768,7 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> =>
     typeof value === 'object' && value !== null && !Array.isArray(value);
 
 const isValidBackupShape = (value: unknown): value is BackupData =>
-    isPlainObject(value) && isPlainObject(value.data) && isPlainObject(value.settings);
+    isPlainObject(value) && isPlainObject(value.data) && isPlainObject(value.settings) && Object.values(value.data).every(log => isPlainObject(log) && (log.pain === undefined || log.pain === null || isPainScore(log.pain)));
 
 export const restoreBackup = async (file: File, password?: string): Promise<BackupData> => {
     if (file.size > MAX_IMPORT_FILE_SIZE_BYTES) {

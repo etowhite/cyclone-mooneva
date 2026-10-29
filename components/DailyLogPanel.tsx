@@ -1,3 +1,4 @@
+import {OriginalPainSlider} from './calendar/OriginalPainSlider';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -87,6 +88,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
         const m = logs[date]?.mood;
         return Array.isArray(m) ? m : (m ? [m] : []);
     });
+    const [pain, setPain] = useState<number|null>(() => logs[date]?.pain ?? null);
     const [discharge, setDischarge] = useState<DischargeType>(() => logs[date]?.discharge || null);
     const [sexDrive, setSexDrive] = useState<SexDriveType>(() => logs[date]?.sexDrive || null);
     const [sexType, setSexType] = useState<SexType>(() => logs[date]?.sexType || null);
@@ -99,8 +101,8 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
     const prevDateRef = useRef(date);
     const updateLogRef = useRef(updateLog);
     updateLogRef.current = updateLog;
-    const currentStateRef = useRef({ flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds, pregnancyStart, pregnancyEnd });
-    currentStateRef.current = { flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds, pregnancyStart, pregnancyEnd };
+    const currentStateRef = useRef({ flow, symptoms, notes, mood, pain, discharge, sexDrive, sexType, pillTakenAt, meds, pregnancyStart, pregnancyEnd });
+    currentStateRef.current = { flow, symptoms, notes, mood, pain, discharge, sexDrive, sexType, pillTakenAt, meds, pregnancyStart, pregnancyEnd };
     const isDirtyRef = useRef(false);
     const logsRef = useRef(logs);
     logsRef.current = logs;
@@ -113,7 +115,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
             return;
         }
         isDirtyRef.current = true;
-    }, [flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds, pregnancyStart, pregnancyEnd]);
+    }, [flow, symptoms, notes, mood, pain, discharge, sexDrive, sexType, pillTakenAt, meds, pregnancyStart, pregnancyEnd]);
 
     // Sync state when date changes, flushing any pending unsaved changes for the previous date
     useEffect(() => {
@@ -133,6 +135,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
             setNotes(activeLog?.notes || '');
             setMood(activeLog?.mood ?? []);
             setDischarge(activeLog?.discharge || null);
+            setPain(activeLog?.pain ?? null);
             setSexDrive(activeLog?.sexDrive || null);
             setSexType(activeLog?.sexType || null);
             setPillTakenAt(activeLog?.pillTakenAt);
@@ -171,6 +174,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                 notes,
                 mood,
                 discharge,
+                pain,
                 sexDrive,
                 sexType,
                 pillTakenAt,
@@ -183,9 +187,9 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
         // This panel never touches PeriodRecords directly, but updateLog does: writing a
         // flow here can create a period, extend a nearby one, or fill a gap day. See
         // usePersistence.updateLog. The calendar toggle is the other way in, not the only one.
-    }, [date, flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds, pregnancyStart, pregnancyEnd, updateLog]);
+    }, [date, flow, symptoms, notes, mood, pain, discharge, sexDrive, sexType, pillTakenAt, meds, pregnancyStart, pregnancyEnd, updateLog]);
 
-    useAutoSave(saveToLog, [flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds, pregnancyStart, pregnancyEnd, saveToLog]);
+    useAutoSave(saveToLog, [flow, symptoms, notes, mood, pain, discharge, sexDrive, sexType, pillTakenAt, meds, pregnancyStart, pregnancyEnd, saveToLog]);
 
     const toggleSymptom = (sym: string) => {
         if (symptoms.includes(sym)) {
@@ -565,7 +569,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                     </p>
                                 )}
                                 <div className="flex flex-col items-center gap-6 py-4">
-                                    <div className="flex items-center justify-center gap-4">
+                                    <div className="cyclone-flow-options flex flex-wrap items-center justify-center gap-2">
                                         {!activePeriod ? (
                                             <>
                                                 {/* Only Spotting */}
@@ -634,7 +638,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
 
                         {activeTab === 'mood' && (
                             <section className="flex flex-col gap-3">
-                                <div className="flex flex-wrap gap-x-4 gap-y-3 py-4 items-center justify-center max-w-[280px] mx-auto">
+                                <div className="cyclone-mood-options">
                                     {MOOD_OPTIONS.map(opt => (
                                         <MoodCircle
                                             key={opt.id}
@@ -717,7 +721,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                             <span className="text-[9px] font-black uppercase tracking-[0.2em] text-teal-400">{t('log.secretions', 'Secretions')}</span>
                                             <div className="h-[1.5px] w-6 bg-teal-200 rounded-full" />
                                         </div>
-                                        <div className="grid grid-cols-2 gap-2">
+                                        <div className="cyclone-choice-options flex flex-wrap gap-2">
                                             {[
                                                 { id: 'dry', label: 'log.discharge_dry' },
                                                 { id: 'sticky_creamy', label: 'log.discharge_sticky_creamy' },
@@ -748,6 +752,13 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                     </div>
                                 )}
 
+                                <div className="cyclone-pain-scale">
+                                    <div className="flex items-center justify-between gap-3"><div className="cyclone-pain-heading"><h3>{t('log.pain_title')}</h3><span aria-hidden="true" /></div><strong>{pain===null?t('log.pain_unrated'):pain+' / 10'}</strong></div>
+                                    <p>{pain===null?t('log.pain_unrated'):pain===0?t('log.pain_none'):pain<=3?t('log.pain_mild'):pain<=6?t('log.pain_moderate'):t('log.pain_severe')}</p>
+                                    <OriginalPainSlider value={pain} onChange={setPain} />
+                                    <div className="flex justify-between"><span>0</span><span>10</span></div>
+                                </div>
+
                                 {!settings.kidMode && (
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2 pl-1">
@@ -756,7 +767,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                     </div>
 
                                     <div className="grid grid-cols-1 gap-4">
-                                        <div className="flex gap-2 p-1 bg-[#F0F2F5] rounded-xl border border-slate-200/50" style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}>
+                                        <div className="cyclone-choice-options flex flex-wrap gap-2" style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}>
                                             {[
                                                 { id: 'low', label: t('log.libido_low', 'Low') },
                                                 { id: 'medium', label: t('log.libido_medium', 'Medium') },
@@ -773,7 +784,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                                 </button>
                                             ))}
                                         </div>
-                                        <div className="flex gap-2 p-1 bg-[#F0F2F5] rounded-xl border border-slate-200/50" style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}>
+                                        <div className="cyclone-choice-options flex flex-wrap gap-2" style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}>
                                             {[
                                                 { id: 'protected', label: t('log.sex_protected', 'Protected') },
                                                 { id: 'unprotected', label: t('log.sex_unprotected', 'Unprotected') }

@@ -1,8 +1,8 @@
+import { Toggle } from './SettingsUI';
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppSettings } from '../../types';
 import { shareOrDownloadBackup, loadData, wipeAllData, saveData, generateBackup, restoreBackup, loadPeriods, savePeriods, parseExternalImport, MAX_IMPORT_FILE_SIZE_BYTES, mergeRestoredSettings, saveSettings, writeAutoBackupPassword, clearAutoBackupPassword } from '../../services/logic';
-import { cancelLabReminder, loadLabForBackup, saveLabFromBackup } from '../../services/lab';
 import Logger from '../../services/logger';
 import { addDays, parseLocalDate, toLocalISOString } from '../../utils/dateUtils';
 import { useDisplayFormat } from '../../services/displayFormat';
@@ -178,10 +178,9 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
             const useLive = !!live && !live.isLoading && !live.loadError;
             const allData = useLive ? live.logs : await loadData();
             const allPeriods = useLive ? live.periods : await loadPeriods();
-            const lab = await loadLabForBackup();
 
             const { blob, filename } = await generateBackup(
-                { data: allData, settings, timestamp: new Date().toISOString(), periods: allPeriods, ...(lab !== undefined && { lab }) },
+                { data: allData, settings, timestamp: new Date().toISOString(), periods: allPeriods },
                 isBackupEncrypted ? backupPassword : undefined
             );
             shareOrDownloadBackup(blob, `${filename.split('.')[0]}-${toLocalISOString(new Date())}.${filename.split('.')[1]}`);
@@ -205,7 +204,6 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
         try {
             const restored = await restoreBackup(file, passwordToUse);
             // Check every part before writing any of it, so a bad file leaves nothing half-written.
-            // Only the Lab part is allowed to be bad: it is skipped and the user is told.
             if (restored.periods !== undefined && !Array.isArray(restored.periods)) {
                 alert(t('settings.invalid_backup'));
                 return;
@@ -218,28 +216,8 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                 if (Array.isArray(restored.periods)) {
                     await savePeriods(restored.periods);
                 }
-                // A backup without Lab data leaves the current Lab data alone. Lab comes after the
-                // core data, so a failed core write never leaves new Lab data beside old core data;
-                // an invalid Lab part writes nothing and the user is told.
-                let labKept = false;
-                if (restored.lab !== undefined) {
-                    try {
-                        labKept = !(await saveLabFromBackup(restored.lab));
-                    } catch (e) {
-                        Logger.error('Lab restore failed:', e);
-                        labKept = true;
-                    }
-                }
-                // A restored file may switch Lab off or change Lab data. Drop the pending Lab reminder;
-                // after the reload the app-level effect schedules it again if Lab is on.
-                await cancelLabReminder();
                 await saveSettings(mergedSettings);
                 onUpdate(mergedSettings);
-                if (labKept) {
-                    alert(t('settings.import_lab_kept', {
-                        defaultValue: 'Backup restored. The Lab data in the file could not be used, so your current Lab data was kept.',
-                    }));
-                }
                 window.location.reload();
             } else {
                 // If decryptBackup returns null or incomplete structure
@@ -300,8 +278,8 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
     };
 
     return (
-        <div className="h-full flex flex-col bg-[#F0F2F5] animate-slide-left">
-            <div className="flex items-center gap-4 p-6 bg-[#F0F2F5] sticky top-0 z-10">
+        <div className="cyclone-data-page h-full flex flex-col bg-[#F0F2F5] animate-slide-up">
+            <div className="cyclone-subheader sticky top-0 z-10">
                 <button
                     onClick={onBack}
                     className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors text-slate-500"
@@ -318,7 +296,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                     {/* Box 0: Automatic backup. Its own card, not a section inside the
                         manual-backup box: it is the one that keeps working without the
                         user, and it should not read as a footnote to Export. */}
-                    <div className="bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'rgba(163, 177, 198, 0.4) 6px 6px 12px, rgba(255, 255, 255, 0.8) -6px -6px 12px' }}>
+                    <div className="cyclone-data-card bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'rgba(163, 177, 198, 0.4) 6px 6px 12px, rgba(255, 255, 255, 0.8) -6px -6px 12px' }}>
                         <div className="p-6">
                             {/* AUTOMATIC BACKUP SECTION */}
                             <div className="space-y-4">
@@ -335,23 +313,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                 </div>
 
                                 <div className="bg-white/50 rounded-xl p-3 border border-slate-100/50">
-                                    <label className="flex items-center justify-between cursor-pointer">
-                                        <span className="text-xs font-semibold text-slate-600">{t('settings.auto_backup_enable', { defaultValue: 'Back up automatically' })}</span>
-                                        <div className="relative">
-                                            <input
-                                                type="checkbox"
-                                                data-testid="auto-backup-toggle"
-                                                className="sr-only"
-                                                checked={settings.autoBackupEnabled ?? false}
-                                                onChange={handleAutoBackupToggle}
-                                            />
-                                            <div className={`w-10 h-6 rounded-full shadow-inner transition-colors duration-200 ${settings.autoBackupEnabled ? 'bg-[#7598a0]' : 'bg-slate-200'}`}></div>
-                                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${settings.autoBackupEnabled
-                                                ? 'ltr:translate-x-5 rtl:-translate-x-5'
-                                                : 'ltr:translate-x-1 rtl:-translate-x-1'
-                                                } ltr:left-0 rtl:right-0`}></div>
-                                        </div>
-                                    </label>
+                                    <div className="flex items-center justify-between gap-3"><span className="text-sm font-semibold">{t('settings.auto_backup_enable')}</span><Toggle small label={t('settings.auto_backup_enable')} active={!!settings.autoBackupEnabled} onClick={handleAutoBackupToggle} /></div>
 
                                     {/* The single most useful thing to know about this feature, and the
                                         least obvious: the folder can be one another app syncs off-device.
@@ -442,7 +404,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                     </div>
 
                     {/* Box 1: Export/Import Combined */}
-                    <div className="bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'rgba(163, 177, 198, 0.4) 6px 6px 12px, rgba(255, 255, 255, 0.8) -6px -6px 12px' }}>
+                    <div className="cyclone-data-card bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'rgba(163, 177, 198, 0.4) 6px 6px 12px, rgba(255, 255, 255, 0.8) -6px -6px 12px' }}>
                         <div className="p-6 space-y-6">
 
                             {/* EXPORT SECTION */}
@@ -459,22 +421,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
 
                                 {/* Encryption Toggle */}
                                 <div className="bg-white/50 rounded-xl p-3 border border-slate-100/50">
-                                    <label className="flex items-center justify-between cursor-pointer">
-                                        <span className="text-xs font-semibold text-slate-600">{t('settings.protect_with_password')}</span>
-                                        <div className="relative">
-                                            <input
-                                                type="checkbox"
-                                                className="sr-only"
-                                                checked={isBackupEncrypted}
-                                                onChange={(e) => setIsBackupEncrypted(e.target.checked)}
-                                            />
-                                            <div className={`w-10 h-6 rounded-full shadow-inner transition-colors duration-200 ${isBackupEncrypted ? 'bg-[#7598a0]' : 'bg-slate-200'}`}></div>
-                                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${isBackupEncrypted
-                                                ? 'ltr:translate-x-5 rtl:-translate-x-5'
-                                                : 'ltr:translate-x-1 rtl:-translate-x-1'
-                                                } ltr:left-0 rtl:right-0`}></div>
-                                        </div>
-                                    </label>
+                                    <div className="flex items-center justify-between gap-3"><span className="text-sm font-semibold">{t('settings.protect_with_password')}</span><Toggle small label={t('settings.protect_with_password')} active={isBackupEncrypted} onClick={() => setIsBackupEncrypted(!isBackupEncrypted)} /></div>
 
                                     {isBackupEncrypted ? (
                                         <div className="mt-3 animate-fade-in">
@@ -617,7 +564,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                     </div>
 
                     {/* Box 2: Archive & Restore */}
-                    <div className="bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'rgba(163, 177, 198, 0.4) 6px 6px 12px, rgba(255, 255, 255, 0.8) -6px -6px 12px' }}>
+                    <div className="cyclone-data-card bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'rgba(163, 177, 198, 0.4) 6px 6px 12px, rgba(255, 255, 255, 0.8) -6px -6px 12px' }}>
                         <div className="p-4">
                             <p className="text-xs text-slate-500 leading-relaxed mb-4 px-2">
                                 {t('settings.archive_desc_long')}
@@ -701,7 +648,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                     </div>
 
                     {/* Box 3: Nuke */}
-                    <div className="bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'rgba(163, 177, 198, 0.4) 6px 6px 12px, rgba(255, 255, 255, 0.8) -6px -6px 12px' }}>
+                    <div className="cyclone-data-card bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'rgba(163, 177, 198, 0.4) 6px 6px 12px, rgba(255, 255, 255, 0.8) -6px -6px 12px' }}>
                         <div className="p-4">
                             {!showWipeConfirm ? (
                                 <button

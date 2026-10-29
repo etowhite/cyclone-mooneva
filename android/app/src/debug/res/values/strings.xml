@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Mooneva Debug</string>
-    <string name="title_activity_main">Mooneva Debug</string>
+    <string name="app_name">cyclone</string>
+    <string name="title_activity_main">cyclone</string>
 </resources>

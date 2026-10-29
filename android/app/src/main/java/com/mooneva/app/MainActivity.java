@@ -11,5 +11,11 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(WidgetSyncPlugin.class);
         registerPlugin(BackupFolderPlugin.class);
         super.onCreate(savedInstanceState);
+        LauncherAppearance.register(this);
+        LauncherAppearance.apply(this);
+    }
+    @Override public void onConfigurationChanged(android.content.res.Configuration config) {
+        super.onConfigurationChanged(config);
+        LauncherAppearance.apply(this);
     }
 }

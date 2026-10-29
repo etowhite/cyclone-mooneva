@@ -1,3 +1,4 @@
+import CycloneAppearance from './settings/CycloneAppearance';
 import { Share } from '@capacitor/share';
 import { version } from '../package.json';
 import Logger from '../services/logger';
@@ -14,7 +15,6 @@ import { PIN_MAX_LENGTH, isValidPin, normalizePinInput, hasPin, hashPin } from '
 import { FIRST_DAY_OPTIONS, resolveFirstDayOfWeek } from '../utils/weekStart';
 import { applySettingsInterlocks, getCycleVisibility } from '../services/logic/settingsInterlocks';
 import { findActivePeriod, settingBounds } from '../services/logic/cycle';
-import { LabPausedNote } from './lab';
 import { PregnancyPredictionsNote } from './settings/PregnancyPredictionsNote';
 
 import { SubViewType, ViewType, pushBackInterceptor } from '../hooks/useAppNavigation';
@@ -70,6 +70,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
   const [copiedCoupon, setCopiedCoupon] = useState(false);
   const [showPrivacyWarning, setShowPrivacyWarning] = useState(false);
   const [viewReport, setViewReport] = useState(false);
+  const [kidInfoOpen, setKidInfoOpen] = useState(false);
   const [showBirthControlDialog, setShowBirthControlDialog] = useState(false);
   const [showAdaptiveOffWarning, setShowAdaptiveOffWarning] = useState(false);
   const [pendingAction, setPendingAction] = useState<'bc' | 'pause' | null>(null);
@@ -313,7 +314,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   }}
                 />
               </SettingRow>
-              <div className="pl-[64px] pr-4 pb-3 -mt-2">
+              <div className="cyclone-setting-note">
                 {settings.isOnBirthControl ? (
                   <p className="text-xs text-amber-600 font-medium">{t('settings.bc_protected_msg')}</p>
                 ) : (
@@ -350,9 +351,10 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
             </SettingCard>
 
             <SettingCard title={t('settings.kid_mode_section')}>
-              <SettingRow label={t('settings.kid_mode_label')} desc={t('settings.kid_mode_desc')} icon={<Icons.Eye />} last>
-                <Toggle label={t('settings.kid_mode_label')} active={!!settings.kidMode} onClick={() => onUpdate({ ...settings, kidMode: !settings.kidMode })} />
+              <SettingRow label={t('settings.kid_mode_label')} onLabelClick={() => setKidInfoOpen(v => !v)} desc={<button type="button" className="text-start" aria-expanded={kidInfoOpen} aria-controls="kid-mode-info" onClick={() => setKidInfoOpen(v => !v)}>{t('settings.kid_mode_desc')} · {t('common.learn_more')}</button>} icon={<Icons.Eye />} last>
+                <Toggle label={t('settings.kid_mode_label')} active={!!settings.kidMode} onClick={() => { setKidInfoOpen(true); onUpdate({ ...settings, kidMode: !settings.kidMode }); }} />
               </SettingRow>
+            {kidInfoOpen && <div id="kid-mode-info" className="cyclone-setting-note"><p>{t('settings.kid_mode_details')}</p></div>}
             </SettingCard>
 
           </div>
@@ -362,7 +364,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
         {showBirthControlDialog && periodForDialog && createPortal(
           <>
             <div className="fixed inset-0 bg-black/40 z-[301]" onClick={() => { setShowBirthControlDialog(false); setPeriodForDialog(null); }} />
-            <div role="dialog" aria-modal="true" aria-labelledby="bc-dialog-title" className="fixed left-4 right-4 top-1/2 -translate-y-1/2 z-[302] bg-[#F0F2F5] rounded-2xl p-5 max-w-sm mx-auto" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
+            <div role="dialog" aria-modal="true" aria-labelledby="bc-dialog-title" className="cyclone-choice-dialog fixed left-4 right-4 top-1/2 -translate-y-1/2 z-[302] bg-[#F0F2F5] rounded-2xl p-5 max-w-sm mx-auto" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
               <h3 id="bc-dialog-title" className="text-base font-bold text-slate-700 mb-1">{t('settings.birth_control_dialog_title', 'Current Period')}</h3>
               <p className="text-xs text-slate-500 mb-4">
                 {t('settings.birth_control_dialog_message', 'You have an active period. How should it be tagged?')}
@@ -377,7 +379,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   }}
                   className="py-3 rounded-xl font-semibold text-[11px] uppercase tracking-wide text-white bg-indigo-500"
                 >
-                  💊 {t('settings.birth_control_keep_withdrawal', 'Keep as Withdrawal Bleed')}
+                  {t('settings.birth_control_keep_withdrawal', 'Keep as Withdrawal Bleed')}
                 </button>
                 <button
                   onClick={() => {
@@ -388,7 +390,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   }}
                   className="py-3 rounded-xl font-semibold text-[11px] uppercase tracking-wide text-white bg-rose-400"
                 >
-                  ⭐ {t('settings.birth_control_tag_natural', 'Tag as Natural Period')}
+                  {t('settings.birth_control_tag_natural', 'Tag as Natural Period')}
                 </button>
                 <button
                   onClick={() => {
@@ -450,6 +452,70 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
     );
   }
 
+  if (subView === 'appearance') {
+    return <div className="cyclone-settings-page flex flex-col h-full bg-[#F0F2F5]">
+      <header className="cyclone-subheader">
+        <button type="button" onClick={() => onSubViewChange('main')} aria-label={t('common.back')}>←</button>
+        <h1>{t('cyclone.appearance', 'Appearance')}</h1>
+      </header>
+      <div className="flex-1 overflow-y-auto px-4 pb-32 space-y-5">
+        <CycloneAppearance />
+          <section>
+            <SettingCard title={t('settings.language')}>
+              <SettingRow label={t('settings.language')} icon={<Icons.Globe />} mergeWithNext>
+                <select
+                  aria-label={t('settings.language')}
+                  value={i18n.language}
+                  onChange={(e) => {
+                    const lang = e.target.value;
+                    i18n.changeLanguage(lang);
+                    document.dir = i18n.dir(lang);
+                  }}
+                  className="cyclone-select"
+                >
+                  {[{code:'en',label:'English'}, {code:'ru',label:'Русский'}].map(lang => (
+                    <option key={lang.code} value={lang.code}>{lang.label}</option>
+                  ))}
+                </select>
+              </SettingRow>
+              <SettingRow
+                label={t('settings.first_day_of_week')}
+                desc={t('settings.first_day_of_week_desc')}
+                icon={<Icons.Calendar />}
+                last
+              >
+                <div className="flex flex-col items-end gap-1">
+                  <select
+                    aria-label={t('settings.first_day_of_week')}
+                    value={effectiveFirstDayOfWeek}
+                    onChange={(e) => onUpdate({
+                      ...settings,
+                      firstDayOfWeek: e.target.value as FirstDayOfWeek
+                    })}
+                    className="cyclone-select"
+                  >
+                    {FIRST_DAY_OPTIONS.map(day => (
+                      <option key={day} value={day}>{t(`settings.week_start_${day}`)}</option>
+                    ))}
+                  </select>
+                  {settings.firstDayOfWeek && (
+                    <button
+                      type="button"
+                      onClick={() => onUpdate({ ...settings, firstDayOfWeek: undefined })}
+                      className="text-[9px] font-bold uppercase tracking-wider text-[#7598a0] hover:text-[#5d7f87] transition-colors"
+                    >
+                      {t('settings.use_language_default')}
+                    </button>
+                  )}
+                </div>
+              </SettingRow>
+            </SettingCard>
+          </section>
+
+      </div>
+    </div>;
+  }
+
   if (subView === 'data_management') {
     return <DataManagementView settings={settings} onUpdate={onUpdate} onBack={() => onSubViewChange('main')} runBackupNow={runBackupNow} />;
   }
@@ -457,102 +523,28 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
   return (
     <div className="flex flex-col h-full bg-[#F0F2F5] animate-slide-up relative">
       <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
-        {/* PREMIUM SPA BRANDING */}
-        {/* PREMIUM BRANDING HEADER - COMPACT & NEUMORPHIC */}
-        <div className="flex flex-col items-center pt-8 pb-4 px-8 text-center relative overflow-hidden">
-          <div className="w-48 mb-2 relative filter drop-shadow-sm">
-            <img
-              src="/bitmap.png"
-              alt={t('branding.logo_alt')}
-              className="w-full h-auto opacity-90"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.parentElement!.innerHTML = '<h1 class="text-3xl font-black text-slate-700 tracking-tighter mb-1">Mooneva</h1>';
-              }}
-            />
-          </div>
-          <div className="space-y-0.5 relative z-10">
-            <h2 className="text-xs font-bold text-slate-400 tracking-[0.2em] uppercase opacity-80">
-              {t('branding.subtitle', 'Private Period Tracker')}
-            </h2>
-          </div>
-        </div>
-
+        <header className="cyclone-settings-heading">
+          <span className="cyclone-wordmark">cyclone</span>
+          <h1>{t('common.settings')}</h1>
+          <p>{t('cyclone.settings_subtitle', 'Your space, your preferences.')}</p>
+        </header>
         <div className="px-4 space-y-6 max-w-lg mx-auto">
-          {/* 0. About & Support (Consolidated & Neumorphic) */}
           <section>
-            <div
-              className="rounded-2xl p-4 bg-[#F0F2F5] space-y-4"
-              style={{ boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.3), inset -4px -4px 8px rgba(255, 255, 255, 0.7)' }}
-            >
-              <div className="text-center space-y-1.5 pt-1">
-                <h3 className="text-base font-black tracking-tight">
-                  <span style={{ color: '#005293' }}>{t('common.free', 'Free')}.</span>{' '}
-                  <span style={{ color: '#ddca00' }}>{t('common.private', 'Private')}.</span>{' '}
-                  <span style={{ color: '#005293' }}>{t('common.forever', 'Forever')}.</span>{' '}🇸🇪
-                </h3>
-                <p className="text-[11px] font-medium text-slate-500 leading-relaxed max-w-xs mx-auto">
-                  {t('branding.passion_not_ads')}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => setShowGiftModal(true)}
-                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-[#F0F2F5] text-slate-600 transition-all active:scale-[0.98] group cursor-pointer"
-                  style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
-                >
-                  <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shadow-inner group-hover:scale-110 transition-transform duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wide group-hover:text-emerald-600 transition-colors">
-                    {t('branding.voucher_button', '25% Voucher')}
-                  </span>
-                </button>
-
-                <button
-                  onClick={async () => {
-                    try {
-                      await Share.share({
-                        title: 'Mooneva',
-                        text: t('share_message.text'),
-                        url: 'https://mooneva.se/pages/mooneva_cycle',
-                        dialogTitle: t('common.share')
-                      });
-                    } catch (error) {
-                      Logger.error('Error sharing:', error);
-                    }
-                  }}
-                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-[#F0F2F5] text-slate-600 transition-all active:scale-[0.98] group cursor-pointer"
-                  style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
-                >
-                  <div className="w-8 h-8 rounded-full bg-[#e0f2fe] flex items-center justify-center text-sky-500 shadow-inner group-hover:scale-110 transition-transform duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wide group-hover:text-sky-500 transition-colors">{t('common.share')}</span>
-                </button>
-              </div>
-
-              <div className="flex justify-center gap-6 pt-1 opacity-60 hover:opacity-100 transition-opacity">
-                <a href="https://mooneva.se" target="_blank" rel="noopener noreferrer" className="text-[9px] font-bold uppercase tracking-widest text-slate-400 hover:text-[#7598a0] transition-colors">
-                  {t('common.website')}
-                </a>
-                <button onClick={() => setShowAbout(!showAbout)} className="text-[9px] font-bold uppercase tracking-widest text-slate-400 hover:text-[#7598a0] transition-colors">
-                  {t('branding.story_title')}
-                </button>
-              </div>
-
-              {showAbout && (
-                <div className="animate-fade-in pt-3 border-t border-slate-200/50">
-                  <p className="text-[10px] text-slate-500 leading-relaxed text-justify relative">
-                    <span className="text-2xl absolute -top-2 -left-1 opacity-20">❝</span>
-                    {t('branding.story_body')}
-                  </p>
-                </div>
-              )}
-            </div>
+            <SettingCard title={t('cyclone.appearance', 'Appearance')}>
+              <SettingRow label={t('cyclone.appearance', 'Appearance')}
+                desc={t('cyclone.appearance_description', 'Theme, colour palette and language')}
+                icon={<Icons.Moon />} last onClick={() => onSubViewChange('appearance')}
+                rightElement={<span aria-hidden>→</span>} />
+            </SettingCard>
           </section>
-
+          <section className="cyclone-about-card">
+            <h2>{t('cyclone.about_title', 'About this fork')}</h2>
+            <p>{t('cyclone.about_body', 'cyclone is a separate Mooneva-based project. Your health data stays on this device.')}</p>
+            <a href="https://github.com/etowhite/cyclone-mooneva/issues" target="_blank" rel="noopener noreferrer">
+              {t('cyclone.feedback', 'Report a cyclone issue')} ↗
+            </a>
+            <p className="cyclone-attribution">{t('cyclone.attribution', 'Based on Mooneva Cycle. Original authors and GPL-3.0-or-later license retained.')}</p>
+          </section>
           {/* 1. Prediction Settings (grouped) */}
           <section>
             <SettingCard title={t('settings.predictions')}>
@@ -579,90 +571,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
             </SettingCard>
           </section>
 
-          {/* 1.6 Lab (optional tab). Nothing Lab-related shows while discrete mode is on. */}
-          {!settings.discreteMode && (
-            <section>
-              <SettingCard title={t('lab.settings_section')}>
-                <SettingRow label={t('lab.toggle_label')} desc={t('lab.toggle_desc')} icon={<Icons.Flask />} last>
-                  <Toggle label={t('lab.toggle_label')} active={!!settings.labEnabled} onClick={() => {
-                    // Turning Lab off removes its pending reminder.
-                    if (settings.labEnabled) void import('../services/lab').then(m => m.cancelLabReminder());
-                    onUpdate({ ...settings, labEnabled: !settings.labEnabled });
-                  }} />
-                </SettingRow>
-                {settings.labEnabled && <LabPausedNote />}
-              </SettingCard>
-            </section>
-          )}
-
           {/* 2. Language */}
-          <section>
-            <SettingCard title={t('settings.language')}>
-              <SettingRow label={t('settings.language')} icon={<Icons.Globe />} mergeWithNext>
-                <select
-                  aria-label={t('settings.language')}
-                  value={i18n.language}
-                  onChange={(e) => {
-                    const lang = e.target.value;
-                    i18n.changeLanguage(lang);
-                    document.dir = i18n.dir(lang);
-                  }}
-                  className="bg-slate-100 border-none text-text-secondary text-sm font-medium rounded-lg px-3 py-2 pr-8 focus:ring-2 focus:ring-accent/20 outline-none"
-                >
-                  {[
-                    { code: 'en', label: 'English' },
-                    { code: 'zh', label: '中文' },
-                    { code: 'es', label: 'Español' },
-                    { code: 'sv', label: 'Svenska' },
-                    { code: 'fa', label: 'فارسی' },
-                    { code: 'ar', label: 'العربية' },
-                    { code: 'tr', label: 'Türkçe' },
-                    { code: 'de', label: 'Deutsch' },
-                    { code: 'fr', label: 'Français' },
-                    { code: 'uk', label: 'Українська' },
-                    { code: 'it', label: 'Italiano' },
-                    { code: 'hu', label: 'Magyar' },
-                    { code: 'ru', label: 'Русский' },
-                    { code: 'pt', label: 'Português' }
-                  ].map(lang => (
-                    <option key={lang.code} value={lang.code}>{lang.label}</option>
-                  ))}
-                </select>
-              </SettingRow>
-              <SettingRow
-                label={t('settings.first_day_of_week')}
-                desc={t('settings.first_day_of_week_desc')}
-                icon={<Icons.Calendar />}
-                last
-              >
-                <div className="flex flex-col items-end gap-1">
-                  <select
-                    aria-label={t('settings.first_day_of_week')}
-                    value={effectiveFirstDayOfWeek}
-                    onChange={(e) => onUpdate({
-                      ...settings,
-                      firstDayOfWeek: e.target.value as FirstDayOfWeek
-                    })}
-                    className="bg-slate-100 border-none text-text-secondary text-sm font-medium rounded-lg px-3 py-2 pr-8 focus:ring-2 focus:ring-accent/20 outline-none"
-                  >
-                    {FIRST_DAY_OPTIONS.map(day => (
-                      <option key={day} value={day}>{t(`settings.week_start_${day}`)}</option>
-                    ))}
-                  </select>
-                  {settings.firstDayOfWeek && (
-                    <button
-                      type="button"
-                      onClick={() => onUpdate({ ...settings, firstDayOfWeek: undefined })}
-                      className="text-[9px] font-bold uppercase tracking-wider text-[#7598a0] hover:text-[#5d7f87] transition-colors"
-                    >
-                      {t('settings.use_language_default')}
-                    </button>
-                  )}
-                </div>
-              </SettingRow>
-            </SettingCard>
-          </section>
-
           {/* Clinical Export Button (standalone) */}
           <button
             onClick={() => setShowPrivacyWarning(true)}
@@ -685,33 +594,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
             </div>
           </button>
 
-          {/* 3. Appearance */}
-          <section>
-            <SettingCard title="Privacy & Security">
-              <SettingRow
-                label={t('settings.dark_neumorphism')}
-                desc={t('settings.dark_neumorphism_desc')}
-                icon={<Icons.Moon />}
-                last
-              >
-                <Toggle label={t('settings.dark_neumorphism')} active={!!settings.darkNeumorphism} onClick={() => onUpdate({ ...settings, darkNeumorphism: !settings.darkNeumorphism })} />
-              </SettingRow>
-            </SettingCard>
-          </section>
 
-          {/* 3.5 Privacy — Discrete Mode */}
-          <section>
-            <SettingCard title="Privacy & Security">
-              <SettingRow
-                label={t('settings.discrete_mode')}
-                desc={t('settings.discrete_mode_full_desc')}
-                icon={<Icons.Eye />}
-                last
-              >
-                <Toggle label={t('settings.discrete_mode')} active={settings.discreteMode} onClick={() => onUpdate({ ...settings, discreteMode: !settings.discreteMode })} />
-              </SettingRow>
-            </SettingCard>
-          </section>
 
           {/* 4. PIN Lock */}
           <section>
@@ -876,7 +759,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                 </p>
 
                 <a
-                  href="mailto:app@mooneva.se?subject=Mooneva App Feedback"
+                  href="https://github.com/etowhite/cyclone-mooneva/issues" target="_blank" rel="noopener noreferrer"
                   className="block w-full text-center bg-white text-[#5b7a82] py-3 rounded-xl font-bold text-sm shadow-sm active:scale-[0.98] transition-all hover:bg-slate-50"
                 >
                   {t('settings.feedback_button')}
@@ -900,9 +783,9 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                 </svg>
               </div>
 
-              <h3 className="text-sm font-bold text-slate-700 mb-1">{t('settings.star_repo_title', 'Star Mooneva on GitHub')}</h3>
+              <h3 className="text-sm font-bold text-slate-700 mb-1">{t('cyclone.repo_title', 'cyclone on GitHub')}</h3>
               <p className="text-xs text-slate-400 leading-relaxed mb-4">
-                {t('settings.star_repo_desc', 'Mooneva is open source. A star costs you nothing and helps other people find a tracker that keeps their data on their own phone.')}
+                {t('cyclone.repo_body', 'Source, development tasks and progress of this fork.')}
               </p>
 
               <button
@@ -910,7 +793,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                 onClick={() => {
                   // '_system' hands the URL to the OS browser, the same route the store link
                   // uses. The app itself holds no INTERNET permission and makes no request.
-                  window.open('https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker', '_system');
+                  window.open('https://github.com/etowhite/cyclone-mooneva', '_system');
                 }}
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#24292f] text-white font-bold text-xs active:scale-[0.98] transition-transform"
               >

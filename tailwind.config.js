@@ -11,7 +11,7 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Poppins', 'sans-serif'],
+                sans: ['Roboto', 'Arial', 'sans-serif'],
             },
             colors: {
                 accent: '#7598a0',

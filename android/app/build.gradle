@@ -4,10 +4,10 @@ android {
     namespace = "com.mooneva.app"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.mooneva.app"
+        applicationId "com.cyclone.mooneva"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 26
+        versionCode 29
         versionName "3.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
@@ -36,7 +36,7 @@ android {
         // (debug-key) APK never conflicts with a release-signed copy and has its own data.
         debug {
             applicationIdSuffix ".debug"
-            versionNameSuffix "-debug"
+            versionNameSuffix "-beta.4"
         }
         release {
             minifyEnabled false

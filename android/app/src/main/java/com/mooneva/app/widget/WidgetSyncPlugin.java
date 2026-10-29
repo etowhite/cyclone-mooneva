@@ -26,7 +26,7 @@ import org.json.JSONArray;
 public class WidgetSyncPlugin extends Plugin {
 
     private static final Class<?>[] WIDGET_PROVIDERS = {
-            CycleBarWidgetProvider.class
+            CycleBarWidgetProvider.class, CycleTipsWidgetProvider.class
     };
 
     @PluginMethod
@@ -55,6 +55,7 @@ public class WidgetSyncPlugin extends Plugin {
         editor.putInt(CycleBarWidgetProvider.KEY_DAYS_UNTIL_OVULATION, daysUntilOvulation);
         editor.putString(CycleBarWidgetProvider.KEY_CURRENT_PHASE, currentPhase);
         editor.putBoolean(CycleBarWidgetProvider.KEY_DISCRETE_MODE, discreteMode);
+        for (String key : new String[]{"snapshots", "palette", "mode", "language"}) editor.putString(key, call.getString(key, ""));
         editor.apply();
 
         // Trigger update for ALL widget providers
