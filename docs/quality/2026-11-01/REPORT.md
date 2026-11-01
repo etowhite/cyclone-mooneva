@@ -140,3 +140,7 @@ Package com.cyclone.mooneva.debug, version3.0.0-beta.4, code29, min24, target36;
 - Native cyclone JSON migration/biometric integration остаются отдельными задачами; полная поддержка не добавлялась.
 - В web build остаётся предупреждение крупных chunks, в частности html2pdf. Lazy PDF bundle требует отдельной проверки перед оптимизацией.
 - 21 тест — регрессия затронутых функций, а не доказательство отсутствия всех ошибок или клинической точности прогнозов.
+
+## GitHub
+
+[PR #4](https://github.com/etowhite/cyclone-mooneva/pull/4) открыт без автоматического merge. Head0726802: [push CI](https://github.com/etowhite/cyclone-mooneva/actions/runs/41347527481) и [PR CI](https://github.com/etowhite/cyclone-mooneva/actions/runs/41347609593) SUCCESS. Последующее обновление этой документации не меняет application source6c9aaf6; актуальные exact-head checks доступны в PR.

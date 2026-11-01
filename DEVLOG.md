@@ -11,11 +11,11 @@
 
 # 3. Текущий статус и проблемы
 Android runtime НЕ ПРОВЕРЕНО: SDK emulator37.2.12 не загружает Android/adb (DLL error,access violation;directbackendhang). Собственный AVD5574 выключен, временные SDK DLL удалены; другие устройства не трогались. Native widgets/notifications/back/permissions/IME/background/logcat требуют рабочего testdevice.
-Report+selectedscreens+logs:docs/quality/2026-11-01/REPORT.md. Полные local artifacts:verification/update-2026-11-01. GitHub PR/CI сейчас оформляются. Не считать build доказательством полного тестирования.
+Report+selectedscreens+logs:docs/quality/2026-11-01/REPORT.md. Полные local artifacts:verification/update-2026-11-01. GitHub PR #4 открыт: https://github.com/etowhite/cyclone-mooneva/pull/4 . Source/QA head0726802 прошёл оба push+PR web CI; финальное обновление документации проверяется отдельно. Main не объединяли. Не считать build доказательством полного тестирования.
 
 # 4. Следующие шаги
-1. Commit QA scripts/docs, push cyclone/november-quality, создать PR в main; дождаться exact-head CI. Не merge main автоматически.
-2. Дополнить этот журнал и CONTINUE_PROMPT ссылкой на PR/результатом CI.
+1. PR #4 опубликован, оба CI0726802 SUCCESS. Проверить CI последнего документационного commit; main не merge автоматически.
+2. Перед следующими изменениями читать текущий report/журнал/CONTINUE_PROMPT и GitHub checks PR #4; application source остаётся6c9aaf6.
 3. Для продолжения native QA восстановить SDK emulator или отдельное synthetic testdevice. scripts/native-quality-audit.mjs подготовлен, но не исполнялся на Android и может требовать исправления локаторов/диалогов.
 4. Читать/обновлять DEVLOG до кода и ответов, без отчёта о журнале в чате; CONTINUE_PROMPT держать готовым. Не публиковать keys/cache/SDK/health data. Native cyclone migration/biometrics остаются вне выполненного объёма.
 
@@ -221,3 +221,9 @@ Browser audit exposed export hanging on the browser's Capacitor share shim inste
 - Свежая матрица после иконок проходит, assets/source совпадают. Выявлено прежнее maximum-scale=1 в index.html, ограничивающее масштабирование на мобильном браузере: убираем ограничение в рамках запрошенной доступности. В отчёте обновляем происхождение branding и проверяемый source commit вместо прежней оговорки об unstaged snapshot.
 
 - Объединённый application source HEAD6c9aaf6 после brandingf2c8288 и mobile zoom. Web/Cap sync/Android повторно PASS (Android1m4s), signatureV2VALID. Новый APK SHA2565c5ce0bc67ed748bf4de0e0bc0334edf62a85a2c74a99a217fd7eec6a21e3281 сохранён в ../releases/cyclone-mooneva-quality-2026-11-01. Browser icon/source/apple HTTP/zoom PASS. Готовим окончательный QA report, journal/prompt и PR, runtime Android явно НЕ ПРОВЕРЕНО.
+
+- QA/docs commit0726802 опубликован в origin/cyclone/november-quality. Первый gh pr create без --repo обратился к неверному inferred repository и вернул head/base sha blank; PR не создан. Повторяем с явным --repo etowhite/cyclone-mooneva. Логи сохранены без нормализации исходного вывода инструментов (trailing whitespace в raw build logs ожидается).
+
+- PR #4 создан: https://github.com/etowhite/cyclone-mooneva/pull/4 . Push CI для0726802 SUCCESS: https://github.com/etowhite/cyclone-mooneva/actions/runs/41347527481 . Подготавливаем финальную документацию со ссылками; затем проверка exact-head push+PR CI без изменения приложения. APK с новым логотипом готов, checksum подтверждён; Android runtime остаётся НЕ ПРОВЕРЕНО.
+
+- Финальная передача: PR4 mergeable/open,0726802 push41347527481 и pull_request41347609593 SUCCESS. SHA APK повторно совпал. Следующий commit содержит только ссылки/журнал; исходный код приложения и QA evidence не меняются.
