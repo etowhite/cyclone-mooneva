@@ -20,6 +20,7 @@ import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { normalizeFirstDayOfWeek } from '../../utils/weekStart';
+import { parseStrictLocalDate } from '../../utils/dateUtils';
 
 // --- Constants ---
 const STORAGE_KEY_ENCRYPTED = 'mooneva_data_enc';
@@ -767,8 +768,17 @@ export const MAX_IMPORT_FILE_SIZE_BYTES = 50 * 1024 * 1024;
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
     typeof value === 'object' && value !== null && !Array.isArray(value);
 
+const isValidBackupPeriod = (value: unknown): boolean =>
+    isPlainObject(value) && typeof value.id === 'string' &&
+    typeof value.startDate === 'string' && !!parseStrictLocalDate(value.startDate) &&
+    Number.isSafeInteger(value.days) && (value.days as number) > 0 &&
+    (value.activeDays === undefined || (Array.isArray(value.activeDays) && value.activeDays.every(
+        day => Number.isSafeInteger(day) && day >= 0 && day < (value.days as number))));
+
 const isValidBackupShape = (value: unknown): value is BackupData =>
-    isPlainObject(value) && isPlainObject(value.data) && isPlainObject(value.settings) && Object.values(value.data).every(log => isPlainObject(log) && (log.pain === undefined || log.pain === null || isPainScore(log.pain)));
+    isPlainObject(value) && isPlainObject(value.data) && isPlainObject(value.settings) &&
+    (value.periods === undefined || (Array.isArray(value.periods) && value.periods.every(isValidBackupPeriod))) &&
+    Object.values(value.data).every(log => isPlainObject(log) && (log.pain === undefined || log.pain === null || isPainScore(log.pain)));
 
 export const restoreBackup = async (file: File, password?: string): Promise<BackupData> => {
     if (file.size > MAX_IMPORT_FILE_SIZE_BYTES) {
@@ -797,6 +807,19 @@ export const restoreBackup = async (file: File, password?: string): Promise<Back
 // --- Backup Sharing (Merged) ---
 
 export const shareOrDownloadBackup = async (blob: Blob, filename = 'mooneva-backup.enc') => {
+    // The web Share shim may open an OS sheet indefinitely. Export means a download
+    // in a browser; only native builds should write a Capacitor cache file.
+    if (!Capacitor.isNativePlatform()) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        return;
+    }
     try {
         // Convert Blob to Base64 for Capacitor
         const reader = new FileReader();
@@ -834,15 +857,10 @@ export const shareOrDownloadBackup = async (blob: Blob, filename = 'mooneva-back
         }, 60000);
 
     } catch (e) {
-        // Fallback to classic download (Browsers / Desktop)
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        // A hidden anchor is not a working native fallback. Let the caller explain
+        // the actual failure instead of claiming that a copy was saved.
+        Logger.warn('Native backup sharing failed', e);
+        throw e;
     }
 };
 
