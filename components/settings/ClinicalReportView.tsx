@@ -201,7 +201,7 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
     // --- Data Preparation ---
     const cycleDetails: CycleDetail[] = useMemo(() => {
         // 1. Prepare cycles list including ongoing
-        let allCycles = [...model.cycles];
+        const allCycles = [...model.cycles];
 
         if (periods && periods.length > 0) {
             const lastPeriodStart = periods.reduce((latest, current) =>

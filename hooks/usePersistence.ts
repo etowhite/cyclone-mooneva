@@ -249,7 +249,7 @@ export const usePersistence = (): UsePersistenceResult => {
         // If user logs flow on a gap day or trailing day, add it to the period
         if (data.flow) {
             setPeriods(prev => {
-                let updated = [...prev];
+                const updated = [...prev];
                 let changed = false;
 
                 // Check if date is inside an existing period span (gap day case)
@@ -258,7 +258,7 @@ export const usePersistence = (): UsePersistenceResult => {
                 if (pIdx !== -1) {
                     const p = updated[pIdx];
                     const dayIdx = diffInDays(date, p.startDate);
-                    let activeDays = p.activeDays ? [...p.activeDays] : Array.from({ length: p.days }, (_, i) => i);
+                    const activeDays = p.activeDays ? [...p.activeDays] : Array.from({ length: p.days }, (_, i) => i);
 
                     if (!activeDays.includes(dayIdx)) {
                         // Gap day: add to activeDays
@@ -302,7 +302,7 @@ export const usePersistence = (): UsePersistenceResult => {
                                 && !updated.some(q => q.id !== currentPeriod.id && isDateInPeriod(q, nextDay))) {
                                 const extendedDays = currentPeriod.days + 1;
                                 const extendedDayIdx = diffInDays(nextDay, currentPeriod.startDate);
-                                let extActiveDays = currentPeriod.activeDays ? [...currentPeriod.activeDays] : [];
+                                const extActiveDays = currentPeriod.activeDays ? [...currentPeriod.activeDays] : [];
                                 extActiveDays.push(extendedDayIdx);
                                 extActiveDays.sort((a, b) => a - b);
                                 updated[nIdx] = { ...currentPeriod, days: extendedDays, activeDays: extActiveDays };
@@ -401,7 +401,7 @@ export const usePersistence = (): UsePersistenceResult => {
         }
 
         setPeriods(prev => {
-            let updated = [...prev];
+            const updated = [...prev];
 
             const pIdx = updated.findIndex(p => isDateInPeriod(p, date));
 
@@ -492,14 +492,14 @@ export const usePersistence = (): UsePersistenceResult => {
                     if (date > periodEnd) {
                         const newDays = diffInDays(date, p.startDate) + 1;
                         const dayIdx = diffInDays(date, p.startDate);
-                        let activeDays = p.activeDays ? [...p.activeDays] : Array.from({ length: p.days }, (_, i) => i);
+                        const activeDays = p.activeDays ? [...p.activeDays] : Array.from({ length: p.days }, (_, i) => i);
                         activeDays.push(dayIdx);
                         updated[nIdx] = { ...p, days: newDays, activeDays: activeDays.sort((a, b) => a - b) };
                     } else {
                         const oldEnd = addDays(p.startDate, p.days - 1);
                         const newDays = diffInDays(oldEnd, date) + 1;
                         const shift = diffInDays(p.startDate, date);
-                        let activeDays = p.activeDays ? p.activeDays.map(d => d + shift) : Array.from({ length: p.days }, (_, i) => i + shift);
+                        const activeDays = p.activeDays ? p.activeDays.map(d => d + shift) : Array.from({ length: p.days }, (_, i) => i + shift);
                         activeDays.push(0);
                         updated[nIdx] = { ...p, startDate: date, days: newDays, activeDays: activeDays.sort((a, b) => a - b) };
                     }

@@ -401,7 +401,7 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
                   const isOn = !!(settings[item.key as keyof typeof settings]);
                   const timeValue = (settings[item.timeKey as keyof typeof settings] as string) || DEFAULT_REMINDER_TIME;
                   const descKey = item.descKey ? (discrete ? item.descKey.replace('_desc', '_desc_discrete') : item.descKey) : undefined;
-                  let desc = descKey ? t(descKey) : undefined;
+                  const desc = descKey ? t(descKey) : undefined;
                   return (
                     <React.Fragment key={item.key}>
                       <SettingRow

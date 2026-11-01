@@ -93,7 +93,7 @@ function jalCal(jy: number) {
     ];
 
     const bl = breaks.length;
-    let gy = jy + 621;
+    const gy = jy + 621;
     let leapJ = -14;
     let jp = breaks[0];
     let jump: number = 0; // default initialization
@@ -109,7 +109,7 @@ function jalCal(jy: number) {
         jp = jm;
     }
 
-    let n = jy - jp;
+    const n = jy - jp;
 
     // Find the number of leap years from AD 621 to the beginning
     // of the current Jalaali year in the Persian calendar.
