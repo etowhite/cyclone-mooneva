@@ -1,3 +1,4 @@
+import { Field } from './ui/Controls';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PIN_MAX_LENGTH, normalizePinInput, verifyPin } from '../utils/pin';
@@ -136,7 +137,7 @@ const PinLock: React.FC<PinLockProps> = (props) => {
           className="w-20 h-20 rounded-full flex items-center justify-center mb-6 text-[#7598a0]"
           style={{
             backgroundColor: '#F0F2F5',
-            boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)'
+            boxShadow: 'none'
           }}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -158,7 +159,7 @@ const PinLock: React.FC<PinLockProps> = (props) => {
       </div>
 
       <div className="w-full max-w-[280px] space-y-4">
-        <input
+        <Field
           type="password"
           inputMode="numeric"
           pattern="[0-9]*"
@@ -169,7 +170,7 @@ const PinLock: React.FC<PinLockProps> = (props) => {
           onChange={(e) => { setInput(normalizePinInput(e.target.value)); setError(false); }}
           onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
           className={`w-full bg-white border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#7598a0]/30 outline-none transition-all placeholder:text-slate-400 disabled:opacity-50 disabled:bg-slate-100 ${error ? 'border-rose-400' : 'border-slate-300'}`}
-          style={error ? { boxShadow: '0 0 0 2px rgba(251, 113, 133, 0.3)' } : {}}
+          style={error ? { boxShadow: 'none' } : {}}
           autoFocus
           autoComplete="one-time-code"
         />

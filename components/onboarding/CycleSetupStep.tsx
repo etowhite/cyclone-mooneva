@@ -103,7 +103,7 @@ const CycleSetupStep: React.FC<CycleSetupStepProps> = ({ values, onChange }) => 
                             <div className="px-4 pb-4 -mt-1">
                                 <div
                                     className="rounded-xl overflow-hidden"
-                                    style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.25), inset -2px -2px 4px rgba(255, 255, 255, 0.7)' }}
+                                    style={{ boxShadow: 'none' }}
                                 >
                                     <button
                                         type="button"

@@ -499,7 +499,7 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
         <div className="space-y-3">
           <div
             className="bg-[#F0F2F5] p-1.5 rounded-[2rem] flex items-center gap-1"
-            style={{ boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.4), inset -4px -4px 8px rgba(255, 255, 255, 0.8)' }}
+            style={{ boxShadow: 'none' }}
           >
             {[30, 90, 180, 365].map((days) => (
               <button
@@ -511,8 +511,8 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
                   : 'text-slate-500 hover:text-slate-700'
                   }`}
                 style={range === days ? {
-                  backgroundColor: '#5b7a82',
-                  boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.5), -2px -2px 6px rgba(255, 255, 255, 0.8), 0 0 12px rgba(117, 152, 160, 0.3)'
+                  backgroundColor: 'var(--cyclone-primary)',
+                  boxShadow: 'none'
                 } : {}}
               >
                 {days === 365 ? t('trends.year') : t(`trends.${days}d`)}
@@ -535,12 +535,12 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
                     <div
                       className="rounded-[28px] p-5 bg-[#F0F2F5] mb-4 border border-white/20"
                       style={{
-                        boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)'
+                        boxShadow: 'none'
                       }}
                     >
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-2xl bg-[#F0F2F5] flex items-center justify-center text-amber-500 shrink-0"
-                          style={{ boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.8)' }}>
+                          style={{ boxShadow: 'none' }}>
                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" />
                           </svg>
@@ -673,7 +673,7 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
         {pregnancyOpen && Object.keys(cycleDayOpportunities).length === 0 && (
           <div
             className="bg-[#F0F2F5] rounded-[32px] p-6"
-            style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
+            style={{ boxShadow: 'none' }}
           >
             <p className="text-slate-400 text-sm text-center py-8 leading-relaxed">{t('trends.pregnancy_charts_paused')}</p>
           </div>

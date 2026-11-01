@@ -1,7 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import './styles/tokens.css';
+import './styles/palettes.css';
 import './cyclone.css';
+import './styles/controls.css';
 import { i18nReady } from './services/i18n';
 import App from './App';
 

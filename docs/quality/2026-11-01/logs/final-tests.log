@@ -1,0 +1,14 @@
+
+ RUN  v4.0.18 C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva
+
+ ✓ tests/painStats.test.ts (3 tests) 28ms
+ ✓ tests/controls.test.tsx (4 tests) 772ms
+ ✓ tests/cycle.test.ts (6 tests) 34ms
+ ✓ tests/backupCompatibility.test.ts (5 tests) 16ms
+ ✓ tests/dailySuggestions.test.ts (3 tests) 18ms
+
+ Test Files  5 passed (5)
+      Tests  21 passed (21)
+   Start at  23:25:50
+   Duration  10.55s (transform 1.87s, setup 221ms, import 2.93s, tests 867ms, environment 12.52s)
+

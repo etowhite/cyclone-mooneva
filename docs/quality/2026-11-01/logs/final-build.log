@@ -1,0 +1,41 @@
+vite v6.4.1 building for production...
+transforming...
+✓ 177 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/locales/en.json is dynamically imported by C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/services/i18n.ts but also statically imported by C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/components/DailyLogPanel.tsx, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/services/i18n.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/node_modules/.pnpm/@capacitor+core@8.4.1/node_modules/@capacitor/core/dist/index.js is dynamically imported by C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/services/notifications.ts, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/services/notifications.ts but also statically imported by C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/components/screens/NotificationManagerScreen.tsx, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/hooks/useAppTheme.ts, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/node_modules/.pnpm/@capacitor+app@8.0.0_@capacitor+core@8.4.1/node_modules/@capacitor/app/dist/esm/index.js, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/node_modules/.pnpm/@capacitor+app@8.0.0_@capacitor+core@8.4.1/node_modules/@capacitor/app/dist/esm/web.js, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/node_modules/.pnpm/@capacitor+filesystem@8.1.0_@capacitor+core@8.4.1/node_modules/@capacitor/filesystem/dist/esm/index.js, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/node_modules/.pnpm/@capacitor+filesystem@8.1.0_@capacitor+core@8.4.1/node_modules/@capacitor/filesystem/dist/esm/web.js, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/node_modules/.pnpm/@capacitor+local-notifications@8.0.0_@capacitor+core@8.4.1/node_modules/@capacitor/local-notifications/dist/esm/index.js, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/node_modules/.pnpm/@capacitor+local-notifications@8.0.0_@capacitor+core@8.4.1/node_modules/@capacitor/local-notifications/dist/esm/web.js, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/node_modules/.pnpm/@capacitor+share@8.0.0_@capacitor+core@8.4.1/node_modules/@capacitor/share/dist/esm/index.js, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/node_modules/.pnpm/@capacitor+share@8.0.0_@capacitor+core@8.4.1/node_modules/@capacitor/share/dist/esm/web.js, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/node_modules/.pnpm/capacitor-native-settings@8.0.0_@capacitor+core@8.4.1/node_modules/capacitor-native-settings/dist/esm/index.js, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/node_modules/.pnpm/capacitor-native-settings@8.0.0_@capacitor+core@8.4.1/node_modules/capacitor-native-settings/dist/esm/web.js, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/node_modules/.pnpm/capacitor-secure-storage-plugin@0.13.0_@capacitor+core@8.4.1/node_modules/capacitor-secure-storage-plugin/dist/esm/index.js, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/node_modules/.pnpm/capacitor-secure-storage-plugin@0.13.0_@capacitor+core@8.4.1/node_modules/capacitor-secure-storage-plugin/dist/esm/web.js, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/services/appIcon.ts, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/services/autoBackup.ts, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/services/logic/storage.ts, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/services/notifications.ts, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/services/widgetSync.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/services/logic/storage.ts is dynamically imported by C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/contexts/MoonevaContext.tsx but also statically imported by C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/services/autoBackup.ts, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/services/logic/index.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/services/appIcon.ts is dynamically imported by C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/contexts/MoonevaContext.tsx but also statically imported by C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/hooks/useAppTheme.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/services/notifications.ts is dynamically imported by C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/contexts/MoonevaContext.tsx, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/services/logic/storage.ts but also statically imported by C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/components/OnboardingWizard.tsx, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/components/screens/NotificationManagerScreen.tsx, C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva/hooks/useAutoLock.ts, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist/index.html                       0.84 kB │ gzip:   0.49 kB
+dist/assets/index--aznPTLM.css      124.49 kB │ gzip:  21.82 kB
+dist/assets/widgetSync-Ctbi8J6P.js    0.08 kB │ gzip:   0.09 kB
+dist/assets/web-Dv_vBfWB.js           0.36 kB │ gzip:   0.25 kB
+dist/assets/web-YJsIXv5n.js           0.38 kB │ gzip:   0.19 kB
+dist/assets/index-DZ165K9J.js         0.60 kB │ gzip:   0.36 kB
+dist/assets/web-Ptr_ZO4z.js           0.76 kB │ gzip:   0.36 kB
+dist/assets/web-BV9_G-9e.js           1.00 kB │ gzip:   0.43 kB
+dist/assets/autoBackup-C88UHe2g.js    2.26 kB │ gzip:   1.13 kB
+dist/assets/index-oPsYs6HL.js         2.53 kB │ gzip:   1.09 kB
+dist/assets/web-DusutXzr.js           3.45 kB │ gzip:   1.11 kB
+dist/assets/web-Bo7pkVCV.js           8.69 kB │ gzip:   2.96 kB
+dist/assets/ru-5xpW-uHZ.js           66.77 kB │ gzip:  19.00 kB
+dist/assets/index-DfPYTiZX.js       651.94 kB │ gzip: 193.10 kB
+dist/assets/html2pdf-Lh47UXoM.js    983.90 kB │ gzip: 285.54 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 14.72s

@@ -1,0 +1,36 @@
+/* Shared 4px rhythm. Calendar dates and the original Material slider keep their own geometry. */
+@font-face {
+  font-family: 'Cyclone Roboto';
+  src: url('/fonts/Roboto-variable.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+:root {
+  --font-app: 'Cyclone Roboto', Roboto, Arial, sans-serif;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --text-caption: .75rem;
+  --text-label: .875rem;
+  --text-body: 1rem;
+  --text-title: 1.375rem;
+  --text-page: 2rem;
+  --line-body: 1.45;
+  --line-heading: 1.2;
+  --weight-body: 400;
+  --weight-label: 600;
+  --radius-field: 16px;
+  --radius-control: 24px;
+  --radius-card: 32px;
+  --border-width: 1px;
+  --control-size: 44px;
+  --navigation-height: calc(3.5rem + 16px);
+  --icon-size: 24px;
+  --cyclone-block-gap: var(--space-4);
+  --motion-fast: 160ms;
+}

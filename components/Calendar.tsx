@@ -8,7 +8,7 @@ import { getCycleVisibility } from '../services/logic/settingsInterlocks';
 import { DayCell } from './calendar/DayCell';
 import { SexMarkerIcon } from './calendar/SexMarkerIcon';
 import { CycleInsightModal } from './calendar/CycleInsightModal';
-import { CycleInsightMoon } from './calendar/CycleInsightMoon';
+import { CycloneMark } from './ui/CycloneMark';
 import { useSwipe } from '../hooks/useSwipe';
 import { useCalendarSystem } from '../hooks/useCalendarSystem';
 import { pushBackInterceptor } from '../hooks/useAppNavigation';
@@ -203,7 +203,7 @@ const Calendar: React.FC<CalendarProps> = ({
           <div
             onClick={() => setShowInsight(true)}
             className="relative z-10 cursor-pointer bg-[#F0F2F5] rounded-[32px] py-5 px-4 sm:py-8 sm:px-4 flex flex-col items-center text-center overflow-hidden transition-transform active:scale-[0.98]"
-            style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
+            style={{ boxShadow: 'none' }}
           >
             <div className="flex flex-col items-center z-10 w-full px-2">
               {statusDate && (() => {
@@ -271,7 +271,7 @@ const Calendar: React.FC<CalendarProps> = ({
                         aria-label={t('cycle_insight.title')}
                         title={t('cycle_insight.title')}
                       >
-                        <CycleInsightMoon className="cycle-insight-moon-spin h-4 w-4" />
+                        <CycloneMark className="cycle-insight-moon-spin h-4 w-4" />
                       </button>
                     </span>
                   </div>
@@ -319,7 +319,7 @@ const Calendar: React.FC<CalendarProps> = ({
 
       <div
         className="calendar-swipe-surface relative z-10 bg-[#F0F2F5] rounded-[32px] px-4 pt-4 pb-2 sm:pt-6 sm:pb-3 sm:px-4 transition-all overflow-hidden mt-3"
-        style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
+        style={{ boxShadow: 'none' }}
         {...swipeHandlers}
       >
 
@@ -329,7 +329,7 @@ const Calendar: React.FC<CalendarProps> = ({
             <button
               onClick={() => setShowLegend(!showLegend)}
               aria-label={showLegend ? t('calendar.guide.hide') : t('calendar.guide.show')}
-              style={{ boxShadow: showLegend ? 'var(--shadow-inset-xs)' : 'var(--shadow-raised-xs)' }}
+              style={{ boxShadow: 'none' }}
               className="calendar-guide-trigger animate-guide-button relative rounded-full bg-[#F0F2F5] px-2 py-1 text-[9px] after:content-[''] after:absolute after:-inset-x-1 after:-inset-y-2 font-bold uppercase tracking-[0.1em] transition-shadow"
             >
               {t('calendar.guide.label')}
@@ -369,7 +369,7 @@ const Calendar: React.FC<CalendarProps> = ({
             <div
               data-testid="calendar-month-picker"
               className="absolute inset-x-3 top-12 z-40 rounded-3xl bg-[#F0F2F5] p-3 animate-fade-in"
-              style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.45), -8px -8px 16px rgba(255, 255, 255, 0.9)' }}
+              style={{ boxShadow: 'none' }}
               // The card owns the month-swipe gesture; without this, dragging across the
               // picker flips the month behind it.
               onTouchStart={e => e.stopPropagation()}
@@ -406,7 +406,7 @@ const Calendar: React.FC<CalendarProps> = ({
                           ? 'bg-[#7598a0] text-white shadow-sm'
                           : 'bg-[#F0F2F5] text-slate-600'
                       }`}
-                      style={isCurrent ? undefined : { boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.35), -2px -2px 4px rgba(255, 255, 255, 0.85)' }}
+                      style={isCurrent ? undefined : { boxShadow: 'none' }}
                     >
                       {fmt.monthName(pickerYear, m)}
                     </button>
@@ -495,7 +495,7 @@ const Calendar: React.FC<CalendarProps> = ({
                 className="px-4 py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-[0.12em] whitespace-nowrap transition-all duration-300 active:scale-[0.98] text-slate-600"
                 style={{
                   backgroundColor: '#F0F2F5',
-                  boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.4), -4px -4px 8px rgba(255, 255, 255, 0.8)'
+                  boxShadow: 'none'
                 }}
               >
                 {t('common.cancel', 'Cancel')}
@@ -513,7 +513,7 @@ const Calendar: React.FC<CalendarProps> = ({
               className={`period-action-button min-w-[140px] max-w-full px-[15px] py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-[0.12em] max-[340px]:tracking-[0.04em] whitespace-nowrap active:scale-[0.98] justify-self-center flex items-center justify-center gap-2 animate-period-button text-[#5b7a82]`}
               style={{
                 backgroundColor: '#F0F2F5',
-                boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)'
+                boxShadow: 'none'
               }}
             >
               {todayIsPeriod ? (

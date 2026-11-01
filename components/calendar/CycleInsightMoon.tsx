@@ -1,3 +1,0 @@
-import React from 'react';
-// Original cyclone mark, shared with the Android launcher.
-export const CycleInsightMoon = ({className}:{className?:string}) => <svg className={className} viewBox="24 24 60 60" aria-hidden="true"><path d="M32 43 C37 31 53 26 66 32 C75 35 80 43 79 52 C76 43 70 38 62 37 C50 34 39 37 32 43 Z" fill="currentColor"/><path transform="rotate(180 54 54)" d="M32 43 C37 31 53 26 66 32 C75 35 80 43 79 52 C76 43 70 38 62 37 C50 34 39 37 32 43 Z" fill="currentColor"/><path d="M54 42 C55 50 58 53 66 54 C58 55 55 58 54 66 C53 58 50 55 42 54 C50 53 53 50 54 42 Z" fill="currentColor"/></svg>;

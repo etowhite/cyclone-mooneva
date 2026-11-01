@@ -18,7 +18,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, onViewChange, onSett
                 className={`mooneva-bottom-nav flex justify-around items-center h-14 px-4 rounded-[28px] transition-colors ${isCloaked ? 'bg-slate-900 border border-white/10' : 'bg-[#F0F2F5]'
                     }`}
                 style={!isCloaked ? {
-                    boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)'
+                    boxShadow: 'none'
                 } : {}}
                 aria-label={t('common.navigation', 'Navigation')}
             >

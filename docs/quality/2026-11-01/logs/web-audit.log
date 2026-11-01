@@ -1,0 +1,39 @@
+PASS first launch, two languages, selected goal
+PASS palette 360/rose/light
+PASS palette 360/lavender/light
+PASS palette 360/sage/light
+PASS palette 360/ocean/light
+PASS palette 360/amber/light
+PASS palette 360/rose/dark
+PASS palette 360/lavender/dark
+PASS palette 360/sage/dark
+PASS palette 360/ocean/dark
+PASS palette 360/amber/dark
+PASS palette 412/rose/light
+PASS palette 412/lavender/light
+PASS palette 412/sage/light
+PASS palette 412/ocean/light
+PASS palette 412/amber/light
+PASS palette 412/rose/dark
+PASS palette 412/lavender/dark
+PASS palette 412/sage/dark
+PASS palette 412/ocean/dark
+PASS palette 412/amber/dark
+PASS palette 1280/rose/light
+PASS palette 1280/lavender/light
+PASS palette 1280/sage/light
+PASS palette 1280/ocean/light
+PASS palette 1280/amber/light
+PASS palette 1280/rose/dark
+PASS palette 1280/lavender/dark
+PASS palette 1280/sage/dark
+PASS palette 1280/ocean/dark
+PASS palette 1280/amber/dark
+PASS backup UI export and file-input refs
+PASS corrupt backup rejected; JSON roundtrip retains entries and periods
+PASS pain pointer zero, drag maximum, keyboard, restart, date range averages and interactive points
+PASS Настройки all ten theme variants
+PASS Аналитика all ten theme variants
+PASS encrypted backup roundtrip and wrong password rejection
+PASS auto appearance follows device preference
+PASS local-only operation with external network blocked

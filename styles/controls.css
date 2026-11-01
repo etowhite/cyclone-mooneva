@@ -1,0 +1,94 @@
+/* Component rules follow the compatibility layer. No !important: new components own their geometry. */
+body[data-cyclone] .cyclone-button {
+  min-height: var(--control-size);
+  min-width: var(--control-size);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width) solid var(--border-soft);
+  border-radius: var(--radius-control);
+  font: var(--weight-label) var(--text-label)/var(--line-heading) var(--font-app);
+  text-transform: none;
+  letter-spacing: normal;
+  background: var(--surface);
+  color: var(--text-primary);
+  transition: background-color var(--motion-fast), border-color var(--motion-fast);
+}
+body[data-cyclone] .cyclone-button--filled,
+body[data-cyclone] .cyclone-button[aria-pressed='true'] {
+  background: var(--cyclone-primary);
+  color: var(--cyclone-on-primary);
+  border-color: var(--cyclone-primary);
+}
+body[data-cyclone] .cyclone-button--text { background: transparent; border-color: transparent; color: var(--cyclone-primary); }
+body[data-cyclone] .cyclone-button:active:not(:disabled) { filter: brightness(.94); }
+body[data-cyclone] .cyclone-button:disabled { opacity: .5; cursor: not-allowed; }
+body[data-cyclone] .cyclone-card {
+  padding: var(--space-5);
+  border: var(--border-width) solid var(--border-soft);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: none;
+}
+body[data-cyclone] :is(.cyclone-field, input:not([type='checkbox']):not([type='radio']):not([type='range']), textarea) {
+  min-height: var(--control-size);
+  max-width: 100%;
+  border-radius: var(--radius-field);
+  font-family: var(--font-app);
+  line-height: var(--line-body);
+  accent-color: var(--cyclone-primary);
+  color: var(--text-primary);
+  background-color: var(--surface-alt);
+}
+body[data-cyclone] :is(input, textarea)::placeholder { color: var(--text-secondary); opacity: 1; }
+body[data-cyclone] :is(input, textarea)[aria-invalid='true'] { border-color: var(--color-error, #b3261e); }
+body[data-cyclone] .cyclone-toggle {
+  display: inline-grid;
+  place-items: center;
+  position: relative;
+  flex: none;
+  width: var(--control-size);
+  height: var(--control-size);
+  min-width: var(--control-size);
+  min-height: var(--control-size);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  overflow: visible;
+}
+body[data-cyclone] .cyclone-toggle-track {
+  display: block;
+  position: relative;
+  width: 40px;
+  height: 24px;
+  border: var(--border-width) solid var(--border-soft);
+  border-radius: var(--radius-control);
+  background: var(--surface-alt);
+}
+body[data-cyclone] .cyclone-toggle-thumb {
+  display: block;
+  position: absolute;
+  top: 3px;
+  inset-inline-start: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  transition: transform var(--motion-fast);
+}
+body[data-cyclone] .cyclone-toggle[aria-checked='true'] { background: transparent; }
+body[data-cyclone] .cyclone-toggle[aria-checked='true'] .cyclone-toggle-track { background: var(--cyclone-primary); border-color: var(--cyclone-primary); }
+body[data-cyclone] .cyclone-toggle[aria-checked='true'] .cyclone-toggle-thumb { background: var(--cyclone-on-primary); transform: translateX(16px); }
+html[dir='rtl'] body[data-cyclone] .cyclone-toggle[aria-checked='true'] .cyclone-toggle-thumb { transform: translateX(-16px); }
+body[data-cyclone] .cyclone-toggle:disabled { opacity: .5; }
+body[data-cyclone] .cyclone-setting-row { padding: var(--space-4) var(--space-5); }
+body[data-cyclone] .cyclone-setting-row p { margin-top: var(--space-1); font-size: var(--text-caption); line-height: var(--line-body); }
+body[data-cyclone] .cyclone-setting-title { font-size: var(--text-label); line-height: var(--line-heading); overflow-wrap: normal; }
+body[data-cyclone] .cyclone-subheader { flex-shrink: 0; background: var(--app-bg); }
+body[data-cyclone] .cyclone-number-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); padding: var(--space-4) var(--space-5); }
+body[data-cyclone] .cyclone-number-label { flex: 1 1 140px; display: flex; gap: var(--space-3); align-items: center; }
+body[data-cyclone] .cyclone-number-label small { display: block; color: var(--text-secondary); font-size: var(--text-caption); line-height: var(--line-body); }
+body[data-cyclone] .cyclone-number-controls { display: flex; gap: var(--space-2); align-items: center; }
+body[data-cyclone] .cyclone-number-controls input { width: 52px; text-align: center; }
+@media (prefers-reduced-motion: reduce) {
+  body[data-cyclone] :is(.cyclone-button, .cyclone-toggle-thumb) { transition: none; }
+}

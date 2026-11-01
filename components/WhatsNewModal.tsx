@@ -13,13 +13,13 @@ export const WhatsNewModal: React.FC<WhatsNewModalProps> = ({ onClose }) => {
     'Пять палитр, светлая, тёмная и автоматическая тема cyclone.',
     'Оформление и язык в отдельном разделе настроек.',
     'Подписи навигации и читаемые контуры карточек.',
-    'На Android иконка следует палитре приложения и яркости темы устройства.',
+    'Новая монохромная иконка cyclone со спиральным вихрем.',
     'Расчёты, история и аналитика основаны на Mooneva; форк пока находится в разработке.'
   ] : [
     'Five palettes with light, dark and automatic cyclone appearance.',
     'Appearance and language in a dedicated settings page.',
     'Labeled navigation and outlined cards.',
-    'On Android the icon follows the app palette and device theme brightness.',
+    'A new monochrome cyclone icon with a spiral vortex.',
     'Calculations, history and analytics are based on Mooneva. This fork is still in development.'
   ];
   // Android back runs the same onClose as the button (which marks the notes as seen).

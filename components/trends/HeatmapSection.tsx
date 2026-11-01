@@ -103,7 +103,7 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
     return (
         <section
             className="bg-[#F0F2F5] rounded-[32px] p-6"
-            style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
+            style={{ boxShadow: 'none' }}
         >
             {/* Header - stacked like MoodByPhase */}
             <div className="flex flex-col gap-1 mb-6">
@@ -113,7 +113,7 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
                         <span className="heatmap-scale-label text-[8px] font-extrabold uppercase text-slate-500 tracking-wider">{lowLabel}</span>
                         <div
                             className="w-16 h-2 rounded-full overflow-hidden"
-                            style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3), inset -2px -2px 4px rgba(255, 255, 255, 0.7)' }}
+                            style={{ boxShadow: 'none' }}
                         >
                             <div
                                 className="h-full w-full"

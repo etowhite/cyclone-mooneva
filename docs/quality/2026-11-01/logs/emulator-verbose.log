@@ -1,0 +1,42 @@
+INFO         | Android emulator version 37.2.12.0 (build_id 16428233) (CL:N/A)
+INFO         | Graphics backend: gfxstream
+DEBUG   | Current emulator version 37.2.12 is the same as the required version 37.2.12.
+INFO         | Found AVD name 'cyclone_design'
+INFO         | Found AVD target architecture: x86_64
+INFO         | argv[0]: 'C:\Users\white\Downloads\python setup_and_build.py\.toolchain\android-sdk\emulator\emulator.exe'; program directory: 'C:\Users\white\Downloads\python setup_and_build.py\.toolchain\android-sdk\emulator'
+INFO         | Found systemPath C:\Users\white\Downloads\python setup_and_build.py\.toolchain\android-sdk\system-images\android-35\google_apis\x86_64\
+INFO         | emuDirName: 'C:\Users\white\Downloads\python setup_and_build.py\.toolchain\android-sdk\emulator'
+INFO         | try dir C:\Users\white\Downloads\python setup_and_build.py\.toolchain\android-sdk\emulator
+INFO         | Trying emulator path 'C:\Users\white\Downloads\python setup_and_build.py\.toolchain\android-sdk\emulator\qemu\windows-x86_64\qemu-system-x86_64-headless.exe'
+INFO         | Found target-specific 64-bit emulator binary: C:\Users\white\Downloads\python setup_and_build.py\.toolchain\android-sdk\emulator\qemu\windows-x86_64\qemu-system-x86_64-headless.exe
+INFO         | Adding library search path: 'C:\Users\white\Downloads\python setup_and_build.py\.toolchain\android-sdk\emulator\lib64'
+INFO         | Adding library search path: 'C:\Users\white\Downloads\python setup_and_build.py\.toolchain\android-sdk\emulator\lib64\gles_swiftshader'
+INFO         | Adding library search path: 'C:\Users\white\Downloads\python setup_and_build.py\.toolchain\android-sdk\emulator\lib64\vulkan'
+INFO         | Quoted param: ["C:\Users\white\Downloads\python setup_and_build.py\.toolchain\android-sdk\emulator\qemu\windows-x86_64\qemu-system-x86_64-headless.exe"]
+INFO         | Quoted param: [-avd]
+INFO         | Quoted param: [cyclone_design]
+INFO         | Quoted param: [-port]
+INFO         | Quoted param: [5574]
+INFO         | Quoted param: [-no-window]
+INFO         | Quoted param: [-no-audio]
+INFO         | Quoted param: [-no-snapshot]
+INFO         | Quoted param: [-gpu]
+INFO         | Quoted param: [swiftshader_indirect]
+INFO         | Quoted param: [-memory]
+INFO         | Quoted param: [1024]
+INFO         | Quoted param: [-verbose]
+DEBUG   | emulator: Running :C:\Users\white\Downloads\python setup_and_build.py\.toolchain\android-sdk\emulator\qemu\windows-x86_64\qemu-system-x86_64-headless.exe
+DEBUG   | qemu backend: argv[00] = ""C:\Users\white\Downloads\python setup_and_build.py\.toolchain\android-sdk\emulator\qemu\windows-x86_64\qemu-system-x86_64-headless.exe""
+DEBUG   | qemu backend: argv[01] = "-avd"
+DEBUG   | qemu backend: argv[02] = "cyclone_design"
+DEBUG   | qemu backend: argv[03] = "-port"
+DEBUG   | qemu backend: argv[04] = "5574"
+DEBUG   | qemu backend: argv[05] = "-no-window"
+DEBUG   | qemu backend: argv[06] = "-no-audio"
+DEBUG   | qemu backend: argv[07] = "-no-snapshot"
+DEBUG   | qemu backend: argv[08] = "-gpu"
+DEBUG   | qemu backend: argv[09] = "swiftshader_indirect"
+DEBUG   | qemu backend: argv[10] = "-memory"
+DEBUG   | qemu backend: argv[11] = "1024"
+DEBUG   | qemu backend: argv[12] = "-verbose"
+DEBUG   | Concatenated backend parameters:  '"C:\Users\white\Downloads\python setup_and_build.py\.toolchain\android-sdk\emulator\qemu\windows-x86_64\qemu-system-x86_64-headless.exe" ' -avd cyclone_design -port 5574 -no-window -no-audio -no-snapshot -gpu swiftshader_indirect -memory 1024 -verbose
