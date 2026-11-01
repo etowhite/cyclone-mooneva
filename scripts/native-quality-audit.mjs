@@ -46,7 +46,7 @@ try{
  sh('shell','am','start','-n','com.cyclone.mooneva.debug/com.mooneva.app.MainActivity');await p.waitForTimeout(700);
  assert.equal(await slider.getAttribute('aria-valuenow'),'10');pass('WebView pain zero/max and return from background');
  await p.reload();await p.waitForTimeout(1800);
- await p.locator('.calendar-day-cell[aria-current=date]').click();await p.getByRole('tab',{name:'Тело',exact:true}).click();
+ await p.locator('.calendar-day-cell[aria-current=date]').click();const edit=p.getByRole('button',{name:/Нажмите, чтобы изменить/});if(await edit.count())await edit.click();await p.getByRole('tab',{name:'Тело',exact:true}).click();
  assert.equal(await p.getByRole('slider',{name:'Боль',exact:true}).getAttribute('aria-valuenow'),'10');pass('native pain survives reload');
  await p.getByRole('button',{name:'Аналитика',exact:true}).click();
  await p.locator('.cyclone-pain-chart').scrollIntoViewIfNeeded();await shot('analytics');
@@ -56,7 +56,7 @@ try{
  const prefs=sh('shell','run-as','com.cyclone.mooneva.debug','cat','shared_prefs/mooneva_widget_prefs.xml');
  assert.match(prefs,/snapshots/);assert.match(prefs,/lavender/);fs.writeFileSync(path.join(out,'android-widget-sync.xml'),prefs);pass('native widget data and palette sync');
  assert.deepEqual(errors,[]);pass('no WebView JavaScript exceptions');
-}finally{
+}catch(e){results.push({name:e.message,status:'FAIL'});throw e;}finally{
  fs.writeFileSync(path.join(out,'android-results.json'),JSON.stringify({at:new Date().toISOString(),results,errors},null,2));
  await browser.close();
 }

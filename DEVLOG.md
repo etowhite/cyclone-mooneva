@@ -1,24 +1,23 @@
 # 1. Текущая цель
-Текущие запросы завершены: опубликована beta4 отдельного форка cyclone. Продолжать развитие по новым отзывам и оставшимся задачам миграции/регрессии.
+Завершить комплексную доработку cyclone-mooneva и применение готовых иконок, опубликовать проверяемый PR в GitHub. Ветка cyclone/november-quality; отдельный ../cyclone не меняется.
 
 # 2. Выполненные шаги
-- Отдельный GitHub fork etowhite/cyclone-mooneva, ветка cyclone/design, PR #1. GPL-3.0-or-later и атрибуция Mooneva сохранены; старый ../cyclone не менялся.
-- Пять палитр, темы, иконки по палитре/системной яркости, en/ru, единые кнопки/шрифты/карточки, PIN/data UI, детские пояснения и обновлённый первый запуск.
-- Лаборатория полностью убрана из приложения. Основные записи старых бэкапов читаются, локальный PIN не перезаписывается.
-- Три ежедневные подсказки и два виджета, отсутствие подсказок без дня цикла. Виджеты используют общий Mooneva-модельный snapshot, не дублируют расчёт нативно.
-- Оценка боли 0–10 с сохранением нуля, интерактивный график, точные выбранные периоды и средние только по отмеченным дням.
-- Beta4 заменяет прежний slider отдельным React-переносом параметров оригинального Material3 Slider1.3.0 из native SymptomScreen.kt: 16px track,4×44thumb(2press/focus),6gap,4ticks,0..10/steps9, цвета исходных палитр. Inline-секция без отдельной рамки сохранена.
-- Проверены TypeScript,15тестов, мобильные UI360/412, tap0/drag10/keyboard6, сохранение и аналитика90mean4.5/30mean7,JSerrors0. Web/Android builds и exact-head CI успешны.
+- Upstream/main827e36a2bd863efa24faae608ca826bb1d56eab1 от2026-10-19 уже полностью в истории форка; новых исправлений для переноса нет.
+- Коммиты:7ff7e60 lint/tooling,95ac973 backup,eaedeea tokens/design,3b75c81 merge origin/main,f2c8288 готовые Vortex icons,6c9aaf6 mobile zoom.
+- Единые tokens/palettes/controls, локальный Roboto+OFL/кириллица, rem typography,44px targets, light contrast, отсутствие!important вcyclone.css. Расчёты не менялись; Lab удалена.
+- Свежие TS/lint/21unit/web/Cap sync/Android build PASS. Browser50theme/view combinations,backup JSON+encrypted/corrupt, pain0/10/keyboard/persistence/means,auto/200%font,production onboarding/notes/PIN PASS; console errors0.
+- Готовые иконки другого чата применены и закоммичены по прямому поручению пользователя: web,React,Android launcher/adaptive/monochrome/splash/notification/store. Генератор один; canonical path/PNG/11aliases проверены.
+- APK6225253bytes,SHA2565c5ce0bc67ed748bf4de0e0bc0334edf62a85a2c74a99a217fd7eec6a21e3281,source6c9aaf6,debug3.0.0-beta.4/code29. Файл ../releases/cyclone-mooneva-quality-2026-11-01/cyclone-mooneva-quality.apk.
 
 # 3. Текущий статус и проблемы
-Опубликована https://github.com/etowhite/cyclone-mooneva/releases/tag/v3.0.0-beta.4 . Source74358b34f08e065e9c3cb0080729e4af648fe47f,обаCI SUCCESS. APK3.0.0-beta.4/code29,com.cyclone.mooneva.debug,labelcyclone,V2подпись,5588567bytes. SHA2562c1680322184314012574c4951fcd519c60470a66363d6b4e258fcccf6541feb совпадает с GitHub asset digest. Обновляет предыдущие beta этого форка.
-Own emulator5574 OFF,5554не трогали,QAhostудалён,9223forwardснят. Последние beta3/4 UI проверялись в Chrome mobile; не заявлять полной Android/медицинской регрессии. Native cyclone JSON migration/биометрия/production signing ещё не готовы.
+Android runtime НЕ ПРОВЕРЕНО: SDK emulator37.2.12 не загружает Android/adb (DLL error,access violation;directbackendhang). Собственный AVD5574 выключен, временные SDK DLL удалены; другие устройства не трогались. Native widgets/notifications/back/permissions/IME/background/logcat требуют рабочего testdevice.
+Report+selectedscreens+logs:docs/quality/2026-11-01/REPORT.md. Полные local artifacts:verification/update-2026-11-01. GitHub PR/CI сейчас оформляются. Не считать build доказательством полного тестирования.
 
 # 4. Следующие шаги
-1. Новые отзывы и issues #2 mobile QA/#3 native integration. Не восстанавливать удалённую Lab.
-2. Активно вести GitHub через PR/CI. Main protected: PR,webCI strict,admins enforced,no force/delete,approvals0.
-3. Читать и обновлять DEVLOG перед изменениями/ответами; отчёты о журнале в чат не нужны. CONTINUE_PROMPT держать готовым до любого лимита.
-4. Не коммитить ключи,SDK,dist,node_modules,личные данные/QA outputs. JDK21/SDK36/Gradle8.14.3 в ../.toolchain; на8GBhost не совмещать Gradle и эмулятор.
+1. Commit QA scripts/docs, push cyclone/november-quality, создать PR в main; дождаться exact-head CI. Не merge main автоматически.
+2. Дополнить этот журнал и CONTINUE_PROMPT ссылкой на PR/результатом CI.
+3. Для продолжения native QA восстановить SDK emulator или отдельное synthetic testdevice. scripts/native-quality-audit.mjs подготовлен, но не исполнялся на Android и может требовать исправления локаторов/диалогов.
+4. Читать/обновлять DEVLOG до кода и ответов, без отчёта о журнале в чате; CONTINUE_PROMPT держать готовым. Не публиковать keys/cache/SDK/health data. Native cyclone migration/biometrics остаются вне выполненного объёма.
 
 ## История проверок
 
@@ -139,3 +138,86 @@ Own emulator5574 OFF,5554не трогали,QAhostудалён,9223forwardсн�
 - Beta4source74358b34f08e065e9c3cb0080729e4af648fe47f опубликован,обаGitHubCI SUCCESS. Buildweb16s/Android1m1sSUCCESS,aaptlabelcyclone/version3.0.0-beta.4/code29,V2signatureVALID. APK5588567bytes,SHA2562c1680322184314012574c4951fcd519c60470a66363d6b4e258fcccf6541feb. MobiletouchauditPASS0/drag10/keyboard6,analyticsunchanged,errors0. Публикуемprerelease exactsource74358b3.
 
 - Beta4 release API confirmed prerelease=true,APK+SHA256SUMS uploaded,digest matches. Current request complete.
+
+Финальная проверка: рабочее дерево чистое, документация 64702ec опубликована в origin/cyclone/design; beta4 готова к передаче пользователю.
+
+2026-10-29: пользователь ответил «да» со скриншотом PR. Проверяем состояние PR #1; явное действие в сообщении не названо, слияние требует уточнения контекста.
+Уточнение: gh без --repo не нашёл PR; используем явно etowhite/cyclone-mooneva. Нужно уточнить, означает ли «да» слияние PR в main.
+
+2026-10-29: пользователь явно подтвердил слияние PR #1 в main. Проверяем CI и защиту ветки, затем выполняем обычное слияние без обхода защиты.
+
+PR #1 объединён штатной командой gh pr merge --merge после двух успешных web CI, mergeState CLEAN. Слияние подтверждается GitHub; beta4 остаётся доступной.
+
+2026-10-30: запрос «перенеси всё в облако». Проверяем локальные изменения и существующий GitHub. Требуется уточнить назначение облака и объём переноса перед загрузкой файлов вне исходников.
+
+2026-11-01: комплексное обновление. Сохраняем локальные изменения DEVLOG/CONTINUE_PROMPT. Сначала baseline, upstream fetch/merge-base; совместимые исправления и дизайн отдельными коммитами; затем актуальные web/Android проверки и отчёт.
+
+2026-11-01 baseline: TypeScript PASS, 15/15 tests PASS, production web PASS (large chunk warning); lint FAIL — missing ESLint flat configuration. Upstream/main 827e36a2 equals merge-base, no new commits to port. Plan: add real lint gate, consolidate design tokens and legacy compatibility rules, shared accessible controls, test rendering and backup contracts without changing forecasts.
+
+2026-11-01 after interruption: Android baseline BUILD SUCCESSFUL (2m26s), sync PASS. Working tree now has additional branding/icon/WhatsNew/useAppTheme/capacitor changes made outside this task; preserve all, avoid editing those files and do not stage them in this task. Continue with design styles/shared controls and lint only.
+
+Design implementation: extract palette and 4px spacing/type/radius tokens, remove duplicate/inherited important overrides rather than add new ones. Shared Button/Choice/Card/Field and accessible 44px Toggle; preserve original pain track/date cells. Bundle Roboto locally with OFL for offline Cyrillic consistency. Lint first pass identified ten safe prefer-const fixes.
+
+User confirmed parallel icon work in another chat: do not stage or overwrite branding files. Design tokens and controls added, Roboto downloaded from google/fonts with OFL. Next remove stale inline shadows/duplicate CSS and verify all palette contrast and actual navigation before final builds.
+
+First live web regression PASS: pain pointer=0, drag=10, keyboard=6 persist; 90-day mean4.5/30-day mean7 and point selection PASS; no JS errors. TypeScript caught missing ref support in shared Field; fixed with React19 ComponentPropsWithRef, needed for backup file pickers. Next verify refs in UI roundtrip and 200% font layouts.
+
+Visual audit found a real contrast failure in light Sage: secondary text 4.26:1, below4.5. Darken light secondary tokens (without changing the source/native slider palette). First launch en/ru and selected goal PASS. New reproducible Playwright audit saved in scripts/quality-audit.cjs; continue after correcting contrast.
+
+30 palette/width combinations PASS after contrast fixes. Visual review found old high-specificity switch rule painting its entire 44px hit target; remove obsolete rule, keep track40x24. Header buttons still use inline near-white backgrounds: migrate to shared Button. Test navigation had an incorrect selector (cycle header is not subheader); label the real Back control and fix audit.
+
+Browser audit exposed export hanging on the browser's Capacitor share shim instead of downloading. Fix web export to download directly; native still uses Filesystem+Share, and native failures must surface to the UI. Add malformed-period backup validation so imported null/invalid dates cannot crash calendar; do not clamp valid historical durations or change forecasts.
+
+- 2026-11-01: пользователь подтвердил параллельную работу другого чата над иконками. Эти файлы сохраняем вне наших коммитов. Browser QA подтвердил JSON export после исправления; после import страница chrome-error, проверяем доступность dev-сервера и навигацию, затем повторяем проверки.
+
+- Dev-сервер 5174 завершился между экспортом и reload; chrome-error не является ошибкой восстановления. Перезапускаем сервер отдельным скрытым процессом, повторяем аудит. Добавляем проверки повреждённых period objects без изменения расчётов.
+
+- Свежие проверки: TypeScript/lint PASS, 21 unit PASS; browser JSON roundtrip, corrupt rejection, клавиатура боли/сохранение/средние, auto-theme и external-network-blocked PASS. Уточняем 200% тест на мобильной ширине (предыдущий был wide), переводим типографику compatibility-слоя в rem; расширяем palette matrix на настройки/аналитику и encrypted backup. Далее web/Capacitor/Android build и отдельный5574 runtime.
+
+- Мобильный 200% screenshot выявил фиксированный размер подписей навигации. Переводим их и высоту панели в rem, резервируем место под увеличенную панель в scroll-контейнерах, проверяем переносы. Обновляем CONTINUE_PROMPT текущим состоянием вместо устаревшего статуса завершённой beta4.
+
+- При чтении onboarding найден оставшийся недостижимый второй if(step===6) от удалённого скрытого режима. Удаляем его, проверяем полный переход 4→6→Назад4→6→завершение. Последние правки навигации попадут в повторную сборку после завершения текущей.
+
+- Готовим раздельные коммиты: инфраструктура проверок (lint/Playwright/безопасные const), исправление backup, затем дизайн. Upstream новых коммитов не содержит. Чужие icon/config изменения сохраняются unstaged. Полная matrix после rem/nav изменений выполняется повторно.
+
+- Повторная web production/Cap sync/Android build PASS (1m53s), APK292e9aa1…. API35 emulator пока не запустился: launcher завершается с code1 после systemPath без пояснения. Проверяем ANDROID_SDK_ROOT/verbose и доступность headless backend; не считать native runtime PASS до фактического запуска.
+
+- Эмулятор возвращает Windows STATUS_DLL_NOT_FOUND(-1073741515) до старта Android; headless и windowed backend одинаково. WHPX доступен. DLL сами загружаются, проверяем поиск библиотек backend: добавляем только отсутствующие lib64 DLL рядом с qemu в локальном SDK (код проекта не меняется). Если запуск останется недоступен, Android runtime/виджеты/logcat честно отметить НЕ ПРОВЕРЕНО.
+
+- SDK backend запускается напрямую после восстановления поискаDLL, launcher отдельно падал. Ожидаем boot_completed, затем установка только на5574 и synthetic onboarding. Готовим воспроизводимый native QA через WebView CDP с проверкой имени AVD; не используем личные данные/другие устройства.
+
+- Эмуляторная среда остаётся неработоспособной: launcher DLL error/access violation, direct backend висит до adb и загрузки Android; GPUoff тоже. Завершаем только наш backend, возвращаем внесённые SDK DLL, runtime проверки помечаем НЕ ПРОВЕРЕНО с логами. Веб-проверки дополняем полным onboarding, редактированием заметок и PIN, не выдаём сборку за runtime QA.
+
+- Эмуляторные попытки завершены: наш qemu остановлен, добавленные SDK DLL удалены по проверенным абсолютным путям. Полный onboarding browser harness остановился на проверке кнопки; сохраняем screenshot и DOM шага для выяснения, ошибка пока в сценарии теста, не считать сценарий PASS.
+
+- Готов сообщить пользователю: Android APK собран, runtime проверки заблокированы локальным эмулятором; веб matrix, encrypted/plain backups и боль проходят. Дополнительные onboarding/PIN сценарии завершаем до отчёта, затем GitHub PR. Блокирующий runtime не скрывать за успешной сборкой.
+
+- Причина остановки flow harness: regex не включал существующую кнопку «Начать отслеживание» на втором экране. Исправляем только селектор; продукт не меняем. Повторно проверяем полный путь.
+
+- На финальном onboarding экране upstream нет кнопки «Назад»; исправляем harness: возврат проверяется с шага управления циклом на выбор цели (4→3→4). Недостижимая ветка prevStep удалена без добавления нового экрана/изменения алгоритма.
+
+- Полный onboarding browser PASS, включая возврат 4→3→4; продолжается note/PIN. git diff --check нашёл только лишнюю пустую строку index.css, убираем. Финальные unit/type/lint повторяются на текущих файлах. Прогнозы upstream не менялись (0 новых upstream commits, текущий fork16 ahead).
+
+- Note QA подтвердил сохранённую заметку на DayPreview после reload. Для повторного редактирования нужен существующий «Нажмите, чтобы изменить», а не вкладка закрытого редактора; исправляем шаг теста. Продуктовый путь просмотр→изменить сохраняем.
+
+- Фиксируем проверяемый слой дизайна отдельным коммитом: shared primitives/tokens/palettes/fonts и миграция основного UI. Функциональное исправление backup уже95ac973, gate7ff7e60. Parallel branding/config/icons остаются вне индекса. Snapshot APK сохраняем локально с SHA и отметкой включённых параллельных файлов.
+
+- Дополнительные браузерные сценарии PASS: полный onboarding/возврат, сохранение и повторное редактирование заметки, PIN setup/incomplete+mismatch disabled/unlock после reload. Коммиты7ff7e60(tooling),95ac973(backup),eaedeea(design) созданы; origin/main включён merge-коммитом без изменения чужих файлов. Готовим отчёт/скриншоты/логи/APK и PR.
+
+- APK SHA256292e9aa16e15a50bd2b1d54e034fc4beb17e152b45a0926d5cd641e8b5720346, debug signature VALID,com.cyclone.mooneva.debug/3.0.0-beta.4/code29/min24/target36. Не повышали версию без отдельного release. Проверяем дополнительные сценарии именно на production preview, дополняем slider pointer/drag. APK содержит текущую рабочую копию с параллельным branding, это отмечаем в отчёте.
+
+- Production preview PASS: onboarding/back, заметка/edit/reload, PIN setup/unlock. Browser matrix+pointer0/drag10/keyboard6 PASS, errors[]. APK6225252bytes/SHA292e9aa1… . Большая совмещённая команда записи отчёта отклонена автоматической проверкой (blocked by policy, без объяснения). Используем apply_patch для Markdown, отдельные небольшие операции копирования. Android runtime НЕ ПРОВЕРЕНО, логи emulator сохраняем.
+
+- 2026-11-01: пользователь подтвердил готовность иконок другого чата и поручил применить их везде. Разрешено проверить и включить готовые branding файлы в отдельный коммит, сохраняя их содержимое. Проверить launcher/adaptive/night/monochrome/splash/web/notification/widget refs, повторить сборки. Остальная quality задача и GitHub PR продолжаются.
+
+- Иконки проверены: web/favicon/apple-touch, Android adaptive/monochrome/legacy/splash/notification уже подготовлены другим чатом. Внутри календаря остался прежний SVG-знак — заменяем его на тот же canonical Vortex, генератор будет обновлять React-компонент из одного SVG. Виджеты не содержат прежних логотипов; выбор виджетов использует application icon. Готовое монохромное оформление сохраняем, без самовольной перекраски источника.
+
+- Canonical Vortex перенесён в Calendar через generated CycloneMark (currentColor), прежний CycleInsightMoon удалён. Генератор успешно обновил все web/Android/store assets. Повторяем TS/lint/unit/web и Cap sync/Android на объединённом исходном наборе; отдельный branding commit будет включать готовые файлы другого чата по прямому поручению пользователя.
+
+- Документация обновляется по свежим результатам: 21unit, browser50theme/view, production onboarding/notes/PIN. Android build PASS, runtime НЕ ПРОВЕРЕНО из-за неисправного SDK emulator. Иконки теперь включаем отдельным commit, APK будет пересобран из объединённого source commit. Старая README про отсутствие виджетов/Android beta устарела — исправляем с явными ограничениями.
+
+- Branding commit f2c8288 создан по подтверждению пользователя. Проверка canonical path PASS: web/React/21vectors/11aliases/10PNG/notification layers. Повторные TS/lint/21unit/web PASS (final-exits.json). Cap+Android после branding выполняются. Повторяем браузерную матрицу на существующих серверах5174/5175; порты заняты нашими прежними Vite, новые серверы не запущены.
+
+- Свежая матрица после иконок проходит, assets/source совпадают. Выявлено прежнее maximum-scale=1 в index.html, ограничивающее масштабирование на мобильном браузере: убираем ограничение в рамках запрошенной доступности. В отчёте обновляем происхождение branding и проверяемый source commit вместо прежней оговорки об unstaged snapshot.
+
+- Объединённый application source HEAD6c9aaf6 после brandingf2c8288 и mobile zoom. Web/Cap sync/Android повторно PASS (Android1m4s), signatureV2VALID. Новый APK SHA2565c5ce0bc67ed748bf4de0e0bc0334edf62a85a2c74a99a217fd7eec6a21e3281 сохранён в ../releases/cyclone-mooneva-quality-2026-11-01. Browser icon/source/apple HTTP/zoom PASS. Готовим окончательный QA report, journal/prompt и PR, runtime Android явно НЕ ПРОВЕРЕНО.

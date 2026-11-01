@@ -1,0 +1,3 @@
+PASS complete onboarding and cycle-settings back navigation
+PASS note edit persists after reload
+PASS PIN disabled for incomplete or mismatched entry; setup and unlock after reload

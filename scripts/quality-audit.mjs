@@ -138,7 +138,14 @@ async function contrast(page) {
         await p.getByRole('tab',{name:'Тело',exact:true}).click();
         const slider=p.getByRole('slider',{name:'Боль',exact:true});
         await slider.focus(); await slider.press('Home'); await p.waitForTimeout(1800);
-        await slider.press('End'); await p.waitForTimeout(1800);
+        await slider.scrollIntoViewIfNeeded();
+        const bounds=await slider.boundingBox();
+        await p.mouse.click(bounds.x+1,bounds.y+24);await p.waitForTimeout(1800);
+        assert.equal(await slider.getAttribute('aria-valuenow'),'0');
+        await p.mouse.move(bounds.x+1,bounds.y+24);await p.mouse.down();
+        await p.mouse.move(bounds.x+bounds.width-1,bounds.y+24,{steps:10});await p.mouse.up();
+        await p.waitForTimeout(1800);assert.equal(await slider.getAttribute('aria-valuenow'),'10');
+        await slider.focus();await slider.press('End'); await p.waitForTimeout(1800);
         for(let i=0;i<4;i++)await slider.press('ArrowLeft');await p.waitForTimeout(1800);
         await slider.scrollIntoViewIfNeeded();await screenshot(p,'diary-pain-412');
         await p.reload();await p.waitForTimeout(1500);
@@ -152,7 +159,7 @@ async function contrast(page) {
         await p.locator('.cyclone-range-button').first().click();
         assert.match(await chart.innerText(),/7 \/ 10/);
         await chart.scrollIntoViewIfNeeded();await screenshot(p,'analytics-pain-412');
-        record('pain keyboard, restart, date range averages and interactive points');
+        record('pain pointer zero, drag maximum, keyboard, restart, date range averages and interactive points');
 
         for (const view of ['Настройки','Аналитика']) {
             await p.getByRole('button',{name:view,exact:true}).click();

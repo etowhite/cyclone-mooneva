@@ -1,0 +1,18 @@
+{
+  "at": "2026-11-01T20:29:45.811Z",
+  "results": [
+    {
+      "name": "complete onboarding and cycle-settings back navigation",
+      "status": "PASS"
+    },
+    {
+      "name": "note edit persists after reload",
+      "status": "PASS"
+    },
+    {
+      "name": "PIN disabled for incomplete or mismatched entry; setup and unlock after reload",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}

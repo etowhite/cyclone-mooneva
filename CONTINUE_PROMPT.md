@@ -1,3 +1,27 @@
+# Продолжение актуальной работы — 2026-11-01
+
+Проект C:/Users/white/Downloads/python setup_and_build.py/cyclone-mooneva. GitHub https://github.com/etowhite/cyclone-mooneva. Ветка cyclone/november-quality. Отдельный ../cyclone не менять. Сначала читать AGENTS.md (в текущем checkout не найден), DEVLOG.md (верхние4раздела актуальны), README.md,FORK.md,ROADMAP.md и docs/quality/2026-11-01/REPORT.md.
+
+Обязательно читать и обновлять DEVLOG перед кодом и ответами; не писать каждый раз в чат об обновлении. У файла четыре раздела: текущая цель,выполнено,статус/проблемы,следующие шаги. Держать этот промпт готовым до любого лимита. Старую историю ниже не считать текущим завершением.
+
+## Сделано сейчас
+Upstream827e36a2bd863efa24faae608ca826bb1d56eab1 уже является mergebase,новыхupstreamcommitsнет. Featurecommits7ff7e60(tooling),95ac973(backupvalidation/browserdownload),eaedeea(sharedtokens/controls/fonts/contrast),f2c8288(готовыеVortexicons),6c9aaf6(mobilezoom);originmain merged3b75c81. Пользователь подтвердил готовность иконок другого чата и разрешил применить их везде: они теперь включены отдельным commit, прежнее правило не коммитить их больше не актуально. Канонический SVG assets/branding/icon.svg,генераторtools/generate_icons.py обновляет web/Android/React; in-appmark uses currentColor,launcher сохраняет выбранный монохромный рисунок.
+
+Сохранять5палитр/auto/light/dark/en-ru/widgets/pain/backupcompatibility;Labудалена. Алгоритмы не менять ради дизайна,GPL/authorshipне удалять. Общие styles/tokens.css,palettes.css,controls.css,components/ui/Controls.tsx,RobotoOFLлокально. СовместимостьlegacyutilityCSSчастично остаётся,не заявлять полныйrewrite.
+
+Проверкисвежие:TS/lint/21unit/webbuild/CapSync/AndroidbuildPASS. Browser50theme/viewcombinations360/412/1280,auto/200%font/backupJSON+encrypted/wrongpw/corrupt/painpointer0drag10keyboard6persist/means90d4.5+30d7/productiononboarding+notes+PINPASS;errors[]. Иконки canonical+resources+productionfaviconPASS.
+
+APK ../releases/cyclone-mooneva-quality-2026-11-01/cyclone-mooneva-quality.apk,6225253bytes,SHA2565c5ce0bc67ed748bf4de0e0bc0334edf62a85a2c74a99a217fd7eec6a21e3281,application source6c9aaf6466d569fbd9994bc83c73e476f88a4075. Debug3.0.0-beta.4/code29,com.cyclone.mooneva.debug,min24/target36,V2signatureVALID. Это QAartifact,не новыйпроверенныйrelease,версиюнеподнимали.
+
+## Ограничение и продолжение
+Android runtime НЕ ПРОВЕРЕНО: emulator37.2.12 не boot доadb,STATUS_DLL_NOT_FOUND/accessviolation,прямойqemuhang дажеgpuoff. WHPXusable. Собственныйcyclone_design5574выключен,экспериментальные14DLLудалены. Не трогать5554/чужойAVD. Не повторять бесконечно SDKдиагностику;нуженисправныйэмуляторилиотдельныйtestdevice. scripts/native-quality-audit.mjs ещёневалидированнаAndroid. Проверитьlaunch/WebView/back/IME/permissions/notifications/widgets/background/offline/logcatsyntheticdata. Nativecyclonebackupmigration/биометриянереализованы.
+
+Передостановкой:commitQA/docs,pushветку,PRвprotectedmain,exact-headCI;неautomerge. Обновитьжурналиссылкуниже. Пользовательпросил активновестиGitHub.
+
+Команды:pnpm typecheck;pnpm lint;pnpm exec vitest run --maxWorkers=2;pnpm build;pnpm exec cap sync android;android/gradlew.bat -p android assembleDebug --max-workers=1 --console=plain. JDK21 ../.toolchain/jdk21/jdk-21.0.9+10,SDK ../.toolchain/android-sdk. Послеbuildgradle--stop. Browserdev5174+scripts/quality-audit.mjs;productionpreview5175+QA_URL=http://127.0.0.1:5175 node scripts/quality-flows.mjs. Запускались изолированные Chrome contexts,не personalprofile. Логи/PNGverification/update-2026-11-01;выбранные docs/quality/2026-11-01.
+
+## Предыдущая история (не считать текущим завершением)
+
 # Продолжение cyclone Mooneva fork
 
 Перед изменениями читать DEVLOG.md, FORK.md, ROADMAP.md. Обновлять DEVLOG до кода/ответов, без отчётов об обновлении в чат. Этот промпт держать готовым до недельного или пятичасового лимита.
@@ -27,3 +51,5 @@ Node22+/pnpm11.25.0, bundled pnpm.cmd C:/Users/white/.cache/codex-runtimes/codex
 QA fixtures: прямые storage writes могут перезаписываться React debounce600ms+1000ms/unload flush. Ждать initial hydration/debounce до seed; не менять app из-за fixture race. Onboarding button «Начать отслеживание», BC adaptive warning требует «Ок» перед дальнейшим toggle.
 
 Следующее: новые отзывы; issues #2 mobile QA и #3 native integration, миграция JSON исходного native cyclone, опциональная биометрия, production signing и полная регрессия. Не обещать медицинской точности/полного переноса всех старых функций. Активно обновлять GitHub, оформлять релизы с RU/EN notes, APK, SHA и exact source tag. Не сливать незавершённые функции в main.
+
+2026-10-29: по явному подтверждению пользователя PR #1 объединён в main. Для следующей разработки исходить из обновлённого main, не считать PR #1 открытым.

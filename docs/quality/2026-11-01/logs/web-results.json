@@ -1,0 +1,375 @@
+{
+  "at": "2026-11-01T20:29:27.631Z",
+  "results": [
+    {
+      "name": "first launch, two languages, selected goal",
+      "status": "PASS"
+    },
+    {
+      "name": "palette 360/rose/light",
+      "status": "PASS",
+      "details": {
+        "text": 12.099461220320856,
+        "secondary": 5.169205061691322,
+        "selected": 4.819762595120439,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 360/lavender/light",
+      "status": "PASS",
+      "details": {
+        "text": 12.91055300240177,
+        "secondary": 4.604993020873644,
+        "selected": 5.979025035720222,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 360/sage/light",
+      "status": "PASS",
+      "details": {
+        "text": 11.873605157823878,
+        "secondary": 4.854755218078692,
+        "selected": 4.637750809628259,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 360/ocean/light",
+      "status": "PASS",
+      "details": {
+        "text": 12.191758655889453,
+        "secondary": 4.969151130739092,
+        "selected": 5.5903618496217895,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 360/amber/light",
+      "status": "PASS",
+      "details": {
+        "text": 11.797105819990094,
+        "secondary": 5.152003963661352,
+        "selected": 5.0588491620060605,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 360/rose/dark",
+      "status": "PASS",
+      "details": {
+        "text": 13.77849651710576,
+        "secondary": 9.076610039302723,
+        "selected": 9.035992889567094,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 360/lavender/dark",
+      "status": "PASS",
+      "details": {
+        "text": 14.098759986641227,
+        "secondary": 9.258452451439537,
+        "selected": 9.348181156930258,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 360/sage/dark",
+      "status": "PASS",
+      "details": {
+        "text": 13.650548371916065,
+        "secondary": 9.108660612600737,
+        "selected": 9.318929501316987,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 360/ocean/dark",
+      "status": "PASS",
+      "details": {
+        "text": 13.393046544609629,
+        "secondary": 9.006160271473945,
+        "selected": 9.598033572060498,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 360/amber/dark",
+      "status": "PASS",
+      "details": {
+        "text": 13.604332183542912,
+        "secondary": 9.060164649926541,
+        "selected": 9.538333536077815,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 412/rose/light",
+      "status": "PASS",
+      "details": {
+        "text": 12.099461220320856,
+        "secondary": 5.169205061691322,
+        "selected": 4.819762595120439,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 412/lavender/light",
+      "status": "PASS",
+      "details": {
+        "text": 12.91055300240177,
+        "secondary": 4.604993020873644,
+        "selected": 5.979025035720222,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 412/sage/light",
+      "status": "PASS",
+      "details": {
+        "text": 11.873605157823878,
+        "secondary": 4.854755218078692,
+        "selected": 4.637750809628259,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 412/ocean/light",
+      "status": "PASS",
+      "details": {
+        "text": 12.191758655889453,
+        "secondary": 4.969151130739092,
+        "selected": 5.5903618496217895,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 412/amber/light",
+      "status": "PASS",
+      "details": {
+        "text": 11.797105819990094,
+        "secondary": 5.152003963661352,
+        "selected": 5.0588491620060605,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 412/rose/dark",
+      "status": "PASS",
+      "details": {
+        "text": 13.77849651710576,
+        "secondary": 9.076610039302723,
+        "selected": 9.035992889567094,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 412/lavender/dark",
+      "status": "PASS",
+      "details": {
+        "text": 14.098759986641227,
+        "secondary": 9.258452451439537,
+        "selected": 9.348181156930258,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 412/sage/dark",
+      "status": "PASS",
+      "details": {
+        "text": 13.650548371916065,
+        "secondary": 9.108660612600737,
+        "selected": 9.318929501316987,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 412/ocean/dark",
+      "status": "PASS",
+      "details": {
+        "text": 13.393046544609629,
+        "secondary": 9.006160271473945,
+        "selected": 9.598033572060498,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 412/amber/dark",
+      "status": "PASS",
+      "details": {
+        "text": 13.604332183542912,
+        "secondary": 9.060164649926541,
+        "selected": 9.538333536077815,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 1280/rose/light",
+      "status": "PASS",
+      "details": {
+        "text": 12.099461220320856,
+        "secondary": 5.169205061691322,
+        "selected": 4.819762595120439,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 1280/lavender/light",
+      "status": "PASS",
+      "details": {
+        "text": 12.91055300240177,
+        "secondary": 4.604993020873644,
+        "selected": 5.979025035720222,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 1280/sage/light",
+      "status": "PASS",
+      "details": {
+        "text": 11.873605157823878,
+        "secondary": 4.854755218078692,
+        "selected": 4.637750809628259,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 1280/ocean/light",
+      "status": "PASS",
+      "details": {
+        "text": 12.191758655889453,
+        "secondary": 4.969151130739092,
+        "selected": 5.5903618496217895,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 1280/amber/light",
+      "status": "PASS",
+      "details": {
+        "text": 11.797105819990094,
+        "secondary": 5.152003963661352,
+        "selected": 5.0588491620060605,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 1280/rose/dark",
+      "status": "PASS",
+      "details": {
+        "text": 13.77849651710576,
+        "secondary": 9.076610039302723,
+        "selected": 9.035992889567094,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 1280/lavender/dark",
+      "status": "PASS",
+      "details": {
+        "text": 14.098759986641227,
+        "secondary": 9.258452451439537,
+        "selected": 9.348181156930258,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 1280/sage/dark",
+      "status": "PASS",
+      "details": {
+        "text": 13.650548371916065,
+        "secondary": 9.108660612600737,
+        "selected": 9.318929501316987,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 1280/ocean/dark",
+      "status": "PASS",
+      "details": {
+        "text": 13.393046544609629,
+        "secondary": 9.006160271473945,
+        "selected": 9.598033572060498,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "palette 1280/amber/dark",
+      "status": "PASS",
+      "details": {
+        "text": 13.604332183542912,
+        "secondary": 9.060164649926541,
+        "selected": 9.538333536077815,
+        "font": "\"Cyclone Roboto\", Roboto, Arial, sans-serif",
+        "loaded": true
+      }
+    },
+    {
+      "name": "backup UI export and file-input refs",
+      "status": "PASS",
+      "details": {
+        "entries": 4
+      }
+    },
+    {
+      "name": "corrupt backup rejected; JSON roundtrip retains entries and periods",
+      "status": "PASS"
+    },
+    {
+      "name": "pain pointer zero, drag maximum, keyboard, restart, date range averages and interactive points",
+      "status": "PASS"
+    },
+    {
+      "name": "Настройки all ten theme variants",
+      "status": "PASS"
+    },
+    {
+      "name": "Аналитика all ten theme variants",
+      "status": "PASS"
+    },
+    {
+      "name": "encrypted backup roundtrip and wrong password rejection",
+      "status": "PASS"
+    },
+    {
+      "name": "auto appearance follows device preference",
+      "status": "PASS"
+    },
+    {
+      "name": "local-only operation with external network blocked",
+      "status": "PASS"
+    }
+  ],
+  "errors": []
+}

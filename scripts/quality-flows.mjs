@@ -8,7 +8,7 @@ p.on('pageerror',e=>errors.push(e.message));
 const pass=name=>{results.push({name,status:'PASS'});console.log('PASS',name)};
 try{
  await p.addInitScript(()=>localStorage.setItem('i18nextLng','ru'));
- await p.goto('http://127.0.0.1:5174');await p.waitForTimeout(1500);
+ await p.goto(process.env.QA_URL || 'http://127.0.0.1:5174');await p.waitForTimeout(1500);
  for(let n=0;n<7 && await p.locator('.cyclone-onboarding').count();n++){
    
    await p.getByRole('button',{name:/^(Продолжить|Далее|Поехали|Начать отслеживание)$/}).first().click();await p.waitForTimeout(250);
@@ -31,6 +31,6 @@ try{
  const pin=p.locator('input[type=password]');await pin.fill('1234');await pin.press('Enter');await p.waitForTimeout(1200);
  assert.ok(await p.getByRole('button',{name:'Настройки',exact:true}).count());pass('PIN disabled for incomplete or mismatched entry; setup and unlock after reload');
  await p.screenshot({path:out+'/pin-flow.png'});assert.deepEqual(errors,[]);
-}catch(e){await p.screenshot({path:out+'/flows-failure.png'});fs.writeFileSync(out+'/flows-failure.txt',await p.locator('body').innerText());throw e;}finally{fs.writeFileSync(out+'/flows-results.json',JSON.stringify({at:new Date().toISOString(),results,errors},null,2));await browser.close();}
+}catch(e){results.push({name:e.message,status:'FAIL'});await p.screenshot({path:out+'/flows-failure.png'});fs.writeFileSync(out+'/flows-failure.txt',await p.locator('body').innerText());throw e;}finally{fs.writeFileSync(out+'/flows-results.json',JSON.stringify({at:new Date().toISOString(),results,errors},null,2));await browser.close();}
 
 
