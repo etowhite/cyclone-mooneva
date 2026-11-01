@@ -34,7 +34,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
     return (
         <div
             className="day-preview-panel relative z-0 w-[95%] max-w-[95%] mx-auto bg-[#F0F2F5] rounded-b-[24px] px-3 py-3 animate-fade-in"
-            style={{ boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.3), -6px -6px 12px rgba(255, 255, 255, 0.7)' }}
+            style={{ boxShadow: 'none' }}
         >
             {/* Line 1: Flow, Mood and Close Button */}
             <div className="flex items-start justify-between mt-6 mb-2 px-0.5">
@@ -45,7 +45,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                                 className="day-preview-chip day-preview-cycle-chip text-[10px] font-bold text-indigo-400 uppercase tracking-wider px-2 h-[20px] rounded-lg flex items-center flex-shrink-0"
                                 style={{
                                     backgroundColor: '#F0F2F5',
-                                    boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.3), -2px -2px 4px rgba(255, 255, 255, 0.8)'
+                                    boxShadow: 'none'
                                 }}
                             >
                                 {t('log.day_x_of_y', { day: diffInDays(date, activePeriod.startDate) + 1, total: activePeriod.days })}
@@ -56,7 +56,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                                 className="day-preview-chip day-preview-pregnancy-chip text-[10px] font-bold text-violet-500 uppercase tracking-wider px-2 h-[20px] rounded-lg flex items-center flex-shrink-0"
                                 style={{
                                     backgroundColor: '#F0F2F5',
-                                    boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.3), -2px -2px 4px rgba(255, 255, 255, 0.8)'
+                                    boxShadow: 'none'
                                 }}
                             >
                                 {t('dashboard.pregnancy')} · {t('dashboard.pregnancy_week', { week: meta.pregnancyWeek ?? 1 })}
@@ -67,7 +67,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                                 className="day-preview-chip day-preview-pregnancy-end-chip text-[10px] font-bold text-violet-500 uppercase tracking-wider px-2 h-[20px] rounded-lg flex items-center flex-shrink-0"
                                 style={{
                                     backgroundColor: '#F0F2F5',
-                                    boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.3), -2px -2px 4px rgba(255, 255, 255, 0.8)'
+                                    boxShadow: 'none'
                                 }}
                             >
                                 {t('log.pregnancy_ended')}
@@ -78,7 +78,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                                 className="day-preview-chip day-preview-flow-chip flex items-center gap-1 px-2 h-[20px] rounded-lg flex-shrink-0"
                                 style={{
                                     backgroundColor: '#F0F2F5',
-                                    boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.3), -2px -2px 4px rgba(255, 255, 255, 0.8)'
+                                    boxShadow: 'none'
                                 }}
                             >
                                 <div className="flex items-center gap-1">
@@ -103,7 +103,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                                             className="day-preview-chip day-preview-mood-chip day-preview-mood-chip-custom px-2 h-[20px] rounded-lg flex items-center justify-center flex-shrink-0"
                                             style={{
                                                 backgroundColor: '#F0F2F5',
-                                                boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.3), -2px -2px 4px rgba(255, 255, 255, 0.8)',
+                                                boxShadow: 'none',
                                                 border: `1.5px solid ${CUSTOM_MOOD_COLORS.color}`,
                                                 color: CUSTOM_MOOD_COLORS.dark,
                                             }}
@@ -118,7 +118,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                                         className="day-preview-chip day-preview-mood-chip px-2 h-[20px] rounded-lg flex items-center justify-center flex-shrink-0"
                                         style={{
                                             backgroundColor: '#F0F2F5',
-                                            boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.3), -2px -2px 4px rgba(255, 255, 255, 0.8)',
+                                            boxShadow: 'none',
                                             border: `1.5px solid ${config.color}`,
                                             color: config.dark,
                                         }}
@@ -221,7 +221,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                     className="day-preview-edit-button w-full mt-2 py-2 px-4 rounded-xl text-slate-400 font-bold text-[9px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:text-slate-600 transition-colors"
                     style={{
                         backgroundColor: '#F0F2F5',
-                        boxShadow: '3px 3px 6px rgba(163, 177, 198, 0.4), -3px -3px 6px rgba(255, 255, 255, 0.8)'
+                        boxShadow: 'none'
                     }}
                 >
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>

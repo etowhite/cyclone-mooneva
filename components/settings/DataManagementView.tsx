@@ -1,3 +1,4 @@
+import { Field } from '../ui/Controls';
 import { Toggle } from './SettingsUI';
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -283,7 +284,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                 <button
                     onClick={onBack}
                     className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors text-slate-500"
-                    style={{ boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.4), -4px -4px 8px rgba(255, 255, 255, 0.8)' }}
+                    style={{ boxShadow: 'none' }}
                 >
                     <span className="text-xl rtl:rotate-180">←</span>
                 </button>
@@ -296,14 +297,14 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                     {/* Box 0: Automatic backup. Its own card, not a section inside the
                         manual-backup box: it is the one that keeps working without the
                         user, and it should not read as a footnote to Export. */}
-                    <div className="cyclone-data-card bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'rgba(163, 177, 198, 0.4) 6px 6px 12px, rgba(255, 255, 255, 0.8) -6px -6px 12px' }}>
+                    <div className="cyclone-data-card bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'none' }}>
                         <div className="p-6">
                             {/* AUTOMATIC BACKUP SECTION */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
                                     {/* Indigo, matching this section's buttons, so the automatic path
                                         reads as one block instead of blending into the manual one below. */}
-                                    <div className="w-10 h-10 rounded-xl bg-[#F0F2F5] flex items-center justify-center text-indigo-500" style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3), inset -2px -2px 4px rgba(255, 255, 255, 0.8)' }}>
+                                    <div className="w-10 h-10 rounded-xl bg-[#F0F2F5] flex items-center justify-center text-indigo-500" style={{ boxShadow: 'none' }}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7" /><polyline points="21 3 21 9 15 9" /></svg>
                                     </div>
                                     <div>
@@ -334,7 +335,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                                     })}
                                                 </p>
                                             </div>
-                                            <input
+                                            <Field
                                                 data-testid="auto-backup-password"
                                                 placeholder={t('settings.enter_password') + '...'}
                                                 className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#7598a0] focus:ring-1 focus:ring-[#7598a0]"
@@ -343,7 +344,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                                 onChange={(e) => { setAutoBackupPassword(e.target.value); setAutoBackupMismatch(false); }}
                                                 autoComplete="new-password"
                                             />
-                                            <input
+                                            <Field
                                                 data-testid="auto-backup-password-confirm"
                                                 placeholder={t('settings.repeat_password')}
                                                 className={`w-full bg-white border rounded-lg px-3 py-2.5 text-xs outline-none focus:ring-1 focus:ring-[#7598a0] ${autoBackupMismatch ? 'border-rose-400 focus:border-rose-400' : 'border-slate-200 focus:border-[#7598a0]'}`}
@@ -404,13 +405,13 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                     </div>
 
                     {/* Box 1: Export/Import Combined */}
-                    <div className="cyclone-data-card bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'rgba(163, 177, 198, 0.4) 6px 6px 12px, rgba(255, 255, 255, 0.8) -6px -6px 12px' }}>
+                    <div className="cyclone-data-card bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'none' }}>
                         <div className="p-6 space-y-6">
 
                             {/* EXPORT SECTION */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-[#F0F2F5] flex items-center justify-center text-[#7598a0]" style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3), inset -2px -2px 4px rgba(255, 255, 255, 0.8)' }}>
+                                    <div className="w-10 h-10 rounded-xl bg-[#F0F2F5] flex items-center justify-center text-[#7598a0]" style={{ boxShadow: 'none' }}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
                                     </div>
                                     <div>
@@ -425,7 +426,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
 
                                     {isBackupEncrypted ? (
                                         <div className="mt-3 animate-fade-in">
-                                            <input
+                                            <Field
                                                 data-testid="backup-password"
                                                 placeholder={t('settings.enter_password') + '...'}
                                                 className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#7598a0] focus:ring-1 focus:ring-[#7598a0]"
@@ -434,7 +435,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                                 onChange={(e) => { setBackupPassword(e.target.value); setBackupMismatch(false); }}
                                                 autoComplete="new-password"
                                             />
-                                            <input
+                                            <Field
                                                 data-testid="backup-password-confirm"
                                                 placeholder={t('settings.repeat_password')}
                                                 className={`w-full mt-2 bg-white border rounded-lg px-3 py-2.5 text-xs outline-none focus:ring-1 focus:ring-[#7598a0] ${backupMismatch ? 'border-rose-400 focus:border-rose-400' : 'border-slate-200 focus:border-[#7598a0]'}`}
@@ -478,7 +479,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                             {/* RESTORE SECTION */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-[#F0F2F5] flex items-center justify-center text-amber-500" style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3), inset -2px -2px 4px rgba(255, 255, 255, 0.8)' }}>
+                                    <div className="w-10 h-10 rounded-xl bg-[#F0F2F5] flex items-center justify-center text-amber-500" style={{ boxShadow: 'none' }}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
                                     </div>
                                     <div>
@@ -489,7 +490,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
 
                                 <div className="bg-slate-50/50 rounded-xl p-3 border border-slate-100">
                                     <label className="flex items-center gap-2 cursor-pointer mb-2">
-                                        <input
+                                        <Field
                                             type="checkbox"
                                             className="rounded border-slate-300 text-amber-500 focus:ring-amber-500"
                                             checked={isImportEncrypted}
@@ -499,7 +500,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                     </label>
 
                                     {isImportEncrypted && (
-                                        <input
+                                        <Field
                                             placeholder={t('settings.enter_backup_password')}
                                             className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                                             type="password"
@@ -517,7 +518,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                     {t('common.import')}
                                 </button>
 
-                                <input
+                                <Field
                                     // generateBackup writes .enc with a password and .json without,
                                     // so restore has to offer both or the plaintext one is unpickable.
                                     accept=".enc,.json,application/json,application/octet-stream"
@@ -534,7 +535,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                             {/* IMPORT FROM ANOTHER APP: its own block, apart from restoring a Mooneva backup */}
                             <div className="space-y-4" data-testid="import-from-app">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 shrink-0 rounded-xl bg-[#F0F2F5] flex items-center justify-center text-[#5a7d87]" style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3), inset -2px -2px 4px rgba(255, 255, 255, 0.8)' }}>
+                                    <div className="w-10 h-10 shrink-0 rounded-xl bg-[#F0F2F5] flex items-center justify-center text-[#5a7d87]" style={{ boxShadow: 'none' }}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14 3h7v7" /><path d="M21 3l-9 9" /><path d="M5 5h6" /><path d="M5 5v14h14v-6" /></svg>
                                     </div>
                                     <div>
@@ -551,7 +552,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                     {t('settings.import_app_choose')}
                                 </button>
 
-                                <input
+                                <Field
                                     accept=".csv,.json,text/csv,application/json"
                                     className="hidden"
                                     type="file"
@@ -564,7 +565,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                     </div>
 
                     {/* Box 2: Archive & Restore */}
-                    <div className="cyclone-data-card bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'rgba(163, 177, 198, 0.4) 6px 6px 12px, rgba(255, 255, 255, 0.8) -6px -6px 12px' }}>
+                    <div className="cyclone-data-card bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'none' }}>
                         <div className="p-4">
                             <p className="text-xs text-slate-500 leading-relaxed mb-4 px-2">
                                 {t('settings.archive_desc_long')}
@@ -594,7 +595,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                 <button
                                     onClick={() => setShowArchiveConfirm(true)}
                                     className="w-full py-4 px-5 flex items-center justify-between bg-[#F0F2F5] text-slate-600 rounded-xl transition-all active:scale-[0.98] group"
-                                    style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
+                                    style={{ boxShadow: 'none' }}
                                 >
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-full bg-[#fde68a] flex items-center justify-center text-amber-600 shadow-inner group-hover:scale-110 transition-transform duration-300">
@@ -617,7 +618,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                         </p>
                                     </div>
                                     <div className="px-4">
-                                        <input
+                                        <Field
                                             type="date"
                                             value={archiveDate}
                                             onChange={(e) => setArchiveDate(e.target.value)}
@@ -648,7 +649,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                     </div>
 
                     {/* Box 3: Nuke */}
-                    <div className="cyclone-data-card bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'rgba(163, 177, 198, 0.4) 6px 6px 12px, rgba(255, 255, 255, 0.8) -6px -6px 12px' }}>
+                    <div className="cyclone-data-card bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'none' }}>
                         <div className="p-4">
                             {!showWipeConfirm ? (
                                 <button

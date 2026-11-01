@@ -1,3 +1,4 @@
+import { Card } from '../ui/Controls';
 import React,{useMemo,useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import type {DailyLog} from '../../types';
@@ -13,7 +14,7 @@ export default function PainChart({logs,days}:{logs:Record<string,DailyLog>;days
  const y=(value:number)=>160-value*14;
  const dateLabel=(date:string)=>new Intl.DateTimeFormat(ru?'ru-RU':'en-GB',{day:'numeric',month:'short',year:'numeric'}).format(parseLocalDate(date));
  const chooseAt=(clientX:number,el:SVGSVGElement)=>{const r=el.getBoundingClientRect();const px=(clientX-r.left)/r.width*320;let best=summary.points[0];for(const p of summary.points)if(Math.abs(x(p.offset)-px)<Math.abs(x(best.offset)-px))best=p;setSelectedDate(best.date)};
- return <section className="cyclone-pain-chart" aria-label={ru?'График боли':'Pain chart'}>
+ return <Card className="cyclone-pain-chart" aria-label={ru?'График боли':'Pain chart'}>
   <h2>{ru?'Боль со временем':'Pain over time'}</h2>
   <p>{ru?'Средняя боль':'Average pain'}: <strong>{summary.average===null?'—':summary.average.toLocaleString(ru?'ru-RU':'en-GB',{maximumFractionDigits:1})+' / 10'}</strong></p>
   <p className="cyclone-pain-caption">{ru?`За ${days} дней · отметок: ${summary.count}. Дни без оценки не считаются нулём.`:`${days} days · ${summary.count} entries. Unrated days are not treated as zero.`}</p>
@@ -26,5 +27,5 @@ export default function PainChart({logs,days}:{logs:Record<string,DailyLog>;days
     <text x="32" y="183" fill="var(--text-secondary)" fontSize="10">{dateLabel(summary.start)}</text><text x="302" y="183" textAnchor="end" fill="var(--text-secondary)" fontSize="10">{dateLabel(summary.end)}</text>
    </svg>
   </>}
- </section>;
+ </Card>;
 }

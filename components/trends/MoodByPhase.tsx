@@ -1,3 +1,4 @@
+import { Card } from '../ui/Controls';
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { DailyLog, Cycle, MOOD_OPTIONS } from '../../types';
 import { useTranslation } from 'react-i18next';
@@ -167,15 +168,15 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles, cycleModel }) =
 
     if (cycles.length === 0) {
         return (
-            <div className="cyclone-mood-phase-card bg-[#F0F2F5] rounded-[40px] p-8" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
+            <Card className="cyclone-mood-phase-card bg-[#F0F2F5] rounded-[40px] p-8" style={{ boxShadow: 'none' }}>
                 <h3 className="text-sm font-extrabold tracking-[0.15em] text-slate-800 uppercase">{t('trends.mood_by_phase')}</h3>
                 <p className="text-slate-400 text-sm text-center py-8">{t('trends.need_data_mood')}</p>
-            </div>
+            </Card>
         );
     }
 
     return (
-        <div className="cyclone-mood-phase-card bg-[#F0F2F5] rounded-[32px] p-6" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
+        <Card className="cyclone-mood-phase-card bg-[#F0F2F5] rounded-[32px] p-6" style={{ boxShadow: 'none' }}>
             {/* Header - stacked for better mobile alignment */}
             <div className="flex flex-col gap-1 mb-6">
                 <h2 className="text-sm font-extrabold tracking-[0.15em] text-slate-800 uppercase">
@@ -195,7 +196,7 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles, cycleModel }) =
                     <div
                         key={phaseData.phase}
                         className="p-4 rounded-2xl bg-[#F0F2F5] flex flex-col gap-3"
-                        style={{ boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)' }}
+                        style={{ boxShadow: 'none' }}
                     >
                         {/* Phase Icon & Label */}
                         <div className="flex items-center gap-2 min-w-0">
@@ -217,14 +218,14 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles, cycleModel }) =
                         {phaseData.percentage > 0 && (
                             <div
                                 className="h-1.5 w-full bg-slate-200/50 rounded-full overflow-hidden"
-                                style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3), inset -2px -2px 4px rgba(255, 255, 255, 0.7)' }}
+                                style={{ boxShadow: 'none' }}
                             >
                                 <div
                                     className="h-full rounded-full transition-all duration-500"
                                     style={{
                                         width: `${phaseData.percentage}%`,
                                         backgroundColor: phaseData.color,
-                                        boxShadow: `0 0 6px ${phaseData.glowColor}`
+                                        boxShadow: 'none'
                                     }}
                                 />
                             </div>
@@ -239,7 +240,7 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles, cycleModel }) =
                     {t('trends.biology_insight')}
                 </p>
             </div>
-        </div>
+        </Card>
     );
 };
 

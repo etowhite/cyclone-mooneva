@@ -22,7 +22,7 @@ const TrendStatCards: React.FC<TrendStatCardsProps> = ({ rangeAverages }) => {
             {/* Avg Cycle Length Card */}
             <div
                 className="bg-[#F0F2F5] rounded-[32px] p-6"
-                style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
+                style={{ boxShadow: 'none' }}
             >
                 <div className="flex items-baseline gap-1">
                     <span className="text-5xl font-black text-[#7598a0] tracking-tighter">{show(rangeAverages.avgCycle)}</span>
@@ -34,7 +34,7 @@ const TrendStatCards: React.FC<TrendStatCardsProps> = ({ rangeAverages }) => {
             {/* Avg Period Duration Card */}
             <div
                 className="bg-[#F0F2F5] rounded-[32px] p-6"
-                style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
+                style={{ boxShadow: 'none' }}
             >
                 <div className="flex items-baseline gap-1">
                     <span className="text-5xl font-black text-[#fb7185] tracking-tighter">{show(rangeAverages.avgPeriod)}</span>

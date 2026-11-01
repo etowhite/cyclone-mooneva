@@ -11,15 +11,15 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Roboto', 'Arial', 'sans-serif'],
+                sans: ['Cyclone Roboto', 'Roboto', 'Arial', 'sans-serif'],
             },
             colors: {
-                accent: '#7598a0',
+                accent: 'var(--cyclone-primary)',
 
                 surface: {
-                    body: '#fcfaf6',
-                    card: '#ffffff',
-                    onboarding: '#fefdfb',
+                    body: 'var(--app-bg)',
+                    card: 'var(--surface)',
+                    onboarding: 'var(--app-bg)',
                 },
 
                 text: {

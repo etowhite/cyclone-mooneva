@@ -1,3 +1,4 @@
+import { Button } from './ui/Controls';
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppSettings, DailyLog, FirstDayOfWeek, INITIAL_SYMPTOMS } from '../types';
@@ -98,9 +99,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
   // --- Navigation Helpers ---
   const nextStep = () => {
     if (step === 4) {
-      setStep(6); // skip spycraft, go to get started
-    } else if (step === 5) {
-      setStep(6); // spycraft → get started
+      setStep(6); // go directly to the final step
     } else if (step === 6) {
       handleFinish();
     } else {
@@ -111,8 +110,6 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
   const prevStep = () => {
     if (step === 6) {
       setStep(4);
-    } else if (step === 6) {
-      setStep(5);
     } else {
       setStep(s => Math.max(0, s - 1));
     }
@@ -142,13 +139,13 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
           <h1 className="text-xs text-slate-400 font-medium mb-6 tracking-wide">{t('onboarding.choose_language')}</h1>
           <div
             className="w-full max-w-sm bg-[#F0F2F5] rounded-2xl p-4 mb-auto"
-            style={{ boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.4), inset -4px -4px 8px rgba(255, 255, 255, 0.8)' }}
+            style={{ boxShadow: 'none' }}
           >
             <div className="cyclone-language-choices flex flex-wrap justify-center gap-2">
               {languages.map((lang) => {
                 const isSelected = i18n.language === lang.code;
                 return (
-                  <button
+                  <Button
                     key={lang.code}
                     aria-pressed={isSelected}
                     onClick={() => i18n.changeLanguage(lang.code)}
@@ -157,13 +154,13 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
                       : 'bg-white text-slate-600 hover:bg-slate-50'
                       }`}
                     style={isSelected ? {
-                      boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.1)'
+                      boxShadow: 'none'
                     } : {
-                      boxShadow: '3px 3px 6px rgba(163, 177, 198, 0.4), -3px -3px 6px rgba(255, 255, 255, 0.9)'
+                      boxShadow: 'none'
                     }}
                   >
                     <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-slate-600'}`}>{lang.native}</span>
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -171,12 +168,12 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
           <h2 className="text-xs text-slate-400 font-medium mt-6 mb-3 tracking-wide">{t('settings.first_day_of_week')}</h2>
           <div
             className="w-full max-w-sm bg-[#F0F2F5] rounded-2xl p-2 flex gap-2"
-            style={{ boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.4), inset -4px -4px 8px rgba(255, 255, 255, 0.8)' }}
+            style={{ boxShadow: 'none' }}
           >
             {FIRST_DAY_OPTIONS.map(day => {
               const isSelected = resolveFirstDayOfWeek(i18n.language, firstDayOfWeek) === day;
               return (
-                <button
+                <Button
                   key={day}
                   aria-pressed={isSelected}
                   onClick={() => setFirstDayOfWeek(day)}
@@ -185,25 +182,25 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
                     : 'bg-white text-slate-600 hover:bg-slate-50'
                     }`}
                   style={isSelected ? {
-                    boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.1)'
+                    boxShadow: 'none'
                   } : {
-                    boxShadow: '3px 3px 6px rgba(163, 177, 198, 0.4), -3px -3px 6px rgba(255, 255, 255, 0.9)'
+                    boxShadow: 'none'
                   }}
                 >
                   {t(`settings.week_start_${day}`)}
-                </button>
+                </Button>
               );
             })}
           </div>
         </div>
         <div className="flex-shrink-0 w-full max-w-sm mx-auto pt-4 pb-2">
-          <button
+          <Button
             onClick={nextStep}
             className="w-full py-4 rounded-2xl font-bold text-sm text-white bg-[#7598a0] transition-all active:scale-[0.98]"
-            style={{ boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)' }}
+            style={{ boxShadow: 'none' }}
           >
             {t('common.continue')}
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -225,19 +222,19 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
         </div>
       </div>
       <div className="flex-shrink-0 space-y-3 w-full max-w-sm mx-auto pt-4 pb-2">
-        <button
+        <Button
           onClick={nextStep}
           className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs text-white bg-[#7598a0] transition-all active:scale-[0.98]"
-          style={{ boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)' }}
+          style={{ boxShadow: 'none' }}
         >
           {t('onboarding.trust.start')}
-        </button>
-        <button
+        </Button>
+        <Button
           className="w-full text-[10px] font-bold uppercase tracking-widest text-[#7598a0] hover:text-[#5a767d] transition-colors"
           onClick={() => alert(t('onboarding.trust.backup_alert'))}
         >
           {t('onboarding.trust.backup_hint')}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -261,21 +258,21 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
               <div
                 ref={dateStripRef}
                 className="bg-[#F0F2F5] p-3 rounded-2xl overflow-x-auto no-scrollbar flex gap-3 scroll-smooth"
-                style={{ boxShadow: 'inset 3px 3px 6px rgba(163, 177, 198, 0.3), inset -3px -3px 6px rgba(255, 255, 255, 0.7)' }}
+                style={{ boxShadow: 'none' }}
               >
                 {dates.map((date) => {
                   const dateStr = toLocalISOString(date);
                   const isSelected = lastPeriodDate === dateStr;
                   const parts = fmt.calendarParts(date);
                   return (
-                    <button
+                    <Button
                       key={dateStr}
                       onClick={() => setLastPeriodDate(dateStr)}
                       className={`flex flex-col items-center justify-center min-w-[60px] h-[70px] rounded-xl transition-all flex-shrink-0 ${isSelected ? 'bg-[#7598a0] text-white shadow-md' : 'text-slate-500 hover:bg-white/50'}`}
                     >
                       <span className="text-[10px] font-bold uppercase">{fmt.monthName(parts.year, parts.month)}</span>
                       <span className="text-xl font-black">{formatNumber(parts.day)}</span>
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
@@ -298,19 +295,19 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
             </div>
             <div
               className="flex items-center justify-between bg-[#F0F2F5] p-2 rounded-2xl"
-              style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.2), -8px -8px 16px rgba(255, 255, 255, 0.6)' }}
+              style={{ boxShadow: 'none' }}
             >
-              <button
+              <Button
                 onClick={() => setCycleSetup(s => ({ ...s, cycleLength: Math.max(21, s.cycleLength - 1) }))}
                 className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-500 text-xl font-bold bg-[#F0F2F5] active:scale-95 transition-all"
-                style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
-              >-</button>
+                style={{ boxShadow: 'none' }}
+              >-</Button>
               <span className="text-2xl font-black text-slate-700">{cycleSetup.cycleLength} <span className="text-sm font-bold text-slate-400">{t('common.days')}</span></span>
-              <button
+              <Button
                 onClick={() => setCycleSetup(s => ({ ...s, cycleLength: Math.min(45, s.cycleLength + 1) }))}
                 className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-500 text-xl font-bold bg-[#F0F2F5] active:scale-95 transition-all"
-                style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
-              >+</button>
+                style={{ boxShadow: 'none' }}
+              >+</Button>
             </div>
           </div>
           <div className="space-y-4">
@@ -320,24 +317,24 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
             </div>
             <div
               className="flex items-center justify-between bg-[#F0F2F5] p-2 rounded-2xl"
-              style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.2), -8px -8px 16px rgba(255, 255, 255, 0.6)' }}
+              style={{ boxShadow: 'none' }}
             >
-              <button
+              <Button
                 onClick={() => setCycleSetup(s => ({ ...s, periodLength: Math.max(2, s.periodLength - 1) }))}
                 className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-500 text-xl font-bold bg-[#F0F2F5] active:scale-95 transition-all"
-                style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
-              >-</button>
+                style={{ boxShadow: 'none' }}
+              >-</Button>
               <span className="text-2xl font-black text-slate-700">{cycleSetup.periodLength} <span className="text-sm font-bold text-slate-400">{t('common.days')}</span></span>
-              <button
+              <Button
                 onClick={() => setCycleSetup(s => ({ ...s, periodLength: Math.min(settingBounds(s).period.max, s.periodLength + 1) }))}
                 className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-500 text-xl font-bold bg-[#F0F2F5] active:scale-95 transition-all"
-                style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
-              >+</button>
+                style={{ boxShadow: 'none' }}
+              >+</Button>
             </div>
           </div>
         </div>
         <div className="flex-shrink-0 pt-3 space-y-3">
-          <button
+          <Button
             onClick={() => {
               if (!lastPeriodDate && !dontRemember) {
                 setDontRemember(true);
@@ -345,11 +342,11 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
               nextStep();
             }}
             className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs text-white bg-[#7598a0] transition-all active:scale-[0.98]"
-            style={{ boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)' }}
+            style={{ boxShadow: 'none' }}
           >
             {t('common.next')}
-          </button>
-          <button onClick={prevStep} className="w-full text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('common.back')}</button>
+          </Button>
+          <Button onClick={prevStep} className="w-full text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('common.back')}</Button>
           <p className="text-[9px] text-center text-slate-400">{t('onboarding.calibration.settings_hint')}</p>
         </div>
       </div>
@@ -371,14 +368,14 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
           {goals.map((g) => {
             const active = goal === g.id;
             return (
-              <button
+              <Button
                 key={g.id}
                 aria-pressed={active}
                 onClick={() => selectGoal(g.id)}
                 className={`cyclone-goal-choice w-full p-4 rounded-2xl text-left rtl:text-right transition-all flex items-center gap-4 group relative overflow-hidden ${active ? 'text-[#7598a0]' : 'text-slate-600'}`}
                 style={active
-                  ? { boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.4), inset -4px -4px 8px rgba(255, 255, 255, 0.8)', backgroundColor: '#F0F2F5' }
-                  : { boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.3), -6px -6px 12px rgba(255, 255, 255, 0.7)', backgroundColor: '#F0F2F5' }
+                  ? { boxShadow: 'none', backgroundColor: '#F0F2F5' }
+                  : { boxShadow: 'none', backgroundColor: '#F0F2F5' }
                 }
               >
                 <span className="text-2xl">{g.icon}</span>
@@ -386,19 +383,19 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
                   <div className="text-sm font-black uppercase tracking-wider">{g.label}</div>
                   <div className="text-[10px] font-medium text-slate-400 mt-0.5">{g.sub}</div>
                 </div>
-              </button>
+              </Button>
             );
           })}
         </div>
         <div className="flex-shrink-0 pt-3 space-y-3">
-          <button
+          <Button
             onClick={nextStep}
             className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs text-white bg-[#7598a0] transition-all active:scale-[0.98]"
-            style={{ boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)' }}
+            style={{ boxShadow: 'none' }}
           >
             {t('common.continue')}
-          </button>
-          <button onClick={prevStep} className="w-full text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('common.back')}</button>
+          </Button>
+          <Button onClick={prevStep} className="w-full text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('common.back')}</Button>
           <p className="text-[9px] text-center text-slate-400">{t('onboarding.calibration.settings_hint')}</p>
         </div>
       </div>
@@ -412,14 +409,14 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
           <CycleSetupStep values={cycleSetup} onChange={setCycleSetup} />
         </div>
         <div className="flex-shrink-0 pt-3 space-y-3">
-          <button
+          <Button
             onClick={nextStep}
             className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs text-white bg-[#7598a0] transition-all active:scale-[0.98]"
-            style={{ boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)' }}
+            style={{ boxShadow: 'none' }}
           >
             {t('common.continue')}
-          </button>
-          <button onClick={prevStep} className="w-full text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('common.back')}</button>
+          </Button>
+          <Button onClick={prevStep} className="w-full text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('common.back')}</Button>
           <p className="text-[9px] text-center text-slate-400">{t('onboarding.calibration.settings_hint')}</p>
         </div>
       </div>
@@ -436,7 +433,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
         {/* Card 1: Log your period */}
         <div
           className="bg-[#F0F2F5] p-5 rounded-3xl space-y-3"
-          style={{ boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.3), inset -4px -4px 8px rgba(255, 255, 255, 0.7)' }}
+          style={{ boxShadow: 'none' }}
         >
           <p className="text-xs font-black uppercase tracking-[0.15em] text-rose-400">
             {t('onboarding.get_started.period_card_title')}
@@ -450,7 +447,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
               className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-[10px] font-extrabold uppercase tracking-[0.2em] text-rose-400"
               style={{
                 backgroundColor: '#F0F2F5',
-                boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)'
+                boxShadow: 'none'
               }}
             >
               <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="currentColor">
@@ -467,7 +464,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
         {/* Card 2: Log daily symptoms */}
         <div
           className="bg-[#F0F2F5] p-5 rounded-3xl space-y-3"
-          style={{ boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.3), inset -4px -4px 8px rgba(255, 255, 255, 0.7)' }}
+          style={{ boxShadow: 'none' }}
         >
           <p className="text-xs font-black uppercase tracking-[0.15em] text-[#7598a0]">
             {t('onboarding.get_started.daily_card_title')}
@@ -484,7 +481,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
                   className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all ${i === 1
                     ? 'bg-[#7598a0]/20 ring-2 ring-[#7598a0] text-[#5a7d87]'
                     : 'bg-white text-slate-400'}`}
-                  style={i !== 1 ? { boxShadow: '3px 3px 6px rgba(163, 177, 198, 0.3), -3px -3px 6px rgba(255, 255, 255, 0.9)' } : {}}
+                  style={i !== 1 ? { boxShadow: 'none' } : {}}
                 >
                   {n}
                 </div>
@@ -495,13 +492,13 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
       </div>
 
       <div className="flex-shrink-0 pt-3">
-        <button
+        <Button
           onClick={handleFinish}
           className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs text-white bg-[#7598a0] transition-all active:scale-[0.98]"
-          style={{ boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)' }}
+          style={{ boxShadow: 'none' }}
         >
           {t('onboarding.get_started.cta')}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -511,7 +508,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
       <div
         className="w-full max-w-md bg-[#F0F2F5] rounded-[32px] overflow-hidden flex flex-col relative"
         style={{
-          boxShadow: '12px 12px 24px rgba(163, 177, 198, 0.4), -12px -12px 24px rgba(255, 255, 255, 0.8)',
+          boxShadow: 'none',
           height: 'min(800px, 100%)',
           maxHeight: '100%',
         }}

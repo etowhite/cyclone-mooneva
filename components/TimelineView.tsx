@@ -57,7 +57,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, showFertile: fertil
           <div className="px-1 mt-8 scroll-mt-4">
             <div
               className="bg-[#F0F2F5] rounded-[32px] p-6"
-              style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
+              style={{ boxShadow: 'none' }}
             >
               <div className="flex items-center gap-3 mb-6">
                 <span className="timeline-history-heading text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 pt-[9px]">{t('common.history')}</span>
@@ -90,7 +90,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, showFertile: fertil
                             segmenting it would invent structure that is not there. */}
                         <div
                           className="timeline-history-bar relative w-full h-4 bg-[#d9dde4] rounded-full overflow-hidden border border-slate-200/80"
-                          style={{ boxShadow: 'inset 2px 2px 5px rgba(163, 177, 198, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.7)' }}
+                          style={{ boxShadow: 'none' }}
                         >
                           <div className="absolute inset-0 bg-violet-200/80" />
                         </div>
@@ -158,7 +158,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, showFertile: fertil
                       {/* Progress Bar Container - Neumorphic Inset */}
                       <div
                         className="timeline-history-bar relative w-full h-4 bg-[#d9dde4] rounded-full overflow-hidden border border-slate-200/80"
-                        style={{ boxShadow: 'inset 2px 2px 5px rgba(163, 177, 198, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.7)' }}
+                        style={{ boxShadow: 'none' }}
                       >
 
                         {/* Period Segment */}
@@ -166,7 +166,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, showFertile: fertil
                           className="timeline-period-segment absolute top-0 left-0 h-full rounded-full flex items-center justify-center z-20 border-r border-white/20 bg-[#e11d48]"
                           style={{
                             width: `${periodWidth}%`,
-                            boxShadow: '2px 0 4px rgba(251, 113, 133, 0.3)'
+                            boxShadow: 'none'
                           }}
                         >
                           <span className="text-[9px] font-bold text-white drop-shadow-sm">{formatNumber(periodLen)}</span>

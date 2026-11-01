@@ -1,6 +1,6 @@
 import React from 'react';
 
-// 1. Neumorphic Toggle
+// Visible 40x24 track inside a 44x44 keyboard/touch target on every screen.
 export const Toggle = ({ active, onClick, disabled, small = false, label }: { active: boolean; onClick: () => void; disabled?: boolean; small?: boolean; label?: string }) => (
     <button
         type="button"
@@ -9,29 +9,17 @@ export const Toggle = ({ active, onClick, disabled, small = false, label }: { ac
         aria-label={label}
         onClick={disabled ? undefined : onClick}
         disabled={disabled}
-        className={`cyclone-toggle shrink-0 ${small ? 'w-10 h-6' : 'w-14 h-8'} rounded-full relative transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7598a0] focus-visible:ring-offset-2 ${active ? 'bg-[#7598a0]' : 'bg-[#E8EAED]'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-        style={{
-            boxShadow: active
-                ? 'inset 2px 2px 4px rgba(0,0,0,0.1), 0 0 8px rgba(117, 152, 160, 0.3)'
-                : 'inset 3px 3px 6px rgba(163, 177, 198, 0.4), inset -3px -3px 6px rgba(255, 255, 255, 0.8)'
-        }}
+        className="cyclone-toggle"
     >
-        <div
-            className={`absolute ${small ? 'top-1 w-4 h-4' : 'top-1 w-6 h-6'} rounded-full transition-transform duration-300 ${active
-                ? `${small ? 'ltr:translate-x-5 rtl:-translate-x-5' : 'ltr:translate-x-7 rtl:-translate-x-7'} bg-white`
-                : 'ltr:translate-x-1 rtl:-translate-x-1 bg-[#F0F2F5]'
-                } ltr:left-0 rtl:right-0`}
-            style={{ boxShadow: small ? '1px 1px 3px rgba(163, 177, 198, 0.5), -1px -1px 2px rgba(255, 255, 255, 0.8)' : '2px 2px 4px rgba(163, 177, 198, 0.5), -1px -1px 3px rgba(255, 255, 255, 0.8)' }}
-        ></div>
+        <span className="cyclone-toggle-track" aria-hidden="true"><span className="cyclone-toggle-thumb" /></span>
     </button>
 );
 
-// 2. Neumorphic Card. The title is not shown; it names the group for screen readers.
+// The title names the group for screen readers.
 export const SettingCard = ({ children, title }: { children: React.ReactNode, title?: string }) => (
     <div className="space-y-3" role="group" aria-label={title}>
         <div
-            className="cyclone-setting-card bg-[#F0F2F5] rounded-[24px] overflow-hidden"
-            style={{ boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)' }}
+            className="cyclone-setting-card overflow-hidden"
         >
             {children}
         </div>
@@ -52,7 +40,7 @@ export const SettingRow = ({ label, desc, icon, children, last, mergeWithNext, o
                 {icon && (
                     <div
                         className="w-9 h-9 shrink-0 rounded-xl bg-[#F0F2F5] flex items-center justify-center text-slate-500"
-                        style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3), inset -2px -2px 4px rgba(255, 255, 255, 0.8)' }}
+                        style={{ boxShadow: 'none' }}
                     >
                         {icon}
                     </div>

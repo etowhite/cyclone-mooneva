@@ -77,7 +77,7 @@ const AverageFlowCurve: React.FC<AverageFlowCurveProps> = ({ logs, periods }) =>
         return (
             <div
                 className="bg-[#F0F2F5] rounded-[32px] p-6"
-                style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
+                style={{ boxShadow: 'none' }}
             >
                 <h3 className="text-sm font-extrabold tracking-[0.15em] text-slate-800 uppercase">{t('trends.flow_pattern')}</h3>
                 <p className="text-slate-400 text-sm text-center py-8">{t('trends.need_data_flow')}</p>
@@ -137,7 +137,7 @@ const AverageFlowCurve: React.FC<AverageFlowCurveProps> = ({ logs, periods }) =>
     return (
         <div
             className="bg-[#F0F2F5] rounded-[32px] p-6"
-            style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
+            style={{ boxShadow: 'none' }}
         >
             <div className="flex flex-col gap-1 mb-4">
                 <h3 className="text-sm font-extrabold tracking-[0.15em] text-slate-800 uppercase">{t('trends.flow_pattern')}</h3>

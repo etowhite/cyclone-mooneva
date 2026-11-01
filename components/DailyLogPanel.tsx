@@ -27,7 +27,7 @@ const SYMPTOM_SELECTED = {
     style: {
         borderColor: '#fb7185',
         color: '#fb7185',
-        boxShadow: 'inset 2px 2px 5px rgba(163, 177, 198, 0.4), inset -2px -2px 5px rgba(255, 255, 255, 0.8)',
+        boxShadow: 'none',
     } as React.CSSProperties,
 };
 // A selected custom mood: the mood-circle ring and glow, in the neutral custom-mood grey.
@@ -38,7 +38,7 @@ const CUSTOM_MOOD_SELECTED = {
         border: `2px solid ${CUSTOM_MOOD_COLORS.color}`,
         backgroundColor: `${CUSTOM_MOOD_COLORS.color}1A`,
         color: CUSTOM_MOOD_COLORS.dark,
-        boxShadow: `4px 4px 10px ${CUSTOM_MOOD_COLORS.shadow}, -3px -3px 8px rgba(255, 255, 255, 0.8)`,
+        boxShadow: 'none',
         '--daily-log-selection-color': CUSTOM_MOOD_COLORS.color,
         '--daily-log-selection-bg': `${CUSTOM_MOOD_COLORS.color}2E`,
         '--daily-log-selection-glow': CUSTOM_MOOD_COLORS.shadow,
@@ -284,7 +284,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                 aria-labelledby="preg-start-label"
                 aria-describedby="preg-start-desc"
                 className="w-full text-start flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-slate-200/50 cursor-pointer transition-all active:scale-[0.99]"
-                style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}
+                style={{ boxShadow: 'none' }}
                 onClick={() => handlePregnancyToggle()}
                 data-testid="pregnancy-start-toggle"
             >
@@ -316,7 +316,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                 aria-disabled={!canToggleEnd}
                 disabled={!canToggleEnd}
                 className={`w-full text-start flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-slate-200/50 transition-all ${canToggleEnd ? 'cursor-pointer active:scale-[0.99]' : 'cursor-not-allowed opacity-50'}`}
-                style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}
+                style={{ boxShadow: 'none' }}
                 onClick={() => { if (canToggleEnd) setPregnancyEnd(!endShown); }}
                 data-testid="pregnancy-end-toggle"
             >
@@ -370,7 +370,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                             <div
                                 aria-disabled="true"
                                 className="flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-slate-200/50 cursor-not-allowed opacity-50"
-                                style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.25)' }}
+                                style={{ boxShadow: 'none' }}
                             >
                                 <div className="flex-1">
                                     <label className="text-[11px] font-bold text-slate-600 select-none block">
@@ -393,7 +393,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                         <div
                             aria-disabled="true"
                             className="flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-slate-200/50 cursor-not-allowed opacity-50"
-                            style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.25)' }}
+                            style={{ boxShadow: 'none' }}
                         >
                             <div className="flex-1">
                                 <label className="text-[11px] font-bold text-slate-600 select-none block">
@@ -427,7 +427,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                             aria-labelledby="withdrawal-label"
                             aria-describedby="withdrawal-desc"
                             className="w-full text-start flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-slate-200/50 cursor-pointer transition-all active:scale-[0.99]"
-                            style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}
+                            style={{ boxShadow: 'none' }}
                             onClick={() => updatePeriodWithdrawalBleed(activePeriod.id, !activePeriod.isWithdrawalBleed)}
                         >
                             <div className="flex-1">
@@ -469,7 +469,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                         aria-labelledby="ignore-avg-label"
                         aria-describedby="ignore-avg-desc"
                         className="w-full text-start flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-slate-200/50 cursor-pointer transition-all active:scale-[0.99]"
-                        style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}
+                        style={{ boxShadow: 'none' }}
                         onClick={() => updatePeriodIgnoreForAverages(activePeriod.id, !activePeriod.ignoreForAverages)}
                     >
                         <div className="flex-1">
@@ -507,7 +507,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
         <>
             <div
                 className="daily-log-panel relative z-0 w-[95%] max-w-[95%] mx-auto bg-[#F0F2F5] rounded-b-[32px] px-4 py-4 animate-fade-in space-y-4"
-                style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
+                style={{ boxShadow: 'none' }}
             >
 
                 <div className="flex items-center gap-2 mb-4 mt-4">
@@ -516,7 +516,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                             className="daily-log-tabs flex-1 min-w-0 flex flex-nowrap gap-0 p-1.5 bg-[#F0F2F5] rounded-2xl overflow-x-auto no-scrollbar mt-[5px]"
                             role="tablist"
                             aria-label={t('log.daily_log_tabs', 'Daily log tabs')}
-                            style={{ boxShadow: 'inset 3px 3px 6px rgba(163, 177, 198, 0.4), inset -3px -3px 6px rgba(255, 255, 255, 0.8)' }}
+                            style={{ boxShadow: 'none' }}
                         >
                             {tabItems.map((tab) => (
                                 <button
@@ -528,7 +528,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                     ${activeTab === tab.id ? 'daily-log-tab-active text-slate-700' : 'daily-log-tab-inactive text-slate-400 hover:text-slate-600'}`}
                                     style={activeTab === tab.id ? {
                                         backgroundColor: '#F0F2F5',
-                                        boxShadow: '3px 3px 6px rgba(163, 177, 198, 0.4), -3px -3px 6px rgba(255, 255, 255, 0.8)'
+                                        boxShadow: 'none'
                                     } : {}}
                                 >
                                     {t(tab.labelKey)}
@@ -543,7 +543,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                             className="daily-log-close flex-shrink-0 p-2 text-slate-500 hover:text-slate-700 transition-colors rounded-xl mt-[5px]"
                             style={{
                                 backgroundColor: '#F0F2F5',
-                                boxShadow: '3px 3px 6px rgba(163, 177, 198, 0.4), -3px -3px 6px rgba(255, 255, 255, 0.8)'
+                                boxShadow: 'none'
                             }}
                         >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
@@ -683,7 +683,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                                             ? SYMPTOM_SELECTED.className
                                                             : 'bg-white border-transparent text-slate-500 hover:border-slate-200'}`}
                                                     style={isSelected ? SYMPTOM_SELECTED.style : {
-                                                        boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.8)'
+                                                        boxShadow: 'none'
                                                     }}
                                                 >
                                                     {t(`symptom.${sym.label.toLowerCase()}`, sym.label)}
@@ -739,9 +739,9 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                                                 ? 'bg-white border-[#2dd4bf] text-[#2dd4bf]'
                                                                 : 'bg-white border-transparent text-slate-400 hover:border-slate-200'}`}
                                                         style={isSelected ? {
-                                                            boxShadow: 'inset 2px 2px 5px rgba(163, 177, 198, 0.4), inset -2px -2px 5px rgba(255, 255, 255, 0.8)'
+                                                            boxShadow: 'none'
                                                         } : {
-                                                            boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.8)'
+                                                            boxShadow: 'none'
                                                         }}
                                                     >
                                                         {t(opt.label)}
@@ -767,7 +767,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                     </div>
 
                                     <div className="grid grid-cols-1 gap-4">
-                                        <div className="cyclone-choice-options flex flex-wrap gap-2" style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}>
+                                        <div className="cyclone-choice-options flex flex-wrap gap-2" style={{ boxShadow: 'none' }}>
                                             {[
                                                 { id: 'low', label: t('log.libido_low', 'Low') },
                                                 { id: 'medium', label: t('log.libido_medium', 'Medium') },
@@ -784,7 +784,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                                 </button>
                                             ))}
                                         </div>
-                                        <div className="cyclone-choice-options flex flex-wrap gap-2" style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}>
+                                        <div className="cyclone-choice-options flex flex-wrap gap-2" style={{ boxShadow: 'none' }}>
                                             {[
                                                 { id: 'protected', label: t('log.sex_protected', 'Protected') },
                                                 { id: 'unprotected', label: t('log.sex_unprotected', 'Unprotected') }
@@ -822,7 +822,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                 {(cycleVis.pillLog || pillTakenAt) && (<>
                                     <label
                                         className="daily-log-control-card flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-cyan-100/60 cursor-pointer transition-all active:scale-[0.99]"
-                                        style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}
+                                        style={{ boxShadow: 'none' }}
                                     >
                                         <div className="flex-1">
                                             <span className="text-[11px] font-bold text-slate-700 select-none block">
@@ -904,7 +904,7 @@ interface SelectionCircleProps {
 
 const SelectionCircle: React.FC<SelectionCircleProps> = ({ isSelected, onClick, colorConfig, className = '', toggle = false, children }) => {
     const selectedStyle = {
-            boxShadow: `8px 8px 16px ${colorConfig.shadow}, -4px -4px 12px rgba(255, 255, 255, 0.8)`,
+            boxShadow: 'none',
             border: `3px solid ${colorConfig.color}`,
             backgroundColor: `${colorConfig.color}1A`,
             color: colorConfig.dark,
@@ -913,7 +913,7 @@ const SelectionCircle: React.FC<SelectionCircleProps> = ({ isSelected, onClick, 
             '--daily-log-selection-glow': colorConfig.shadow,
         } as React.CSSProperties;
     const idleStyle = {
-            boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.4), -4px -4px 8px rgba(255, 255, 255, 0.8)',
+            boxShadow: 'none',
             color: '#94a3b8',
             border: '1px solid transparent'
         } as React.CSSProperties;

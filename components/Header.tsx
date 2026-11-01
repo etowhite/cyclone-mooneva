@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from './ui/Controls';
 import { useTranslation } from 'react-i18next';
 
 import { CycleStatusData } from '../services/logic/status';
@@ -36,14 +37,14 @@ const Header: React.FC<HeaderProps> = ({ isCloaked, cycleStatus, taskCount = 0, 
             </div>
             <div className="flex-1 min-w-0 flex justify-end items-center gap-2">
               {onBackupClick && (
-                <button
+                <Button
                   type="button"
                   onClick={onBackupClick}
                   disabled={backupState === 'running'}
                   className={`p-2 rounded-xl transition-colors ${backupTint}`}
                   style={{
-                    backgroundColor: '#F0F2F5',
-                    boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.4), -4px -4px 8px rgba(255, 255, 255, 0.8)'
+                    backgroundColor: 'var(--surface-alt)',
+                    boxShadow: 'none'
                   }}
                   aria-label={t('settings.auto_backup', 'Automatic backup')}
                   data-testid="header-backup"
@@ -60,22 +61,22 @@ const Header: React.FC<HeaderProps> = ({ isCloaked, cycleStatus, taskCount = 0, 
                     <path d="M21 12a9 9 0 1 1-3-6.7" />
                     <polyline points="21 3 21 9 15 9" />
                   </svg>
-                </button>
+                </Button>
               )}
-              <button
+              <Button
                 type="button"
                 onClick={onNotificationsClick}
                 className="p-2 text-slate-500 hover:text-slate-700 rounded-xl transition-colors"
                 style={{
-                  backgroundColor: '#F0F2F5',
-                  boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.4), -4px -4px 8px rgba(255, 255, 255, 0.8)'
+                  backgroundColor: 'var(--surface-alt)',
+                  boxShadow: 'none'
                 }}
                 aria-label={t('common.notifications', 'Notifications')}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
-              </button>
+              </Button>
             </div>
           </>
         ) : (

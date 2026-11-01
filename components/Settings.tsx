@@ -1,3 +1,4 @@
+import { Button, Field } from './ui/Controls';
 import CycloneAppearance from './settings/CycloneAppearance';
 import { Share } from '@capacitor/share';
 import { version } from '../package.json';
@@ -116,13 +117,14 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
         <div
           className="flex items-center gap-4 p-6 bg-[#F0F2F5] sticky top-0 z-10"
         >
-          <button
+          <Button
             onClick={() => onSubViewChange('main')}
+            aria-label={t('common.back')}
             className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors text-slate-500"
-            style={{ boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.4), -4px -4px 8px rgba(255, 255, 255, 0.8)' }}
+            style={{ boxShadow: 'none' }}
           >
             <span className="text-xl rtl:rotate-180">←</span>
-          </button>
+          </Button>
           <h2 className="text-lg font-extrabold text-slate-700 tracking-tight">{t('settings.cycle_mgmt_title')}</h2>
         </div>
 
@@ -200,9 +202,9 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                 <div className="px-4 pb-4 -mt-1">
                   <div
                     className="rounded-xl overflow-hidden"
-                    style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.25), inset -2px -2px 4px rgba(255, 255, 255, 0.7)' }}
+                    style={{ boxShadow: 'none' }}
                   >
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setFertilityDisclaimerExpanded(!fertilityDisclaimerExpanded)}
                       aria-expanded={fertilityDisclaimerExpanded}
@@ -218,7 +220,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                       >
                         <path d="m6 9 6 6 6-6" />
                       </svg>
-                    </button>
+                    </Button>
                     {fertilityDisclaimerExpanded && (
                       <div className="px-4 pb-4 -mt-1">
                         <p className="text-[12px] text-slate-600 leading-relaxed">
@@ -351,7 +353,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
             </SettingCard>
 
             <SettingCard title={t('settings.kid_mode_section')}>
-              <SettingRow label={t('settings.kid_mode_label')} onLabelClick={() => setKidInfoOpen(v => !v)} desc={<button type="button" className="text-start" aria-expanded={kidInfoOpen} aria-controls="kid-mode-info" onClick={() => setKidInfoOpen(v => !v)}>{t('settings.kid_mode_desc')} · {t('common.learn_more')}</button>} icon={<Icons.Eye />} last>
+              <SettingRow label={t('settings.kid_mode_label')} onLabelClick={() => setKidInfoOpen(v => !v)} desc={<Button type="button" className="text-start" aria-expanded={kidInfoOpen} aria-controls="kid-mode-info" onClick={() => setKidInfoOpen(v => !v)}>{t('settings.kid_mode_desc')} · {t('common.learn_more')}</Button>} icon={<Icons.Eye />} last>
                 <Toggle label={t('settings.kid_mode_label')} active={!!settings.kidMode} onClick={() => { setKidInfoOpen(true); onUpdate({ ...settings, kidMode: !settings.kidMode }); }} />
               </SettingRow>
             {kidInfoOpen && <div id="kid-mode-info" className="cyclone-setting-note"><p>{t('settings.kid_mode_details')}</p></div>}
@@ -364,13 +366,13 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
         {showBirthControlDialog && periodForDialog && createPortal(
           <>
             <div className="fixed inset-0 bg-black/40 z-[301]" onClick={() => { setShowBirthControlDialog(false); setPeriodForDialog(null); }} />
-            <div role="dialog" aria-modal="true" aria-labelledby="bc-dialog-title" className="cyclone-choice-dialog fixed left-4 right-4 top-1/2 -translate-y-1/2 z-[302] bg-[#F0F2F5] rounded-2xl p-5 max-w-sm mx-auto" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
+            <div role="dialog" aria-modal="true" aria-labelledby="bc-dialog-title" className="cyclone-choice-dialog fixed left-4 right-4 top-1/2 -translate-y-1/2 z-[302] bg-[#F0F2F5] rounded-2xl p-5 max-w-sm mx-auto" style={{ boxShadow: 'none' }}>
               <h3 id="bc-dialog-title" className="text-base font-bold text-slate-700 mb-1">{t('settings.birth_control_dialog_title', 'Current Period')}</h3>
               <p className="text-xs text-slate-500 mb-4">
                 {t('settings.birth_control_dialog_message', 'You have an active period. How should it be tagged?')}
               </p>
               <div className="flex flex-col gap-2">
-                <button
+                <Button
                   onClick={() => {
                     onUpdatePeriodWithdrawalBleed(periodForDialog.id, true);
                     onUpdate({ ...settings, isOnBirthControl: false });
@@ -380,8 +382,8 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   className="py-3 rounded-xl font-semibold text-[11px] uppercase tracking-wide text-white bg-indigo-500"
                 >
                   {t('settings.birth_control_keep_withdrawal', 'Keep as Withdrawal Bleed')}
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => {
                     onUpdatePeriodWithdrawalBleed(periodForDialog.id, false);
                     onUpdate({ ...settings, isOnBirthControl: false });
@@ -391,8 +393,8 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   className="py-3 rounded-xl font-semibold text-[11px] uppercase tracking-wide text-white bg-rose-400"
                 >
                   {t('settings.birth_control_tag_natural', 'Tag as Natural Period')}
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => {
                     setShowBirthControlDialog(false);
                     setPeriodForDialog(null);
@@ -400,7 +402,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   className="py-2 rounded-xl font-medium text-[11px] text-slate-500"
                 >
                   {t('common.cancel', 'Cancel')}
-                </button>
+                </Button>
               </div>
             </div>
           </>,
@@ -411,8 +413,8 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
         {showAdaptiveOffWarning && createPortal(
           <>
             <div className="fixed inset-0 bg-black/40 z-[301]" onClick={() => { setShowAdaptiveOffWarning(false); setPendingAction(null); }} />
-            <div role="dialog" aria-modal="true" aria-labelledby="adaptive-off-title" className="fixed left-4 right-4 top-1/2 -translate-y-1/2 z-[302] bg-[#F0F2F5] rounded-3xl p-6 max-w-sm mx-auto overflow-hidden" style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}>
-              <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-amber-500 mb-4" style={{ boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.8)' }}>
+            <div role="dialog" aria-modal="true" aria-labelledby="adaptive-off-title" className="fixed left-4 right-4 top-1/2 -translate-y-1/2 z-[302] bg-[#F0F2F5] rounded-3xl p-6 max-w-sm mx-auto overflow-hidden" style={{ boxShadow: 'none' }}>
+              <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-amber-500 mb-4" style={{ boxShadow: 'none' }}>
                 <Icons.Brain />
               </div>
               <h3 id="adaptive-off-title" className="text-lg font-extrabold text-slate-700 mb-2 leading-tight">{t('settings.adaptive_prediction_off_title')}</h3>
@@ -420,7 +422,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                 {t('settings.adaptive_prediction_off_desc')}
               </p>
               <div className="flex flex-col gap-3">
-                <button
+                <Button
                   onClick={() => {
                     if (pendingAction === 'bc') {
                       updateInterlockedSettings({ isOnBirthControl: true });
@@ -433,8 +435,8 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   className="w-full py-4 bg-[#7598a0] text-white rounded-2xl font-bold text-sm shadow-lg shadow-[#7598a0]/20 active:scale-[0.98] transition-all"
                 >
                   {t('common.ok')}
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => {
                     setShowAdaptiveOffWarning(false);
                     setPendingAction(null);
@@ -442,7 +444,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   className="w-full py-2 text-slate-400 font-bold text-xs uppercase tracking-widest active:opacity-60 transition-all"
                 >
                   {t('common.cancel')}
-                </button>
+                </Button>
               </div>
             </div>
           </>,
@@ -455,7 +457,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
   if (subView === 'appearance') {
     return <div className="cyclone-settings-page flex flex-col h-full bg-[#F0F2F5]">
       <header className="cyclone-subheader">
-        <button type="button" onClick={() => onSubViewChange('main')} aria-label={t('common.back')}>←</button>
+        <Button type="button" onClick={() => onSubViewChange('main')} aria-label={t('common.back')}>←</Button>
         <h1>{t('cyclone.appearance', 'Appearance')}</h1>
       </header>
       <div className="flex-1 overflow-y-auto px-4 pb-32 space-y-5">
@@ -499,13 +501,13 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                     ))}
                   </select>
                   {settings.firstDayOfWeek && (
-                    <button
+                    <Button
                       type="button"
                       onClick={() => onUpdate({ ...settings, firstDayOfWeek: undefined })}
                       className="text-[9px] font-bold uppercase tracking-wider text-[#7598a0] hover:text-[#5d7f87] transition-colors"
                     >
                       {t('settings.use_language_default')}
-                    </button>
+                    </Button>
                   )}
                 </div>
               </SettingRow>
@@ -573,11 +575,11 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
 
           {/* 2. Language */}
           {/* Clinical Export Button (standalone) */}
-          <button
+          <Button
             onClick={() => setShowPrivacyWarning(true)}
             className="w-full flex items-center justify-between p-5 bg-[#F0F2F5] rounded-2xl group active:scale-[0.98] transition-all"
             style={{
-              boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)'
+              boxShadow: 'none'
             }}
           >
             <div className="flex items-center gap-4">
@@ -592,7 +594,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
             <div className="w-8 h-8 rounded-full bg-slate-200/50 flex items-center justify-center text-slate-400 group-hover:text-[#7598a0] group-hover:bg-white transition-all rtl:rotate-180">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5l7 7-7 7" /></svg>
             </div>
-          </button>
+          </Button>
 
 
 
@@ -608,7 +610,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                 mergeWithNext={!hasPin(settings) && pinExpanded}
                 rightElement={
                   hasPin(settings) ? (
-                    <button
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         onUpdate({ ...settings, pin: undefined, pinHash: undefined, pinSalt: undefined });
@@ -616,7 +618,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                       className="text-xs font-semibold text-rose-500 hover:text-rose-600 px-3 py-1.5 bg-rose-50 rounded-lg"
                     >
                       {t('settings.remove_pin')}
-                    </button>
+                    </Button>
                   ) : (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -649,13 +651,13 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                         const labels: Record<number, string> = { 30: t('settings.lock_30s'), 120: t('settings.lock_2min'), 0: t('settings.lock_immediate') };
                         const active = (settings.lockTimeout ?? 120) === val;
                         return (
-                          <button
+                          <Button
                             key={val}
                             onClick={(e) => { e.stopPropagation(); onUpdate({ ...settings, lockTimeout: val }); }}
                             className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${active ? 'bg-[#7598a0] text-white' : 'bg-slate-100 text-slate-500'}`}
                           >
                             {labels[val]}
-                          </button>
+                          </Button>
                         );
                       })}
                     </div>
@@ -666,7 +668,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
               {/* Expandable PIN setup form */}
               {!hasPin(settings) && pinExpanded && (
                 <div className="pin-setup-panel px-5 pb-5 space-y-3">
-                  <input
+                  <Field
                     type="password"
                     inputMode="numeric"
                     pattern="[0-9]*"
@@ -677,7 +679,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                     className="pin-setup-input w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm focus:border-[#7598a0] focus:ring-1 focus:ring-[#7598a0] outline-none transition-all placeholder:text-slate-400"
                     autoComplete="off"
                   />
-                  <input
+                  <Field
                     type="password"
                     inputMode="numeric"
                     pattern="[0-9]*"
@@ -691,7 +693,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   {pinMismatch && (
                     <p className="pin-setup-error text-xs text-rose-600 text-center">{t('settings.pins_dont_match')}</p>
                   )}
-                  <button
+                  <Button
                     onClick={async () => {
                       if (!pinEntryReady) {
                         alert(t('settings.pin_error'));
@@ -713,13 +715,14 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                         alert(t('settings.pin_error'));
                       }
                     }}
+                    disabled={!pinEntryReady || pinInput !== pinConfirm}
                     className={`pin-setup-button w-full py-3 rounded-xl font-bold text-sm transition-all transform active:scale-[0.98] ${pinEntryReady && pinInput === pinConfirm
                       ? 'bg-[#7598a0] text-white shadow-md shadow-[#7598a0]/20'
                       : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                       }`}
                   >
                     {t('settings.enable_pin')}
-                  </button>
+                  </Button>
                   <p className="pin-setup-helper text-[10px] text-center text-slate-400 px-4">
                     {t('settings.pin_security_desc')}
                   </p>
@@ -772,11 +775,11 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
           <section>
             <div
               className="bg-[#F0F2F5] rounded-2xl p-5 text-center"
-              style={{ boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)' }}
+              style={{ boxShadow: 'none' }}
             >
               <div
                 className="w-10 h-10 rounded-full bg-[#F0F2F5] flex items-center justify-center text-amber-400 mx-auto mb-3"
-                style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3), inset -2px -2px 4px rgba(255, 255, 255, 0.8)' }}
+                style={{ boxShadow: 'none' }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
                   <path fillRule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z" clipRule="evenodd" />
@@ -788,7 +791,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                 {t('cyclone.repo_body', 'Source, development tasks and progress of this fork.')}
               </p>
 
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   // '_system' hands the URL to the OS browser, the same route the store link
@@ -801,7 +804,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
                 </svg>
                 {t('settings.star_repo_button', 'Open GitHub')}
-              </button>
+              </Button>
             </div>
           </section>
 
@@ -824,18 +827,18 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
               {t('settings.medical_privacy_desc')}
             </p>
             <div className="space-y-3">
-              <button
+              <Button
                 onClick={() => { setShowPrivacyWarning(false); setViewReport(true); }}
                 className="w-full py-3 bg-[#7598a0] text-white rounded-xl font-bold text-sm shadow-lg shadow-[#7598a0]/20 hover:bg-[#66868d] transition-all"
               >
                 {t('settings.generate_private_report')}
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setShowPrivacyWarning(false)}
                 className="w-full py-3 text-slate-500 font-bold text-sm hover:bg-slate-50 rounded-xl transition-all"
               >
                 {t('common.cancel')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -873,7 +876,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   <span className="font-mono text-sm font-black tracking-wider text-slate-800 select-all pl-1">
                     MOONEVAAPP25
                   </span>
-                  <button
+                  <Button
                     type="button"
                     onClick={handleCopyCoupon}
                     className="px-3 py-1.5 rounded-xl bg-white border border-slate-200/80 shadow-xs text-xs font-bold text-slate-700 hover:text-emerald-600 transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
@@ -889,7 +892,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                         <span>{t('common.copy', 'Copy')}</span>
                       </>
                     )}
-                  </button>
+                  </Button>
                 </div>
                 <div className="flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-500 pt-0.5">
                   <span className="text-sm">🇪🇺</span>
@@ -920,13 +923,13 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, subView, onSubV
                   </svg>
                 </a>
 
-                <button
+                <Button
                   type="button"
                   onClick={() => setShowGiftModal(false)}
                   className="w-full py-2 text-slate-400 font-bold text-xs tracking-wide hover:text-slate-600 transition-colors cursor-pointer"
                 >
                   {t('common.close', 'Close')}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
