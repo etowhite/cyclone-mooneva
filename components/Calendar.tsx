@@ -8,7 +8,7 @@ import { getCycleVisibility } from '../services/logic/settingsInterlocks';
 import { DayCell } from './calendar/DayCell';
 import { SexMarkerIcon } from './calendar/SexMarkerIcon';
 import { CycleInsightModal } from './calendar/CycleInsightModal';
-import { CycleInsightMoon } from './calendar/CycleInsightMoon';
+import { CycloneMark } from './ui/CycloneMark';
 import { useSwipe } from '../hooks/useSwipe';
 import { useCalendarSystem } from '../hooks/useCalendarSystem';
 import { pushBackInterceptor } from '../hooks/useAppNavigation';
@@ -271,7 +271,7 @@ const Calendar: React.FC<CalendarProps> = ({
                         aria-label={t('cycle_insight.title')}
                         title={t('cycle_insight.title')}
                       >
-                        <CycleInsightMoon className="cycle-insight-moon-spin h-4 w-4" />
+                        <CycloneMark className="cycle-insight-moon-spin h-4 w-4" />
                       </button>
                     </span>
                   </div>

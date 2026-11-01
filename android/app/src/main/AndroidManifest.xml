@@ -2,14 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
         android:allowBackup="false"
-        android:icon="@drawable/cyclone_rose_light"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/cyclone_rose_light"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
             android:name=".MainActivity"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBarLaunch"
             android:launchMode="singleTask"
@@ -23,8 +24,8 @@
             android:targetActivity=".LauncherEntryActivity"
             android:enabled="true"
             android:exported="true"
-            android:icon="@drawable/cyclone_rose_light"
-            android:roundIcon="@drawable/cyclone_rose_light"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,16 +48,16 @@
             </intent-filter>
         </activity-alias>
 
-<activity-alias android:name=".LauncherroseLight" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@drawable/cyclone_rose_light" android:roundIcon="@drawable/cyclone_rose_light" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
-<activity-alias android:name=".LauncherroseDark" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@drawable/cyclone_rose_dark" android:roundIcon="@drawable/cyclone_rose_dark" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
-<activity-alias android:name=".LauncherlavenderLight" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@drawable/cyclone_lavender_light" android:roundIcon="@drawable/cyclone_lavender_light" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
-<activity-alias android:name=".LauncherlavenderDark" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@drawable/cyclone_lavender_dark" android:roundIcon="@drawable/cyclone_lavender_dark" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
-<activity-alias android:name=".LaunchersageLight" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@drawable/cyclone_sage_light" android:roundIcon="@drawable/cyclone_sage_light" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
-<activity-alias android:name=".LaunchersageDark" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@drawable/cyclone_sage_dark" android:roundIcon="@drawable/cyclone_sage_dark" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
-<activity-alias android:name=".LauncheroceanLight" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@drawable/cyclone_ocean_light" android:roundIcon="@drawable/cyclone_ocean_light" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
-<activity-alias android:name=".LauncheroceanDark" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@drawable/cyclone_ocean_dark" android:roundIcon="@drawable/cyclone_ocean_dark" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
-<activity-alias android:name=".LauncheramberLight" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@drawable/cyclone_amber_light" android:roundIcon="@drawable/cyclone_amber_light" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
-<activity-alias android:name=".LauncheramberDark" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@drawable/cyclone_amber_dark" android:roundIcon="@drawable/cyclone_amber_dark" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
+<activity-alias android:name=".LauncherroseLight" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
+<activity-alias android:name=".LauncherroseDark" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
+<activity-alias android:name=".LauncherlavenderLight" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
+<activity-alias android:name=".LauncherlavenderDark" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
+<activity-alias android:name=".LaunchersageLight" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
+<activity-alias android:name=".LaunchersageDark" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
+<activity-alias android:name=".LauncheroceanLight" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
+<activity-alias android:name=".LauncheroceanDark" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
+<activity-alias android:name=".LauncheramberLight" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
+<activity-alias android:name=".LauncheramberDark" android:targetActivity=".LauncherEntryActivity" android:enabled="false" android:exported="true" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity-alias>
 <receiver android:name=".LauncherThemeReceiver" android:exported="false"><intent-filter><action android:name="android.intent.action.BOOT_COMPLETED"/></intent-filter></receiver>
         <provider
             android:name="androidx.core.content.FileProvider"

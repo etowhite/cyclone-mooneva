@@ -58,9 +58,8 @@ export const useAppTheme = ({ view, discreteMode }: UseAppThemeOptions) => {
 
             document.title = 'cyclone';
 
-            const iconUrl = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="18" fill="#eee0f5"/><path d="M44 19a18 18 0 1 0 4 24M43 27a10 10 0 1 0 0 14" fill="none" stroke="#76578c" stroke-width="6" stroke-linecap="round"/></svg>');
-            if (favicon) favicon.href = iconUrl;
-            if (appleIcon) appleIcon.href = iconUrl;
+            if (favicon) favicon.href = '/icon.svg';
+            if (appleIcon) appleIcon.href = '/apple-touch-icon.png';
         }
     }, [view, discreteMode, darkNeumorphism, t, appearance.palette]);
 };
